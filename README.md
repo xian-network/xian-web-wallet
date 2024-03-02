@@ -19,7 +19,7 @@ Xian Connect is a lightweight, serverless web application designed to securely c
 As Xian Connect is a serverless application, no traditional installation is necessary. It needs to be hosted using a webserver.
 
 ```
-git clone https://github.com/yourusername/xian-connect.git
+git clone https://github.com/crosschainer/xian-connect.git
 cd xian-connect
 open index.html
 ```
