@@ -1,3 +1,3 @@
 function loadWalletPage(){
-    document.getElementById("walletAddress").innerHTML = localStorage.getItem('publicKey');
+    document.getElementById("walletAddress").innerHTML = readSecureCookie("publicKey");
 }

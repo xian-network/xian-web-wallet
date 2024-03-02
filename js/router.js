@@ -45,10 +45,10 @@ function changePage(page) {
 }
 
 document.addEventListener('DOMContentLoaded', (event) => {
-    if (localStorage.getItem('publicKey') && localStorage.getItem('encryptedPrivateKey') && unencryptedPrivateKey != null) {
+    if (readSecureCookie('publicKey') && readSecureCookie('encryptedPrivateKey') && unencryptedPrivateKey != null) {
         changePage('wallet');
     } 
-    else if (localStorage.getItem('publicKey') && localStorage.getItem('encryptedPrivateKey') && unencryptedPrivateKey == null) {
+    else if (readSecureCookie('publicKey') && readSecureCookie('encryptedPrivateKey') && unencryptedPrivateKey == null) {
         changePage('password-input');
     }
     else {

@@ -22,9 +22,9 @@ function createWallet() {
     let encryptedPrivateKey = keyPair.encryptedPrivateKey;
     let _unencryptedPrivateKey = keyPair.unencryptedPrivateKey;
     
-    // Save the public key and the encrypted private key to the local storage
-    localStorage.setItem('publicKey', publicKey);
-    localStorage.setItem('encryptedPrivateKey', encryptedPrivateKey);
+    // Save the public key and the encrypted private key
+    createSecureCookie('publicKey', publicKey, 9999);
+    createSecureCookie('encryptedPrivateKey', encryptedPrivateKey, 9999);
 
     // Save the unencrypted private key to the global variable
     unencryptedPrivateKey = _unencryptedPrivateKey;
@@ -65,9 +65,9 @@ function importWallet() {
     let encryptedPrivateKey = keyPair.encryptedPrivateKey;
     let _unencryptedPrivateKey = keyPair.unencryptedPrivateKey;
     
-    // Save the public key and the encrypted private key to the local storage
-    localStorage.setItem('publicKey', publicKey);
-    localStorage.setItem('encryptedPrivateKey', encryptedPrivateKey);
+    // Save the public key and the encrypted private key
+    createSecureCookie('publicKey', publicKey, 9999);
+    createSecureCookie('encryptedPrivateKey', encryptedPrivateKey, 9999);
     
     // Save the unencrypted private key to the global variable
     unencryptedPrivateKey = _unencryptedPrivateKey;
@@ -98,17 +98,17 @@ function removeWallet(){
     if (!confirm_delete) {
         return;
     }
-    // Removes the wallet from the local storage
-    localStorage.removeItem('publicKey');
-    localStorage.removeItem('encryptedPrivateKey');
+    // Removes the wallet
+    eraseSecureCookie('publicKey');
+    eraseSecureCookie('encryptedPrivateKey');
     unencryptedPrivateKey = null;
     changePage('get-started');
 }
 
 function unlockWallet() {
     let password = document.getElementById('unlock_password').value;
-    let encryptedPrivateKey = localStorage.getItem('encryptedPrivateKey');
-    let publicKey = localStorage.getItem('publicKey');
+    let encryptedPrivateKey = readSecureCookie('encryptedPrivateKey');
+    let publicKey = readSecureCookie('publicKey');
     let _unencryptedPrivateKey = decryptPrivateKey(encryptedPrivateKey, password, publicKey);
     if (_unencryptedPrivateKey == null) {
         document.getElementById('passwordError').style.display = 'block';
