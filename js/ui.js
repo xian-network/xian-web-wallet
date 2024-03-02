@@ -112,3 +112,8 @@ function unlockWallet() {
     unencryptedPrivateKey = _unencryptedPrivateKey;
     changePage('wallet');
 }
+
+function lockWallet() {
+    unencryptedPrivateKey = null;
+    changePage('password-input');
+}
