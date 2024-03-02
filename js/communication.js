@@ -1,5 +1,5 @@
 if (!!window.SharedWorker) {
-    const worker = new SharedWorker('sharedWorkerXian.js');
+    const worker = new SharedWorker('js/sharedWorkerXian.js');
 
     worker.port.start();
 
