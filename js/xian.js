@@ -27,7 +27,7 @@ function decryptPrivateKey(encryptedPrivateKey, password, publicKey) {
     let decrypted = nacl.secretbox.open(message, nonce, key);
     
     if (decrypted) {
-        
+        decrypted = fromHexString(toHexString(decrypted).slice(0, 64)); // Ensure the private key is the correct size
         let keyPair = nacl.sign.keyPair.fromSeed(decrypted)
         if (toHexString(keyPair.publicKey) === publicKey) {
             return decrypted; // Correct password and private key size
