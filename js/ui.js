@@ -108,7 +108,15 @@ function removeWallet(){
 function unlockWallet() {
     let password = document.getElementById('unlock_password').value;
     let encryptedPrivateKey = localStorage.getItem('encryptedPrivateKey');
-    let _unencryptedPrivateKey = decryptPrivateKey(encryptedPrivateKey, password);
+    let publicKey = localStorage.getItem('publicKey');
+    let _unencryptedPrivateKey = decryptPrivateKey(encryptedPrivateKey, password, publicKey);
+    if (_unencryptedPrivateKey == null) {
+        document.getElementById('passwordError').style.display = 'block';
+        document.getElementById('passwordError').innerHTML = 'Incorrect password!';
+        return;
+    }
+    document.getElementById('passwordError').style.display = 'none';
+
     unencryptedPrivateKey = _unencryptedPrivateKey;
     changePage('wallet');
 }

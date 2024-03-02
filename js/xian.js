@@ -19,14 +19,21 @@ function encryptPrivateKey(privateKey, password) {
     return toHexString(nonce) + toHexString(encryptedPrivateKey);
 }
 
-function decryptPrivateKey(encryptedPrivateKey, password) {
-    // Convert password to a hash and ensure it's the correct size for a key
+function decryptPrivateKey(encryptedPrivateKey, password, publicKey) {
     let hash = nacl.hash(fromHexString(password));
-    let key = hash.slice(0, 32); // Adjust to 32 bytes for the key
+    let key = hash.slice(0, 32); // Key for secretbox must be 32 bytes
     let nonce = fromHexString(encryptedPrivateKey.slice(0, 48));
     let message = fromHexString(encryptedPrivateKey.slice(48));
-    let decryptedPrivateKey = nacl.secretbox.open(message, nonce, key);
-    return decryptedPrivateKey;
+    let decrypted = nacl.secretbox.open(message, nonce, key);
+    
+    if (decrypted) {
+        
+        let keyPair = nacl.sign.keyPair.fromSeed(decrypted)
+        if (toHexString(keyPair.publicKey) === publicKey) {
+            return decrypted; // Correct password and private key size
+        }
+    }
+    return null; // Incorrect password or private key size
 }
 
 function createKeyPair(password) {
