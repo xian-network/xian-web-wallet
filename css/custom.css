@@ -1,0 +1,89 @@
+body, html{
+    height: 100%;
+    margin: 0;
+    background-color: #f4f4f4;
+    font-family: Roboto, sans-serif;
+}
+
+/* Positioning the dark mode toggler */
+.dark-mode-toggler {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 1050; /* Ensures the toggler stays above most elements */
+}
+
+/* Dark mode specific styles */
+.dark-mode {
+    background-color: #121212; /* Dark background */
+    color: #e4e6eb; /* Bright text */
+}
+
+.dark-mode .app-box {
+    background-color: #1e1e1e; /* Darker background */
+    box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1); /* Lighter shadow */
+}
+
+
+.app-container {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.app-logo {
+    width: 100px; /* Adjust based on your logo's size */
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.app-box {
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.app-box-title {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.app-box .btn-group {
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-box button {
+    width: 100%; /* Full-width buttons */
+}
+
+.app-name, .app-description {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.bottom-0 {
+    bottom: 0;
+}
+
+.end-0 {
+    right: 0;
+}
+
+#walletAddress {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    color: #007bff;
+    display: block;
+}

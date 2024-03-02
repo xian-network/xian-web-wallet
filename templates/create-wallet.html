@@ -1,0 +1,14 @@
+<h1 class="app-box-title">Create a Wallet</h1>
+<p class="app-box-description">To create a wallet, please enter a password. This password will be used to encrypt your private key. Make sure to remember it, as it <b>cannot be recovered</b>.</p>
+<div class="app-box-form">
+    <div class="alert alert-danger" role="alert" id="createWalletError" style="display: none;"></div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" id="password" placeholder="Enter a password" required>
+    </div>
+    <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password" required>
+    </div>
+    <button class="btn btn-primary" onclick="createWallet()">Create Wallet</button>
+</div>
