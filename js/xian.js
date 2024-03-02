@@ -58,6 +58,17 @@ function createKeyPairFromSK(privateKey, password) {
     };
 }
 
+function getNonce() {
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", RPC + '/abci_query?path="/get_next_nonce/'+readSecureCookie('publicKey')+'"', false);
+    xhr.send();
+    let response = JSON.parse(xhr.responseText);
+    if (response.result.response.value === "AA==") {
+        return 0;
+    }
+    return parseInt(atob(response.result.response.value), 10);
+}
+
 function signTransaction(transaction, privateKey) {
     let signed_tx = nacl.sign(transaction, privateKey);
     return signed_tx;
