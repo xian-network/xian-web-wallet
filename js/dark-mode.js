@@ -12,10 +12,19 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     }
 
-    // By default, enable dark mode
-    body.classList.add('dark-mode');
-    localStorage.setItem('darkMode', 'true');
-    updateTogglerUI();
+    if (localStorage.getItem('darkMode') === null) {
+        localStorage.setItem('darkMode', 'true');
+     }
+
+    if (localStorage.getItem('darkMode') === 'true') {
+        body.classList.add('dark-mode');
+        updateTogglerUI();
+    }
+
+    if (localStorage.getItem('darkMode') === 'false') {
+        body.classList.remove('dark-mode');
+        updateTogglerUI();
+    }
 
     toggler.addEventListener('click', () => {
         body.classList.toggle('dark-mode');
