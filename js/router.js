@@ -50,6 +50,7 @@ function changePage(page) {
             fetch("templates/receive-token.html")
                 .then(response => response.text())
                 .then(data => app_box.innerHTML = data);
+            document.getElementById('yourAddressReceive').innerHTML = readSecureCookie("publicKey");
             break;
         default:
             break;
