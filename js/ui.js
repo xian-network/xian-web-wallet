@@ -181,8 +181,6 @@ function sendToken(contract) {
             recipient: recipient,
             amount: amount
         },
-        nonce: getNonce(),
-        sender: readSecureCookie('publicKey'),
         stamps_supplied: 100
     };
 
@@ -190,7 +188,10 @@ function sendToken(contract) {
 
     let response = broadcastTransaction(signed_tx);
 
-    response = atob(response['result']['deliver_tx']['data']);
-    console.log(response);
+    hash = JSON.parse(response)['result']['deliver_tx']['hash'];
+    response = atob(JSON.parse(response)['result']['deliver_tx']['data']);
+    
+    successMsg.innerHTML = 'Transaction sent successfully! Hash: ' + "<a href='https://explorer.xian.org/tx/"+hash+"' target='_blank'>"+hash+"</a>";
+    successMsg.style.display = 'block';
 
 }
