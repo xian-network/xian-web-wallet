@@ -173,6 +173,18 @@ function sendToken(contract) {
         return;
     }
 
+    if (amount > parseFloat(getVariable(contract, "balances", readSecureCookie('publicKey')))) {
+        errorMsg.innerHTML = 'Insufficient balance!';
+        errorMsg.style.display = 'block';
+        return;
+    }
+
+    if (recipient.substring(0, 2) === '0x') {
+        errorMsg.innerHTML = 'Incompatible recipient address!';
+        errorMsg.style.display = 'block';
+        return;
+    }
+
     let transaction = {
         chain_id: CHAIN_ID,
         contract: contract,
