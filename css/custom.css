@@ -135,3 +135,18 @@ body, html{
 .token-name span, .token-symbol span, .token-balance span {
     font-weight: bold;
 }
+
+.token-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.token-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.token-actions button {
+    background-color: #f4f4f4;
+}
