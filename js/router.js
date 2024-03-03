@@ -49,8 +49,10 @@ function changePage(page) {
             // load html template from templates/receive-token.html
             fetch("templates/receive-token.html")
                 .then(response => response.text())
-                .then(data => app_box.innerHTML = data);
-            document.getElementById('yourAddressReceive').innerHTML = readSecureCookie("publicKey");
+                .then(data => {
+                    app_box.innerHTML = data;
+                    loadReceiveTokenPage();
+                });
             break;
         default:
             break;
