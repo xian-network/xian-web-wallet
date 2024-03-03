@@ -16,7 +16,10 @@ function changePage(page) {
             // load html template from templates/create-wallet.html
             fetch("templates/create-wallet.html")
                 .then(response => response.text())
-                .then(data => app_box.innerHTML = data);
+                .then(data => {
+                    app_box.innerHTML = data;
+                    inputValidation();
+                });
             break;
         case "import-wallet":
             // load html template from templates/import-wallet.html
@@ -56,6 +59,35 @@ function changePage(page) {
             break;
         default:
             break;
+    }
+}
+
+function inputValidation() {
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
+    const createWalletError = document.getElementById('createWalletError');
+
+    password.addEventListener("input", checkPasswordLength);
+    confirmPassword.addEventListener("input", matchPasswords);
+
+    function checkPasswordLength(event){
+        const passwordValue = event.target.value;
+        if (passwordValue.length > 0 && passwordValue.length < 6) {
+            createWalletError.innerHTML = 'Password must be at least 6 characters long!';
+            createWalletError.style.display = 'block';
+        } else {
+            createWalletError.style.display = 'none';
+        }
+    }
+
+    function matchPasswords(event){
+        const confirmPasswordValue = event.target.value;
+        if (password.value !== confirmPasswordValue || confirmPasswordValue === '') {
+            createWalletError.innerHTML = 'Passwords do not match!';
+            createWalletError.style.display = 'block';
+        }else {
+            createWalletError.style.display = 'none';
+        }
     }
 }
 
