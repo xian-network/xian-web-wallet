@@ -142,3 +142,17 @@ function sendTokenScreen() {
 function receiveTokenScreen() {
     changePage('receive-token');
 }
+
+function refreshBalance() {
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", RPC + '/abci_query?path="/get/currency.balances:'+readSecureCookie('publicKey')+'"', false);
+    xhr.send();
+    let response = JSON.parse(xhr.responseText);
+    let balance = atob(response.result.response.value);
+    if (balance === "AA==") {
+        balance = "0";
+    }
+    balance = parseFloat(balance);
+    balance = balance.toFixed(8);
+    document.getElementById('tokenBalance').innerHTML = balance;
+}
