@@ -98,3 +98,34 @@ body, html{
     border-top-left-radius: .25rem!important;
     border-bottom-left-radius: .25rem!important;
 }
+
+.token-list {
+    margin-top: 20px;
+    border-top: 2px solid #dee2e6;
+    border-bottom: 2px solid #dee2e6;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.token-item:last-child {
+    margin-bottom: 0;
+}
+
+.token-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+}
+
+
+.token-item div {
+    margin: 5px 0;
+}
+
+.token-name span, .token-symbol span, .token-balance span {
+    font-weight: bold;
+}

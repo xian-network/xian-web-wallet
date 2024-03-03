@@ -1,7 +1,17 @@
 <h1 class="app-box-title">Overview</h1>
 <p class="app-box-description">This is your Xian wallet. You can use it to send and receive Xian.</p>
 <div class="app-box-form">
-    <span class="app-box-form-title"><b>Wallet Address:</b> <span id="walletAddress" onclick="copyToClipboard('walletAddress')"></span></span>
-    <button class="btn btn-primary mt-2" onclick="lockWallet()">Lock Wallet</button>
-    <button class="btn btn-secondary mt-2" onclick="removeWallet()">Remove Wallet</button>
+    <div id="wallet-info">
+        <span class="app-box-form-title"><b>Wallet Address:</b> <span id="walletAddress" onclick="copyToClipboard('walletAddress')"></span></span>
+    </div>
+    <div id="wallet-tokens" class="token-list">
+        <div class="token-item">
+            <div class="token-name">Token Name: <span>Xian</span> (<span class="token-symbol">Xian</span>)</div>
+            <div class="token-balance">Balance: <span>100 Xian</span></div>
+        </div>
+    </div>
+    <div id="wallet-actions">
+        <button class="btn btn-primary mt-2" onclick="lockWallet()">Lock Wallet</button>
+        <button class="btn btn-secondary mt-2" onclick="removeWallet()">Remove Wallet</button>
+    </div>
 </div>
