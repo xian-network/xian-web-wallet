@@ -91,6 +91,7 @@ function copyToClipboard(elementId) {
         selection.addRange(range);
     }
     document.execCommand('copy');
+    alert('Copied to clipboard');
 }
 
 function removeWallet(){
