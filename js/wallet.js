@@ -1,6 +1,6 @@
 function loadWalletPage(){
     document.getElementById("walletAddress").innerHTML = readSecureCookie("publicKey");
-    refreshBalance();
+    refreshBalance("currency");
 }
 
 function loadReceiveTokenPage(){

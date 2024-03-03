@@ -143,9 +143,9 @@ function receiveTokenScreen() {
     changePage('receive-token');
 }
 
-function refreshBalance() {
+function refreshBalance(contract) {
     let xhr = new XMLHttpRequest();
-    xhr.open("POST", RPC + '/abci_query?path="/get/currency.balances:'+readSecureCookie('publicKey')+'"', false);
+    xhr.open("POST", RPC + '/abci_query?path="/get/'+contract+'.balances:'+readSecureCookie('publicKey')+'"', false);
     xhr.send();
     let response = JSON.parse(xhr.responseText);
     let balance = atob(response.result.response.value);
@@ -154,5 +154,5 @@ function refreshBalance() {
     }
     balance = parseFloat(balance);
     balance = balance.toFixed(8);
-    document.getElementById('tokenBalance').innerHTML = balance;
+    document.getElementById(contract+'Balance').innerHTML = balance;
 }
