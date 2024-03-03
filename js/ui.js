@@ -167,6 +167,16 @@ function sendToken(contract) {
         return;
     }
 
+    // Check if there is a comma in the amount
+    if (amount.includes(',')) {
+        errorMsg.innerHTML = 'Commas are not allowed! Decimals should be separated by a dot.';
+        errorMsg.style.display = 'block';
+        return;
+    }
+
+    // Turn the amount into a float 
+    amount = parseFloat(amount);
+
     if (amount <= 0) {
         errorMsg.innerHTML = 'Invalid amount!';
         errorMsg.style.display = 'block';
