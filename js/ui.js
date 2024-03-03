@@ -144,15 +144,53 @@ function receiveTokenScreen() {
 }
 
 function refreshBalance(contract) {
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", RPC + '/abci_query?path="/get/'+contract+'.balances:'+readSecureCookie('publicKey')+'"', false);
-    xhr.send();
-    let response = JSON.parse(xhr.responseText);
-    let balance = atob(response.result.response.value);
-    if (balance === "AA==") {
+    let balance = getVariable(contract, "balances", readSecureCookie('publicKey'));
+    if (balance === null) {
         balance = "0";
     }
     balance = parseFloat(balance);
     balance = balance.toFixed(8);
     document.getElementById(contract+'Balance').innerHTML = balance;
+}
+
+function sendToken(contract) {
+    let recipient = document.getElementById('toAddress').value;
+    let amount = document.getElementById('tokenAmount').value;
+    let successMsg = document.getElementById('sendTokenSuccess');
+    let errorMsg = document.getElementById('sendTokenError');
+    successMsg.style.display = 'none';
+    errorMsg.style.display = 'none';
+
+    if (recipient.length !== 64) {
+        errorMsg.innerHTML = 'Invalid recipient address!';
+        errorMsg.style.display = 'block';
+        return;
+    }
+
+    if (amount <= 0) {
+        errorMsg.innerHTML = 'Invalid amount!';
+        errorMsg.style.display = 'block';
+        return;
+    }
+
+    let transaction = {
+        chain_id: CHAIN_ID,
+        contract: contract,
+        function: "transfer",
+        kwargs: {
+            recipient: recipient,
+            amount: amount
+        },
+        nonce: getNonce(),
+        sender: readSecureCookie('publicKey'),
+        stamps_supplied: 100
+    };
+
+    let signed_tx = signTransaction(transaction, unencryptedPrivateKey);
+
+    let response = broadcastTransaction(signed_tx);
+
+    response = atob(response['result']['deliver_tx']['data']);
+    console.log(response);
+
 }

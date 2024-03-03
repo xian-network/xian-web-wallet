@@ -1,4 +1,5 @@
 var RPC = "https://testnet.xian.org";
+var CHAIN_ID = "xian-testnet-2";
 
 function toHexString(byteArray) {
     return Array.from(byteArray, function(byte) {
@@ -88,4 +89,16 @@ function broadcastTransaction(signedTransaction) {
         } 
     }
     xhr.send();
+}
+
+function getVariable(contract, variable, key){
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", RPC + '/abci_query?path="/get/'+contract+'.'+variable+':'+key+'"', false);
+    xhr.send();
+    let response = JSON.parse(xhr.responseText);
+    if (response.result.response.value === "AA==") {
+        return null;
+    }
+    let decoded = atob(response.result.response.value);
+    return decoded;
 }
