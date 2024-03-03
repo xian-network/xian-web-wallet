@@ -177,3 +177,7 @@ body {
 .dark-mode .github-link a {
     color: #e4e6eb; /* Light color for dark mode */
 }
+
+.app-box-description {
+    margin-bottom: 10px!important;
+}
