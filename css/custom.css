@@ -121,6 +121,12 @@ body, html{
     border-radius: 5px;
 }
 
+.token-list-title {
+    font-size: 1.25rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
 
 .token-item div {
     margin: 5px 0;
