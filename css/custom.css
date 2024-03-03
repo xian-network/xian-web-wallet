@@ -3,6 +3,7 @@ body, html{
     margin: 0;
     background-color: #f4f4f4;
     font-family: Roboto, sans-serif;
+    color: #121212;
 }
 
 /* Positioning the dark mode toggler */
