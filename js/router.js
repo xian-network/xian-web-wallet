@@ -39,6 +39,18 @@ function changePage(page) {
                 .then(response => response.text())
                 .then(data => app_box.innerHTML = data);
             break;
+        case "send-token":
+            // load html template from templates/send-token.html
+            fetch("templates/send-token.html")
+                .then(response => response.text())
+                .then(data => app_box.innerHTML = data);
+            break;
+        case "receive-token":
+            // load html template from templates/receive-token.html
+            fetch("templates/receive-token.html")
+                .then(response => response.text())
+                .then(data => app_box.innerHTML = data);
+            break;
         default:
             break;
     }

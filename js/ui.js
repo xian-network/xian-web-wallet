@@ -126,3 +126,19 @@ function lockWallet() {
     unencryptedPrivateKey = null;
     changePage('password-input');
 }
+
+function goToWallet() {
+    if (readSecureCookie('publicKey') === null || readSecureCookie('encryptedPrivateKey') === null) {
+        changePage('get-started');
+    } else {
+        changePage('wallet');
+    }
+}
+
+function sendTokenScreen() {
+    changePage('send-token');
+}
+
+function receiveTokenScreen() {
+    changePage('receive-token');
+}
