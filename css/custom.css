@@ -155,3 +155,25 @@ body {
 .token-actions button {
     background-color: #f4f4f4;
 }
+
+.github-link {
+    text-align: center;
+    margin-top: 20px; /* Adjust spacing as needed */
+}
+
+.github-link a {
+    color: #121212; /* Dark color for light mode */
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; /* Space between icon and text */
+}
+
+.github-link a:hover {
+    text-decoration: underline; /* Optional: highlight on hover */
+}
+
+.dark-mode .github-link a {
+    color: #e4e6eb; /* Light color for dark mode */
+}
