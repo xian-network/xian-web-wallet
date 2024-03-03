@@ -1,37 +1,37 @@
-# Xian Connect
+# Xian Web Wallet
 
 ## Introduction
-Xian Connect is a lightweight, serverless web application designed to securely create and manage Xian keypairs using advanced client-side JavaScript. It leverages private key encryption, local storage, and password protection to ensure a high level of security and privacy for users. With Xian Connect, you can easily generate and manage your cryptographic keys without the need for server-side processing or external dependencies.
+Xian Web Wallet is a cutting-edge, serverless web application tailored for secure wallet management and cryptographic keypair generation, utilizing advanced client-side JavaScript. It introduces wallet features, moving beyond keypair management to a comprehensive wallet solution. By incorporating encrypted private key and public key storage in cookies for enhanced security, it ensures user privacy and security without compromising convenience. Xian Web Wallet represents a significant leap in web-based cryptocurrency management, offering a seamless experience for managing wallet contents and cryptographic assets.
 
 ## Features
-- **Serverless Architecture**: Runs entirely on the client-side, eliminating the need for server-side setup and allowing for easy deployment.
-- **Secure Key Management**: Generates and manages Xian keypairs securely using private key encryption.
-- **Local Storage**: Saves keypairs directly in the browser's local storage, ensuring that keys remain private and are easily accessible to the user.
-- **Password Protection**: Enhances security by protecting keypairs with user-defined passwords.
+- **Wallet Management**: Intuitive interface for managing your cryptocurrency wallet, including sending and receiving transactions.
+- **Serverless Architecture**: Operates entirely on the client-side, simplifying deployment and eliminating the need for server-side infrastructure.
+- **Enhanced Security Measures**: Utilizes encrypted cookies for storing public and encrypted private keys, ensuring higher security standards.
+- **Secure Key Management**: Securely generates and manages Xian keypairs with robust encryption techniques.
+- **User-Friendly Security**: Key management is safeguarded with password protection, leveraging user-defined passwords for an additional layer of security.
 
 ## Getting Started
 
 ### Prerequisites
-- A modern web browser with JavaScript enabled.
-- No Node.js or server-side processing required.
+- A contemporary web browser with JavaScript support.
 
 ### Installation
-As Xian Connect is a serverless application, no traditional installation is necessary. It needs to be hosted using a webserver.
+Deploying Xian Web Wallet is straightforward due to its serverless nature. Simply host it on any web server to get started.
 
 ```
-git clone https://github.com/crosschainer/xian-connect.git
-cd xian-connect
+git clone https://github.com/crosschainer/xian-web-wallet.git
+cd xian-web-wallet
 open index.html
 ```
 
 ## Security
-Xian Connect prioritizes security and privacy:
-- All cryptographic operations are performed client-side, ensuring that private keys never leave your device.
-- Keypairs are encrypted and stored in local storage, protected by your password.
-- We recommend choosing a strong, unique password and keeping your device secure.
+Security and privacy are paramount in Xian Web Wallet:
+- Executes all cryptographic functions client-side, ensuring private keys never leave the user's device.
+- Stores keypairs in encrypted cookies, further enhancing security and privacy.
+- It's recommended to use a strong, unique password for your wallet and ensure your device is secure against unauthorized access.
 
 ## Contributions
-Contributions are welcome! If you'd like to contribute, please fork the repository and submit a pull request.
+We warmly welcome contributions to Xian Web Wallet. To contribute, fork the repository, make your changes, and submit a pull request.
 
 ## Disclaimer
-Xian Connect is provided "as is", without warranty of any kind. Use at your own risk.
+Xian Web Wallet is offered "as is", with no warranties. Users should use it at their own risk, understanding the inherent responsibilities of managing cryptographic assets.
