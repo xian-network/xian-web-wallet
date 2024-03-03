@@ -74,7 +74,8 @@ function signTransaction(transaction, privateKey) {
     transaction.nonce = getNonce();
     transaction.sender = readSecureCookie('publicKey');
     let signed_tx = nacl.sign(transaction, privateKey);
-    return signed_tx;
+    transaction.signature = toHexString(signed_tx.signature);
+    return transaction;
 }
 
 function broadcastTransaction(signedTransaction) {
