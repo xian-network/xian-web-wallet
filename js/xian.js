@@ -74,13 +74,23 @@ function signTransaction(transaction, privateKey) {
     transaction.nonce = getNonce();
     transaction.sender = readSecureCookie("publicKey");
 
-    // Serialize transaction object and convert to Uint8Array
     let serializedTransaction = JSON.stringify(transaction);
     let transactionUint8Array = new TextEncoder().encode(serializedTransaction);
 
-    let signed_tx = nacl.sign(transactionUint8Array, privateKey);
-    transaction.signature = toHexString(new Uint8Array(signed_tx.signature));
-    console.log(transaction);
+    let combinedKey = new Uint8Array(64);
+    combinedKey.set(privateKey);
+    combinedKey.set(fromHexString(transaction.sender), 32);
+
+
+    // Use nacl.sign.detached to get the signature
+    let signatureUint8Array = nacl.sign.detached(
+      transactionUint8Array,
+      combinedKey
+    );
+
+    // Convert the signature into a hex string
+    transaction.signature = toHexString(signatureUint8Array);
+
     return transaction;
 }
 
