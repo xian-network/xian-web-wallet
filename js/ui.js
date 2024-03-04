@@ -44,7 +44,6 @@ function importWallet() {
     importWalletError.style.display = 'none';
 
     let keyPair = createKeyPairFromSK(privateKey, password);
-    console.log(keyPair);
     let publicKey = keyPair.publicKey;
     let encryptedPrivateKey = keyPair.encryptedPrivateKey;
     let _unencryptedPrivateKey = keyPair.unencryptedPrivateKey;
@@ -245,15 +244,4 @@ function sendToken(contract) {
     successMsg.innerHTML = 'Transaction sent successfully! Hash: ' + "<a href='https://explorer.xian.org/tx/"+hash+"' target='_blank'>"+hash+"</a>";
     successMsg.style.display = 'block';
 
-}
-
-function exportPrivateKey() {
-    let exportable = toHexString(unencryptedPrivateKey);
-    let element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(exportable));
-    element.setAttribute('download', 'privateKey.txt');
-    element.style.display = 'none';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
 }
