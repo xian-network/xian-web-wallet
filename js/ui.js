@@ -230,7 +230,7 @@ function sendToken(contract) {
             contract: contract,
             function: "transfer",
             kwargs: {
-                recipient: recipient,
+                to: recipient,
                 amount: amount
             },
             stamps_supplied: 100
