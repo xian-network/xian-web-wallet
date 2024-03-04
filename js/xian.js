@@ -98,15 +98,10 @@ function broadcastTransaction(signedTransaction) {
     signedTransaction = toHexString(JSON.stringify(signedTransaction));
     let xhr = new XMLHttpRequest();
     xhr.open("POST", RPC + '/broadcast_tx_commit?tx="' + signedTransaction + '"', true);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            return xhr.responseText;
-        }
-        else {
-            return "Error broadcasting transaction"
-        } 
-    }
     xhr.send();
+    
+    return xhr.responseText;
+    
 }
 
 function getVariable(contract, variable, key){
