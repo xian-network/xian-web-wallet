@@ -12,7 +12,14 @@ body {
     -moz-osx-font-smoothing: grayscale;
     font-smoothing: antialiased;
 }
-
+a{
+    color: #007bff;
+    text-decoration: none;
+}
+a:hover{
+    text-decoration: underline;
+    color: #007bff;
+}
 /* Positioning the dark mode toggler */
 .dark-mode-toggler {
     position: fixed;
