@@ -93,6 +93,9 @@ function signTransaction(transaction, privateKey) {
       transactionUint8Array,
       combinedKey
     );
+    
+    // Add the ordered payload to the transaction
+    transaction.payload = orderedPayload;
 
     // Convert the signature into a hex string
     transaction.metadata.signature = toHexString(signatureUint8Array);
