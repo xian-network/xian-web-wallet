@@ -236,13 +236,31 @@ function sendToken(contract) {
     };
 
     let signed_tx = signTransaction(transaction, unencryptedPrivateKey);
-    console.log(signed_tx);
     let response = broadcastTransaction(signed_tx);
-    console.log(response);
-    hash = JSON.parse(response)['result']['deliver_tx']['hash'];
-    response = atob(JSON.parse(response)['result']['deliver_tx']['data']);
-    
-    successMsg.innerHTML = 'Transaction sent successfully! Hash: ' + "<a href='https://explorer.xian.org/tx/"+hash+"' target='_blank'>"+hash+"</a>";
+    hash = response['result']['hash'];
+
+    if (response['result']['check_tx']['code'] == 1) {
+        errorMsg.innerHTML = 'Transaction failed! Explorer: ' + "<a href='https://explorer.xian.org/tx/"+hash+"' target='_blank'>"+hash+"</a>"
+        errorMsg.style.display = 'block';
+        return;
+    }
+
+    if (response['result']['deliver_tx']['code'] == 1) {
+        errorMsg.innerHTML = 'Transaction failed! Explorer: ' + "<a href='https://explorer.xian.org/tx/"+hash+"' target='_blank'>"+hash+"</a>"
+        errorMsg.style.display = 'block';
+        return;
+    }
+
+    data = atob(response['result']['deliver_tx']['data']);
+    data = JSON.parse(data);
+
+    if (data['status'] == 1) {
+        errorMsg.innerHTML = 'Transaction failed! Explorer: ' + "<a href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
+        errorMsg.style.display = 'block';
+        return;
+    }
+
+    successMsg.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a href='https://explorer.xian.org/tx/"+hash+"' target='_blank'>"+hash+"</a>";
     successMsg.style.display = 'block';
 
 }
