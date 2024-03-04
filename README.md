@@ -15,7 +15,8 @@ Xian Web Wallet is a cutting-edge, serverless web application tailored for secur
 ## Getting Started
 
 ### Prerequisites
-- A contemporary web browser with JavaScript support.
+- A web server with HTTPS cert
+- A node that you are allowed to connect to (CORS)
 
 ### Installation
 Deploying Xian Web Wallet is straightforward due to its serverless nature. Simply host it on any web server to get started.
