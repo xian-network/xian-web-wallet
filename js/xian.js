@@ -79,7 +79,7 @@ function signTransaction(transaction, privateKey) {
 
     let combinedKey = new Uint8Array(64);
     combinedKey.set(privateKey);
-    combinedKey.set(fromHexString(transaction.sender), 32);
+    combinedKey.set(fromHexString(transaction.payload.sender), 32);
 
 
     // Use nacl.sign.detached to get the signature
