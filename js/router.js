@@ -57,6 +57,15 @@ function changePage(page) {
                     loadReceiveTokenPage();
                 });
             break;
+        case "settings":
+            // load html template from templates/settings.html
+            fetch("templates/settings.html")
+                .then(response => response.text())
+                .then(data => {
+                    app_box.innerHTML = data;
+                    loadSettingsPage();
+                });
+            break;
         default:
             break;
     }

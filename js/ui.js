@@ -119,6 +119,51 @@ function goToWallet() {
     }
 }
 
+function loadSettingsPage() {
+    document.getElementById('rpc_input').value = RPC;
+    document.getElementById('chain_id_input').value = CHAIN_ID;
+}
+
+function saveSettings() {
+    let settingsSuccess = document.getElementById('settingsSuccess');
+    let settingsError = document.getElementById('settingsError');
+    settingsSuccess.style.display = 'none';
+    settingsError.style.display = 'none';
+
+    let rpc = document.getElementById('rpc_input').value;
+    let chain_id = document.getElementById('chain_id_input').value;
+
+    if (rpc === "" || chain_id === "") {
+        settingsError.style.display = 'block';
+        settingsError.innerHTML = 'All fields are required!';
+        return;
+    }
+
+    // rpc has to start with https and not end with a slash
+    if (!rpc.startsWith('https://')) {
+        settingsError.style.display = 'block';
+        settingsError.innerHTML = 'RPC must start with https://';
+        return;
+    }
+
+    if (rpc.endsWith('/')) {
+        settingsError.style.display = 'block';
+        settingsError.innerHTML = 'RPC must not end with a slash';
+        return;
+    }
+
+
+    localStorage.setItem("rpc", rpc);
+    localStorage.setItem("chain_id", chain_id);
+    RPC = rpc;
+    CHAIN_ID = chain_id;
+
+
+    settingsSuccess.style.display = 'block';
+    settingsSuccess.innerHTML = 'Settings saved successfully!';
+    
+}
+
 function sendTokenScreen() {
     changePage('send-token');
 }

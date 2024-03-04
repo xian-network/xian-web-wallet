@@ -1,5 +1,5 @@
-var RPC = "https://testnet.xian.org";
-var CHAIN_ID = "xian-testnet-2";
+var RPC = localStorage.getItem("rpc") || "https://testnet.xian.org";
+var CHAIN_ID = localStorage.getItem("chain_id") || "xian-testnet-2";
 
 function toHexString(byteArray) {
     return Array.from(byteArray, function(byte) {
