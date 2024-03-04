@@ -72,9 +72,15 @@ function getNonce() {
 
 function signTransaction(transaction, privateKey) {
     transaction.nonce = getNonce();
-    transaction.sender = readSecureCookie('publicKey');
-    let signed_tx = nacl.sign(transaction, privateKey);
-    transaction.signature = toHexString(signed_tx.signature);
+    transaction.sender = readSecureCookie("publicKey");
+
+    // Serialize transaction object and convert to Uint8Array
+    let serializedTransaction = JSON.stringify(transaction);
+    let transactionUint8Array = new TextEncoder().encode(serializedTransaction);
+
+    let signed_tx = nacl.sign(transactionUint8Array, privateKey);
+    transaction.signature = toHexString(new Uint8Array(signed_tx.signature));
+    console.log(transaction);
     return transaction;
 }
 
