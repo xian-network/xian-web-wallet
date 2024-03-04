@@ -73,7 +73,11 @@ function getNonce() {
 function signTransaction(transaction, privateKey) {
     transaction.payload.nonce = getNonce();
     transaction.payload.sender = readSecureCookie("publicKey");
-
+    // sort the keys in payload
+    let orderedPayload = {};
+    Object.keys(transaction.payload).sort().forEach(function(key) {
+        orderedPayload[key] = transaction.payload[key];
+    });
     let serializedTransaction = JSON.stringify(transaction.payload);
     let transactionUint8Array = new TextEncoder().encode(serializedTransaction);
 
