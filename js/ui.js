@@ -225,14 +225,19 @@ function sendToken(contract) {
     }
 
     let transaction = {
-        chain_id: CHAIN_ID,
-        contract: contract,
-        function: "transfer",
-        kwargs: {
-            recipient: recipient,
-            amount: amount
+        payload: {
+            chain_id: CHAIN_ID,
+            contract: contract,
+            function: "transfer",
+            kwargs: {
+                recipient: recipient,
+                amount: amount
+            },
+            stamps_supplied: 100
         },
-        stamps_supplied: 100
+        metadata: {
+            signature: "",
+        }
     };
 
     let signed_tx = signTransaction(transaction, unencryptedPrivateKey);

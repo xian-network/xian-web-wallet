@@ -89,7 +89,7 @@ function signTransaction(transaction, privateKey) {
     );
 
     // Convert the signature into a hex string
-    transaction.signature = toHexString(signatureUint8Array);
+    transaction.metadata.signature = toHexString(signatureUint8Array);
 
     return transaction;
 }
