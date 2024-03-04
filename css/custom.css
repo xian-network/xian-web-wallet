@@ -21,6 +21,11 @@ a:hover{
     text-decoration: underline;
     color: #007bff;
 }
+.explorer-url{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: block;
+}
 /* Positioning the dark mode toggler */
 .dark-mode-toggler {
     position: fixed;

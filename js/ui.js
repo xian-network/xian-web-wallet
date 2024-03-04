@@ -240,13 +240,13 @@ function sendToken(contract) {
     hash = response['result']['hash'];
 
     if (response['result']['check_tx']['code'] == 1) {
-        errorMsg.innerHTML = 'Transaction failed! Explorer: ' + "<a href='https://explorer.xian.org/tx/"+hash+"' target='_blank'>"+hash+"</a>"
+        errorMsg.innerHTML = 'Transaction failed! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/"+hash+"' target='_blank'>"+hash+"</a>"
         errorMsg.style.display = 'block';
         return;
     }
 
     if (response['result']['deliver_tx']['code'] == 1) {
-        errorMsg.innerHTML = 'Transaction failed! Explorer: ' + "<a href='https://explorer.xian.org/tx/"+hash+"' target='_blank'>"+hash+"</a>"
+        errorMsg.innerHTML = 'Transaction failed! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/"+hash+"' target='_blank'>"+hash+"</a>"
         errorMsg.style.display = 'block';
         return;
     }
@@ -255,12 +255,12 @@ function sendToken(contract) {
     data = JSON.parse(data);
 
     if (data['status'] == 1) {
-        errorMsg.innerHTML = 'Transaction failed! Explorer: ' + "<a href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
+        errorMsg.innerHTML = 'Transaction failed! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
         errorMsg.style.display = 'block';
         return;
     }
 
-    successMsg.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a href='https://explorer.xian.org/tx/"+hash+"' target='_blank'>"+hash+"</a>";
+    successMsg.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/"+hash+"' target='_blank'>"+hash+"</a>";
     successMsg.style.display = 'block';
 
 }
