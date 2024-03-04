@@ -95,7 +95,9 @@ function signTransaction(transaction, privateKey) {
 }
 
 function broadcastTransaction(signedTransaction) {
-    signedTransaction = toHexString(JSON.stringify(signedTransaction));
+    // Broadcast the transaction as hex
+    signedTransaction = toHexString(new TextEncoder().encode(JSON.stringify(signedTransaction)));
+
     let xhr = new XMLHttpRequest();
     xhr.open("POST", RPC + '/broadcast_tx_commit?tx="' + signedTransaction + '"', false);
     xhr.send();
