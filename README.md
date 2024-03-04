@@ -2,6 +2,8 @@
 
 [![CodeQL](https://github.com/crosschainer/xian-web-wallet/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/crosschainer/xian-web-wallet/actions/workflows/github-code-scanning/codeql)
 
+Available at https://wallet.xian.org
+
 ## Introduction
 Xian Web Wallet is a cutting-edge, serverless web application tailored for secure wallet management and cryptographic keypair generation, utilizing advanced client-side JavaScript. It introduces wallet features, moving beyond keypair management to a comprehensive wallet solution. By incorporating encrypted private key and public key storage in cookies for enhanced security, it ensures user privacy and security without compromising convenience. Xian Web Wallet represents a significant leap in web-based cryptocurrency management, offering a seamless experience for managing wallet contents and cryptographic assets.
 
