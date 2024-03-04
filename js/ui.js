@@ -1,22 +1,6 @@
 function createWallet() {
     let password = document.getElementById('password').value;
-    let confirmPassword = document.getElementById('confirmPassword').value;
-    let createWalletError = document.getElementById('createWalletError');
 
-    if (password !== confirmPassword) {
-        createWalletError.innerHTML = 'Passwords do not match!';
-        createWalletError.style.display = 'block';
-        return;
-    }
-
-    if (password.length < 6) {
-        createWalletError.innerHTML = 'Password must be at least 6 characters long!';
-        createWalletError.style.display = 'block';
-        return;
-    }
-
-    createWalletError.style.display = 'none';
-    
     let keyPair = createKeyPair(password);
     let publicKey = keyPair.publicKey;
     let encryptedPrivateKey = keyPair.encryptedPrivateKey;
