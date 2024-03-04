@@ -8,6 +8,9 @@ body {
     background-color: #f4f4f4;
     font-family: 'IBM Plex Sans', sans-serif;
     color: #121212;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-smoothing: antialiased;
 }
 
 /* Positioning the dark mode toggler */
@@ -60,6 +63,14 @@ body {
     margin-bottom: 20px;
     font-size: 1.5rem;
     text-align: center;
+    flex-grow: 1;
+}
+
+.title-container {
+    display: flex;
+    justify-content: center; /* Center the title */
+    align-items: center; /* Align items vertically */
+    position: relative; /* Needed to position the cogwheel icon */
 }
 
 .app-box .btn-group {
@@ -83,6 +94,20 @@ body {
 
 .end-0 {
     right: 0;
+}
+
+.cogwheel-icon {
+    position: absolute; /* Position the icon relative to the title container */
+    right: 0; /* Align it to the right */
+    /* Adjust the size and padding as needed */
+    font-size: 1.25rem;
+    padding: 0 15px;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.cogwheel-icon:hover {
+   color: #e4e6eb;
 }
 
 #walletAddress {
@@ -163,6 +188,10 @@ body {
 
 .token-actions button {
     background-color: #f4f4f4;
+}
+
+.token-actions button:hover {
+    background-color: #e4e6eb;
 }
 
 .github-link {
