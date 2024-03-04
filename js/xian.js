@@ -100,7 +100,8 @@ function broadcastTransaction(signedTransaction) {
     xhr.open("POST", RPC + '/broadcast_tx_commit?tx="' + signedTransaction + '"', true);
     xhr.send();
     
-    return xhr.responseText;
+    let response = JSON.parse(xhr.responseText);
+    return response;
     
 }
 
