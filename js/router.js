@@ -3,7 +3,7 @@ var app_box = document.getElementById("app-box");
 var publicKey = null;
 var unencryptedPrivateKey = null;
 
-function changePage(page, data=null) {
+function changePage(page, some_data=null) {
     app_page = page;
     switch (app_page) {
       case "get-started":
@@ -48,7 +48,7 @@ function changePage(page, data=null) {
           .then((response) => response.text())
           .then((data) => {
             app_box.innerHTML = data;
-            document.getElementById('tokenName').innerHTML = data;
+            document.getElementById('tokenName').innerHTML = some_data;
           });
         break;
       case "receive-token":
