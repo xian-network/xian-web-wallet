@@ -113,8 +113,10 @@ function getTokenInfo(contract) {
         if (response.result.response.value === "AA==") {
             tokenInfo["name"] = null;
         }
-        let tokenName = atob(response.result.response.value);
-        tokenInfo["name"] = tokenName;
+        else{
+            let tokenName = atob(response.result.response.value);
+            tokenInfo["name"] = tokenName;
+        }
     }
 
     request = new XMLHttpRequest();
@@ -125,8 +127,10 @@ function getTokenInfo(contract) {
         if (response.result.response.value === "AA==") {
             tokenInfo["symbol"] = null;
         }
-        let tokenSymbol = atob(response.result.response.value);
-        tokenInfo["symbol"] = tokenSymbol;
+        else{
+            let tokenSymbol = atob(response.result.response.value);
+            tokenInfo["symbol"] = tokenSymbol;
+        }
     }
     return tokenInfo;
 }
