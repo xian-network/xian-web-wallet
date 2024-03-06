@@ -86,10 +86,32 @@ a:hover{
     position: relative; /* Needed to position the cogwheel icon */
 }
 
+.token-title-container {
+    display: flex;
+    align-items: center; /* Align items vertically */
+    position: relative; /* Needed to position the cogwheel icon */
+    margin-top: 0px !important;
+}
+
+.token-title-container > .cogwheel-icon{
+    margin-bottom: 0;
+    padding-right: 4px;
+}
+
 .app-box .btn-group {
     gap: 10px;
     display: flex;
     flex-direction: column;
+}
+
+.kwarg-group{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.kwarg-group label{
+    margin-bottom: 0;
 }
 
 .app-box button {
@@ -191,6 +213,7 @@ a:hover{
 .token-details {
     display: flex;
     flex-direction: column;
+    margin-top: 0px !important;
 }
 
 .token-actions {
@@ -231,4 +254,10 @@ a:hover{
 
 .app-box-description {
     margin-bottom: 10px!important;
+}
+
+.advanced-tx-link{
+    padding-top: 10px;
+    display: block;
+    text-align: center;
 }

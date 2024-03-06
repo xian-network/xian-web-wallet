@@ -1,0 +1,32 @@
+<h1 class="app-box-title">Create Advanced Transaction</h1>
+<p class="app-box-description">Directly interact with a smart contract on the Xian Network.</p>
+<div class="app-box-form">
+    <div class="alert alert-danger" role="alert" id="sendAdvTxError" style="display: none;"></div>
+    <div class="alert alert-success" role="alert" id="sendAdvTxSuccess" style="display: none;"></div>
+    <div class="form-group">
+        <label for="contractName">Contract</label>
+        <input type="text" class="form-control" id="contractName" placeholder="Enter the contract name" required>
+    </div>
+    <div class="form-group">
+        <label for="functionName">Function</label>
+        <select class="form-control" id="functionName" required>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="kwargs">Keyword Arguments</label>
+        <div id="adv_kwargs">
+            <div class="form-group kwarg-group">
+                <label for="kwargsKey">Placeholder</label>
+                <input type="text" class="form-control" id="kwargsValue" placeholder="Enter the value" required>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="stampLimit">Stamp Limit</label>
+        <input type="number" class="form-control" id="stampLimit" placeholder="Enter the stamp limit" required>
+    </div>
+    <div class="btn-group">
+        <button class="btn btn-primary" onclick="sendAdvTx()">Send Transaction</button>
+        <button class="btn btn-secondary" onclick="goToWallet()">Cancel</button>
+    </div>
+</div>

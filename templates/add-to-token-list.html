@@ -1,0 +1,14 @@
+<h1 class="app-box-title">Add to token list</h1>
+<p class="app-box-description">Add a token to the list of tokens you can interact with.</p>
+<div class="app-box-form">
+    <div class="alert alert-danger" role="alert" id="addTokenError" style="display: none;"></div>
+    <div class="alert alert-success" role="alert" id="addTokenSuccess" style="display: none;"></div>
+    <div class="form-group">
+        <label for="contractNameAddToken">Contract</label>
+        <input type="text" class="form-control" id="contractNameAddToken" placeholder="Enter the contract name" required>
+    </div>
+    <div class="btn-group">
+        <button class="btn btn-primary" onclick="addToken()">Add Token</button>
+        <button class="btn btn-secondary" onclick="goToWallet()">Cancel</button>
+    </div>
+</div>
