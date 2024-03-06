@@ -26,7 +26,7 @@ function loadWalletPage() {
                 <div class="token-details">
                     <div class="token-title-container">
                         <div class="token-name"><span>`+tokenInfo["name"]+`</span> (<span class="token-symbol">`+tokenInfo["symbol"]+`</span>)</div>
-                        <i class="fas fa-minus-circle cogwheel-icon" onclick="removeToken('`+tokenInfo["contract"]+`')"></i>
+                        ` + (tokenInfo["contract"] === "currency" ? "" : `<i class="fas fa-minus-circle cogwheel-icon" onclick="removeToken('`+tokenInfo["contract"]+`')"></i>`) + `
                     </div>
                     <div class="token-balance" id="`+tokenInfo["contract"]+`Balance">0</div>
                 </div>    
