@@ -165,8 +165,7 @@ function saveSettings() {
 }
 
 function sendTokenScreen(contract) {
-    changePage('send-token');
-    document.getElementById('tokenName').innerHTML = contract;
+    changePage('send-token', contract);
 }
 
 function receiveTokenScreen() {

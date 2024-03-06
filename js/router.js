@@ -3,7 +3,7 @@ var app_box = document.getElementById("app-box");
 var publicKey = null;
 var unencryptedPrivateKey = null;
 
-function changePage(page) {
+function changePage(page, data=null) {
     app_page = page;
     switch (app_page) {
       case "get-started":
@@ -46,7 +46,10 @@ function changePage(page) {
         // load html template from templates/send-token.html
         fetch("templates/send-token.html")
           .then((response) => response.text())
-          .then((data) => (app_box.innerHTML = data));
+          .then((data) => {
+            app_box.innerHTML = data;
+            document.getElementById('tokenName').innerHTML = data;
+          });
         break;
       case "receive-token":
         // load html template from templates/receive-token.html
