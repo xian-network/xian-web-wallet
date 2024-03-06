@@ -164,8 +164,9 @@ function saveSettings() {
     
 }
 
-function sendTokenScreen() {
+function sendTokenScreen(contract) {
     changePage('send-token');
+    document.getElementById('tokenName').innerHTML = contract;
 }
 
 function receiveTokenScreen() {
@@ -182,7 +183,8 @@ function refreshBalance(contract) {
     document.getElementById(contract+'Balance').innerHTML = balance;
 }
 
-function sendToken(contract) {
+function sendToken() {
+    let contract = document.getElementById('tokenName').innerHTML;
     let recipient = document.getElementById('toAddress').value;
     let amount = document.getElementById('tokenAmount').value;
     let successMsg = document.getElementById('sendTokenSuccess');
