@@ -23,12 +23,6 @@ Xian Web Wallet is a cutting-edge, serverless web application tailored for secur
 ### Installation
 Deploying Xian Web Wallet is straightforward due to its serverless nature. Simply host it on any web server to get started.
 
-```
-git clone https://github.com/crosschainer/xian-web-wallet.git
-cd xian-web-wallet
-open index.html
-```
-
 ## Security
 Security and privacy are paramount in Xian Web Wallet:
 - Executes all cryptographic functions client-side, ensuring private keys never leave the user's device.
