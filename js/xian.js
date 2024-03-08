@@ -127,3 +127,48 @@ function getVariable(contract, variable, key){
     let decoded = atob(response.result.response.value);
     return decoded;
 }
+
+function getTokenInfo(contract) {
+  let tokenInfo = { contract: contract };
+
+  if (contract === "currency") {
+    tokenInfo["name"] = "Xian";
+    tokenInfo["symbol"] = "Xian";
+    return tokenInfo;
+  }
+
+  let request = new XMLHttpRequest();
+  request.open(
+    "GET",
+    RPC + '/abci_query?path="/get/' + contract + '.metadata:token_name"',
+    false
+  );
+  request.send();
+  if (request.status === 200) {
+    let response = JSON.parse(request.responseText);
+    if (response.result.response.value === "AA==") {
+      tokenInfo["name"] = null;
+    } else {
+      let tokenName = atob(response.result.response.value);
+      tokenInfo["name"] = tokenName;
+    }
+  }
+
+  request = new XMLHttpRequest();
+  request.open(
+    "GET",
+    RPC + '/abci_query?path="/get/' + contract + '.metadata:token_symbol"',
+    false
+  );
+  request.send();
+  if (request.status === 200) {
+    let response = JSON.parse(request.responseText);
+    if (response.result.response.value === "AA==") {
+      tokenInfo["symbol"] = null;
+    } else {
+      let tokenSymbol = atob(response.result.response.value);
+      tokenInfo["symbol"] = tokenSymbol;
+    }
+  }
+  return tokenInfo;
+}
