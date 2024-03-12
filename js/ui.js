@@ -469,6 +469,15 @@ function sendAdvTx() {
         if (expectedType === "str") {
             value = value.toString();
         }
+        if (expectedType === "dict" || expectedType === "list") {
+            try {
+                value = JSON.parse(value);
+            } catch (e) {
+                error.innerHTML = "Invalid value for " + arg.name + "!";
+                error.style.display = "block";
+                return;
+            }
+        }
         kwargs[arg.name] = value;
     });
     payload.payload.kwargs = kwargs;
