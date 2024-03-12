@@ -335,7 +335,7 @@ function loadAdvancedTransactionPage() {
         let error = document.getElementById("sendAdvTxError");
         let success = document.getElementById("sendAdvTxSuccess");
         let functionSelect = document.getElementById("functionName");
-        let list_kwargs = document.getElementById("adv_kwargs");
+        let args = document.getElementById("adv_args");
         error.style.display = "none";
         success.style.display = "none";
 
@@ -351,7 +351,7 @@ function loadAdvancedTransactionPage() {
             error.innerHTML = "Contract does not exist!";
             error.style.display = "block";
             functionSelect.innerHTML = "";
-            list_kwargs.innerHTML = "";
+            args.style.display = "none";
             return;
         }
         functionSelect.innerHTML = "";
