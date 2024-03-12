@@ -335,6 +335,7 @@ function loadAdvancedTransactionPage() {
         let error = document.getElementById("sendAdvTxError");
         let success = document.getElementById("sendAdvTxSuccess");
         let functionSelect = document.getElementById("functionName");
+        let list_kwargs = document.getElementById("adv_kwargs");
         error.style.display = "none";
         success.style.display = "none";
 
@@ -349,6 +350,8 @@ function loadAdvancedTransactionPage() {
         if (functions === null) {
             error.innerHTML = "Contract does not exist!";
             error.style.display = "block";
+            functionSelect.innerHTML = "";
+            list_kwargs.innerHTML = "";
             return;
         }
         functionSelect.innerHTML = "";
