@@ -330,7 +330,7 @@ function removeToken(contract) {
 
 function loadAdvancedTransactionPage() {
     document.getElementById("adv_args").style.display = "none";
-    document.getElementById("contractName").addEventListener("input", function () {
+    document.getElementById("contractName").addEventListener("focusout", function () {
         let contractName = document.getElementById("contractName").value;
         let error = document.getElementById("sendAdvTxError");
         let success = document.getElementById("sendAdvTxSuccess");
