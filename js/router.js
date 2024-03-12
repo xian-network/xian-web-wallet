@@ -73,7 +73,10 @@ function changePage(page, some_data=null) {
         // load html template from templates/advanced-transaction.html
         fetch("templates/advanced-transaction.html")
           .then((response) => response.text())
-          .then((data) => (app_box.innerHTML = data));
+          .then((data) => {
+            app_box.innerHTML = data;
+            loadAdvancedTransactionPage();
+          });
         break;
       case "add-to-token-list":
         // load html template from templates/add-to-token-list.html

@@ -327,3 +327,170 @@ function removeToken(contract) {
   localStorage.setItem("token_list", JSON.stringify(token_list));
   loadWalletPage();
 }
+
+function loadAdvancedTransactionPage() {
+    document.getElementById("adv_args").style.display = "none";
+    document.getElementById("contractName").addEventListener("input", function () {
+        let contractName = document.getElementById("contractName").value;
+        let error = document.getElementById("sendAdvTxError");
+        let success = document.getElementById("sendAdvTxSuccess");
+        let functionSelect = document.getElementById("functionName");
+        error.style.display = "none";
+        success.style.display = "none";
+
+        let functions = null;
+        try {
+          functions = getContractFunctions(contractName);
+        } catch (e) {
+          error.innerHTML = "RPC error!";
+          error.style.display = "block";
+          return;
+        }
+        if (functions === null) {
+            error.innerHTML = "Contract does not exist!";
+            error.style.display = "block";
+            return;
+        }
+        functionSelect.innerHTML = "";
+        functionSelect.innerHTML += "<option value=''>Select a function</option>";
+        console.log(functions);
+        functions.methods.forEach((func) => {
+            functionSelect.innerHTML +=
+              "<option value='" + func.name + "'>" + func.name + "</option>";
+        });
+    });
+
+    document.getElementById("functionName").addEventListener("change", function () {
+        let contractName = document.getElementById("contractName").value;
+        let functionName = document.getElementById("functionName").value;
+        let error = document.getElementById("sendAdvTxError");
+        let success = document.getElementById("sendAdvTxSuccess");
+        error.style.display = "none";
+        success.style.display = "none";
+        let args = document.getElementById("adv_args");
+        let list_kwargs = document.getElementById("adv_kwargs");
+
+        let functions = null;
+        try {
+          functions = getContractFunctions(contractName);
+        } catch (e) {
+          error.innerHTML = "RPC error!";
+          error.style.display = "block";
+          return;
+        }
+        if (functions !== null) {
+            args.style.display = "block";
+            let functionInfo = functions.methods.find(
+              (func) => func.name === functionName
+            );
+            list_kwargs.innerHTML = "";
+            functionInfo.arguments.forEach((arg) => {
+              list_kwargs.innerHTML +=
+                `<div class="form-group kwarg-group">
+                <label for="` +
+                arg.name +
+                `">` +
+                arg.name +
+                `(` +
+                arg.type +
+                `)</label>
+                <input type="text" class="form-control" id="` +
+                arg.name +
+                `">
+            </div>`;
+            });
+        }
+        
+    });
+}
+
+function sendAdvTx() {
+    let contractName = document.getElementById("contractName").value;
+    let functionName = document.getElementById("functionName").value;
+    let error = document.getElementById("sendAdvTxError");
+    let success = document.getElementById("sendAdvTxSuccess");
+    error.style.display = "none";
+    success.style.display = "none";
+    let args = document.getElementById("adv_args");
+    let list_kwargs = document.getElementById("adv_kwargs");
+    let kwargs = {};
+    let stamps = document.getElementById("stampLimit").value;
+    let payload = {
+        payload: {
+            chain_id: CHAIN_ID,
+            contract: contractName,
+            function: functionName,
+            kwargs: {},
+            stamps_supplied: stamps
+        },
+        metadata: {
+            signature: "",
+        }
+    };
+    
+    let functionInfo = getContractFunctions(contractName).methods.find(
+        (func) => func.name === functionName
+    );
+    functionInfo.arguments.forEach((arg) => {
+        let value = document.getElementById(arg.name).value;
+        let expectedType = arg.type;
+        if (value === "") {
+            error.innerHTML = "All fields are required!";
+            error.style.display = "block";
+            return;
+        }
+        if (expectedType === "int") {
+            if (isNaN(value)) {
+                error.innerHTML = "Invalid value for " + arg.name + "!";
+                error.style.display = "block";
+                return;
+            }
+            value = parseInt(value);
+        }
+        if (expectedType === "float") {
+            if (isNaN(value)) {
+                error.innerHTML = "Invalid value for " + arg.name + "!";
+                error.style.display = "block";
+                return;
+            }
+            value = parseFloat(value);
+        }
+        if (expectedType === "bool") {
+            if (value !== "true" && value !== "false") {
+                error.innerHTML = "Invalid value for " + arg.name + "!";
+                error.style.display = "block";
+                return;
+            }
+            value = value === "true";
+        }
+        if (expectedType === "str") {
+            value = value.toString();
+        }
+        kwargs[arg.name] = value;
+    });
+    payload.payload.kwargs = kwargs;
+    let signed_tx = signTransaction(payload, unencryptedPrivateKey);
+    let response = broadcastTransaction(signed_tx);
+    hash = response['result']['hash'];
+
+    if (response['result']['check_tx']['code'] == 1) {
+        error.innerHTML = 'Transaction failed! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
+        error.style.display = 'block';
+        return;
+    }
+
+    if (response['result']['deliver_tx']['code'] == 1) {
+        error.innerHTML = 'Transaction failed! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
+        error.style.display = 'block';
+        return;
+    }
+
+    data = atob(response['result']['deliver_tx']['data']);
+    data = JSON.parse(data);
+
+    if (data['status'] == 1) {
+        error.innerHTML = 'Transaction failed! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
+        error.style.display = 'block';
+        return;
+    }
+}
