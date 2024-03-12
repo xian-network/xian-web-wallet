@@ -421,7 +421,7 @@ function sendAdvTx() {
             contract: contractName,
             function: functionName,
             kwargs: {},
-            stamps_supplied: stamps
+            stamps_supplied: parseInt(stamps)
         },
         metadata: {
             signature: "",
@@ -492,5 +492,9 @@ function sendAdvTx() {
         error.innerHTML = 'Transaction failed! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
         error.style.display = 'block';
         return;
+    }
+    if (data['status'] == 0) {
+        success.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
+        success.style.display = 'block';
     }
 }
