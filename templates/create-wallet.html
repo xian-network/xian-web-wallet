@@ -45,4 +45,11 @@
         }
     }
     inputValidation();
+
+    document.getElementById('confirmPassword').addEventListener('keyup', function(event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            createWallet();
+        }
+    });
 </script>
