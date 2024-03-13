@@ -247,14 +247,13 @@ function sendToken() {
 
     if (response['result']['check_tx']['code'] == 1) {
         errorMsg.innerHTML =
-          "Transaction failed! Not enough stamps or invalid transaction!";
+          "Transaction failed! Not enough balance to cover the transaction fee or invalid transaction!";
         errorMsg.style.display = 'block';
         return;
     }
 
     if (response['result']['deliver_tx']['code'] == 1) {
-        errorMsg.innerHTML =
-          "Transaction failed! Not enough stamps or invalid transaction!";
+        errorMsg.innerHTML = 'Transaction failed! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>";
         errorMsg.style.display = 'block';
         return;
     }
@@ -488,14 +487,14 @@ function sendAdvTx() {
     hash = response['result']['hash'];
 
     if (response['result']['check_tx']['code'] == 1) {
-        error.innerHTML = 'Transaction failed! Not enough stamps or invalid transaction!';
+        error.innerHTML = 'Transaction failed! Not enough balance to cover the transaction fee or invalid transaction!';
         error.style.display = 'block';
         return;
     }
 
     if (response['result']['deliver_tx']['code'] == 1) {
         error.innerHTML =
-          "Transaction failed! Not enough stamps or invalid transaction!";
+        'Transaction failed! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>";
         error.style.display = 'block';
         return;
     }
