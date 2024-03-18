@@ -546,8 +546,8 @@ function submitContract() {
             contract: 'submission',
             function: 'submit_contract',
             kwargs: {
-                contract_name: contract,
-                contract_code: contractCode
+                name: contract,
+                code: contractCode
             },
             stamps_supplied: 1500,
         },
