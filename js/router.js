@@ -53,6 +53,9 @@ function changePage(page, some_data = null) {
       case "add-to-token-list":
           loadHtmlAndScripts("templates/add-to-token-list.html");
           break;
+      case "ide":
+          loadHtmlAndScripts("templates/ide.html");
+          break;
       default:
           break;
   }

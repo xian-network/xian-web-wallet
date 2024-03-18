@@ -1,0 +1,44 @@
+<div class="title-container">
+    <h1 class="app-box-title">IDE</h1>
+    <i class="fas fa-arrow-left cogwheel-icon" onclick="changePage('wallet')"></i>
+</div>
+<p class="app-box-description">This is the most basic form of the Xian IDE. You can use it to write and deploy smart contracts on the Xian Network.</p>
+<div class="app-box-form">
+    <div class="alert alert-danger" role="alert" id="submitContractError" style="display: none;"></div>
+    <div class="alert alert-success" role="alert" id="submitContractSuccess" style="display: none;"></div>
+    <div id="editor"></div>
+    <div class="form-group">
+        <label for="submitContractName">Contract Name</label>
+        <input type="text" class="form-control" id="submitContractName" placeholder="Enter a unique contract name, beginning with 'con_'" required>
+    </div>
+    <div id="wallet-actions">
+        <button class="btn btn-primary" onclick="submitContract()">Deploy Contract</button>
+    </div>
+</div>
+<style>
+    .app-box {
+        max-width: 700px;
+    }
+    .app-box-form .CodeMirror {
+        background-color: #f5f5f5; /* Light background */
+        color: #121212; /* Dark text */
+        border-radius: 8px;
+    }
+    .dark-mode .app-box-form .CodeMirror{
+        background-color: #121212; /* Dark background */
+        color: #e4e6eb; /* Bright text */
+        border-radius: 8px;
+    }
+    .dark-mode .app-box-form .CodeMirror-cursor {
+        border-color: #e4e6eb; /* Bright text */
+    }
+    #editor{
+        margin-bottom: 10px;
+    }
+</style>
+<script>
+    var editor = CodeMirror(document.querySelector('#editor'), {
+        value: "def my_function():\n    print('Hello World')\n\nmy_function()",
+        mode:  "python",
+    });
+</script>

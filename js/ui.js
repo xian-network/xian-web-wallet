@@ -252,13 +252,19 @@ function sendToken() {
         return;
     }
 
-    if (response['result']['deliver_tx']['code'] == 1) {
-        errorMsg.innerHTML = 'Transaction failed! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>";
-        errorMsg.style.display = 'block';
-        return;
+    if (response["result"]["deliver_tx"]["code"] == 1) {
+      errorMsg.innerHTML =
+        "Transaction failed! Explorer: " +
+        "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
+        hash +
+        "' target='_blank'>" +
+        hash +
+        "</a>";
+      errorMsg.style.display = "block";
+      return;
     }
 
-    data = atob(response['result']['deliver_tx']['data']);
+    data = atob(response["result"]["deliver_tx"]["data"]);
     data = JSON.parse(data);
 
     if (data['status'] == 1) {
@@ -511,4 +517,91 @@ function sendAdvTx() {
         success.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
         success.style.display = 'block';
     }
+}
+
+function submitContract() {
+    let contract = document.getElementById("submitContractName").value;
+    let contractError = document.getElementById("submitContractError");
+    let contractSuccess = document.getElementById("submitContractSuccess");
+    contractError.style.display = 'none';
+    contractSuccess.style.display = 'none';
+
+    if (contract === "") {
+        contractError.innerHTML = 'Contract name is required!';
+        contractError.style.display = 'block';
+        return;
+    }
+
+    if (!contract.startsWith('con_')) {
+        contractError.innerHTML = 'Contract name must start with con_';
+        contractError.style.display = 'block';
+        return;
+    }
+
+    let contractCode = editor.getValue();
+
+    let payload = {
+        payload: {
+            chain_id: CHAIN_ID,
+            contract: 'submission',
+            function: 'submit_contract',
+            kwargs: {
+                contract_name: contract,
+                contract_code: contractCode
+            },
+            stamps_supplied: 1500,
+        },
+        metadata: {
+            signature: "",
+        }
+    };
+
+    let signed_tx = signTransaction(payload, unencryptedPrivateKey);
+    let response = broadcastTransaction(signed_tx);
+    hash = response['result']['hash'];
+
+    if (response['result']['check_tx']['code'] == 1) {
+        contractError.innerHTML =
+          "Transaction failed! Not enough balance to cover the transaction fee or invalid transaction!";
+        contractError.style.display = "block";
+        return;
+    }
+
+    if (response['result']['deliver_tx']['code'] == 1) {
+        contractError.innerHTML =
+          "Transaction failed! Explorer: " +
+          "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
+          hash +
+          "' target='_blank'>" +
+          hash +
+          "</a>";
+        contractError.style.display = "block";
+        return;
+    }
+
+    data = atob(response['result']['deliver_tx']['data']);
+    data = JSON.parse(data);
+
+    if (data['status'] == 1) {
+        contractError.innerHTML =
+          "Transaction failed! Explorer: " +
+          "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
+          hash +
+          "' target='_blank'>" +
+          hash +
+          "</a>";
+        contractError.style.display = "block";
+        return;
+    }
+    if (data['status'] == 0) {
+        contractSuccess.innerHTML =
+          "Transaction sent successfully! Explorer: " +
+          "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
+          hash +
+          "' target='_blank'>" +
+          hash +
+          "</a>";
+        contractSuccess.style.display = "block";
+    }
+    
 }
