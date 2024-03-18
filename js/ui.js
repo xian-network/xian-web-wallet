@@ -523,6 +523,7 @@ function submitContract() {
     let contract = document.getElementById("submitContractName").value;
     let contractError = document.getElementById("submitContractError");
     let contractSuccess = document.getElementById("submitContractSuccess");
+    let stampLimit = document.getElementById("submitContractstampLimit").value;
     contractError.style.display = 'none';
     contractSuccess.style.display = 'none';
 
@@ -538,6 +539,12 @@ function submitContract() {
         return;
     }
 
+    if (stampLimit === "") {
+        contractError.innerHTML = 'Stamp limit is required!';
+        contractError.style.display = 'block';
+        return;
+    }
+
     let contractCode = editor.getValue();
 
     let payload = {
@@ -549,7 +556,7 @@ function submitContract() {
                 name: contract,
                 code: contractCode
             },
-            stamps_supplied: 1500,
+            stamps_supplied: parseInt(stampLimit)
         },
         metadata: {
             signature: "",
