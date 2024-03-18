@@ -21,6 +21,14 @@ a:hover{
     text-decoration: underline;
     color: #007bff;
 }
+.ide-icon{
+    position: absolute;
+    left: 0;
+    font-size: 1.25rem;
+    padding: 0 15px;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
 .explorer-url{
     text-overflow: ellipsis;
     overflow: hidden;
