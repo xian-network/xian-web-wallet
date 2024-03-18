@@ -152,7 +152,7 @@ a:hover{
     cursor: pointer;
 }
 
-.cogwheel-icon:hover {
+.cogwheel-icon:hover, .ide-icon:hover {
    color: #e4e6eb;
 }
 
