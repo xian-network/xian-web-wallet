@@ -46,3 +46,6 @@ function loadWalletPage() {
     });
     tokenList.innerHTML += `<a href="#" class="advanced-tx-link" onclick="changePage('send-advanced-transaction')">Create Advanced Transaction</a>` 
 }
+
+// Get current stamp rate
+document.getElementById("stamp-rate").innerHTML = getStampRate();

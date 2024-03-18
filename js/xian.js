@@ -185,3 +185,14 @@ function getTokenInfo(contract) {
   }
   return tokenInfo;
 }
+
+function getStampRate() {
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", RPC + '/abci_query?path="/get/stamp_cost.S:value"', false);
+    xhr.send();
+    let response = JSON.parse(xhr.responseText);
+    if (response.result.response.value === "AA==") {
+        return null;
+    }
+    return parseInt(atob(response.result.response.value), 10);
+}
