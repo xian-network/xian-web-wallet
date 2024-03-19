@@ -252,7 +252,7 @@ function sendToken() {
         return;
     }
 
-    if (response["result"]["deliver_tx"]["code"] == 1) {
+    if (response["result"]["tx_result"]["code"] == 1) {
       errorMsg.innerHTML =
         "Transaction failed! Explorer: " +
         "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
@@ -264,7 +264,7 @@ function sendToken() {
       return;
     }
 
-    data = atob(response["result"]["deliver_tx"]["data"]);
+    data = atob(response["result"]["tx_result"]["data"]);
     data = JSON.parse(data);
 
     if (data['status'] == 1) {
@@ -498,14 +498,14 @@ function sendAdvTx() {
         return;
     }
 
-    if (response['result']['deliver_tx']['code'] == 1) {
+    if (response['result']['tx_result']['code'] == 1) {
         error.innerHTML =
         'Transaction failed! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>";
         error.style.display = 'block';
         return;
     }
 
-    data = atob(response['result']['deliver_tx']['data']);
+    data = atob(response["result"]["tx_result"]["data"]);
     data = JSON.parse(data);
 
     if (data['status'] == 1) {
@@ -574,19 +574,19 @@ function submitContract() {
         return;
     }
 
-    if (response['result']['deliver_tx']['code'] == 1) {
-        contractError.innerHTML =
-          "Transaction failed! Explorer: " +
-          "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
-          hash +
-          "' target='_blank'>" +
-          hash +
-          "</a>";
-        contractError.style.display = "block";
-        return;
+    if (response["result"]["tx_result"]["code"] == 1) {
+      contractError.innerHTML =
+        "Transaction failed! Explorer: " +
+        "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
+        hash +
+        "' target='_blank'>" +
+        hash +
+        "</a>";
+      contractError.style.display = "block";
+      return;
     }
 
-    data = atob(response['result']['deliver_tx']['data']);
+    data = atob(response["result"]["tx_result"]["data"]);
     data = JSON.parse(data);
 
     if (data['status'] == 1) {
