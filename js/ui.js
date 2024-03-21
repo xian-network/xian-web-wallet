@@ -280,6 +280,10 @@ function sendToken() {
 
 function exportPrivateKey() {
     let exportable = toHexString(unencryptedPrivateKey);
+    // if the key is longer than 64 characters it includes the public key as well. then we need to remove it. we only need the first 64 characters
+    if (exportable.length > 64) {
+        exportable = exportable.substring(0, 64);
+    }
     let element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(exportable));
     element.setAttribute('download', 'privateKey.txt');
