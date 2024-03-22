@@ -536,19 +536,19 @@ function submitContract() {
     hash = response['result']['hash'];
 
    if (response["result"]["code"] == 1) {
-     error.innerHTML =
+     contractError.innerHTML =
        "Transaction failed! Not enough balance to cover the transaction fee or invalid transaction!";
-     error.style.display = "block";
+       contractError.style.display = "block";
      return;
    } else {
-     success.innerHTML =
+     contractSuccess.innerHTML =
        "Transaction sent successfully! Explorer: " +
        "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
        hash +
        "' target='_blank'>" +
        hash +
        "</a>";
-     success.style.display = "block";
+       contractSuccess.style.display = "block";
    }
     
 }
