@@ -252,27 +252,6 @@ function sendToken() {
         return;
     }
 
-    if (response["result"]["tx_result"]["code"] == 1) {
-      errorMsg.innerHTML =
-        "Transaction failed! Explorer: " +
-        "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
-        hash +
-        "' target='_blank'>" +
-        hash +
-        "</a>";
-      errorMsg.style.display = "block";
-      return;
-    }
-
-    data = atob(response["result"]["tx_result"]["data"]);
-    data = JSON.parse(data);
-
-    if (data['status'] == 1) {
-        errorMsg.innerHTML = 'Transaction failed! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
-        errorMsg.style.display = 'block';
-        return;
-    }
-
     successMsg.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/"+hash+"' target='_blank'>"+hash+"</a>";
     successMsg.style.display = 'block';
 
@@ -502,22 +481,7 @@ function sendAdvTx() {
         return;
     }
 
-    if (response['result']['tx_result']['code'] == 1) {
-        error.innerHTML =
-        'Transaction failed! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>";
-        error.style.display = 'block';
-        return;
-    }
-
-    data = atob(response["result"]["tx_result"]["data"]);
-    data = JSON.parse(data);
-
-    if (data['status'] == 1) {
-        error.innerHTML = 'Transaction failed! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
-        error.style.display = 'block';
-        return;
-    }
-    if (data['status'] == 0) {
+    else {
         success.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
         success.style.display = 'block';
     }
@@ -571,48 +535,20 @@ function submitContract() {
     let response = broadcastTransaction(signed_tx);
     hash = response['result']['hash'];
 
-    if (response['result']['check_tx']['code'] == 1) {
-        contractError.innerHTML =
-          "Transaction failed! Not enough balance to cover the transaction fee or invalid transaction!";
-        contractError.style.display = "block";
-        return;
-    }
-
-    if (response["result"]["tx_result"]["code"] == 1) {
-      contractError.innerHTML =
-        "Transaction failed! Explorer: " +
-        "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
-        hash +
-        "' target='_blank'>" +
-        hash +
-        "</a>";
-      contractError.style.display = "block";
-      return;
-    }
-
-    data = atob(response["result"]["tx_result"]["data"]);
-    data = JSON.parse(data);
-
-    if (data['status'] == 1) {
-        contractError.innerHTML =
-          "Transaction failed! Explorer: " +
-          "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
-          hash +
-          "' target='_blank'>" +
-          hash +
-          "</a>";
-        contractError.style.display = "block";
-        return;
-    }
-    if (data['status'] == 0) {
-        contractSuccess.innerHTML =
-          "Transaction sent successfully! Explorer: " +
-          "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
-          hash +
-          "' target='_blank'>" +
-          hash +
-          "</a>";
-        contractSuccess.style.display = "block";
-    }
+   if (response["result"]["check_tx"]["code"] == 1) {
+     error.innerHTML =
+       "Transaction failed! Not enough balance to cover the transaction fee or invalid transaction!";
+     error.style.display = "block";
+     return;
+   } else {
+     success.innerHTML =
+       "Transaction sent successfully! Explorer: " +
+       "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
+       hash +
+       "' target='_blank'>" +
+       hash +
+       "</a>";
+     success.style.display = "block";
+   }
     
 }

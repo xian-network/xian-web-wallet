@@ -108,7 +108,7 @@ function broadcastTransaction(signedTransaction) {
     signedTransaction = toHexString(new TextEncoder().encode(JSON.stringify(signedTransaction)));
 
     let xhr = new XMLHttpRequest();
-    xhr.open("POST", RPC + '/broadcast_tx_commit?tx="' + signedTransaction + '"', false);
+    xhr.open("POST", RPC + '/broadcast_tx_sync?tx="' + signedTransaction + '"', false);
     xhr.send();
     
     let response = JSON.parse(xhr.responseText);
