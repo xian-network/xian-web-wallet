@@ -245,7 +245,7 @@ function sendToken() {
     let response = broadcastTransaction(signed_tx);
     hash = response['result']['hash'];
 
-    if (response['result']['check_tx']['code'] == 1) {
+    if (response['result']['code'] == 1) {
         errorMsg.innerHTML =
           "Transaction failed! Not enough balance to cover the transaction fee or invalid transaction!";
         errorMsg.style.display = 'block';
@@ -475,7 +475,7 @@ function sendAdvTx() {
     let response = broadcastTransaction(signed_tx);
     hash = response['result']['hash'];
 
-    if (response['result']['check_tx']['code'] == 1) {
+    if (response['result']['code'] == 1) {
         error.innerHTML = 'Transaction failed! Not enough balance to cover the transaction fee or invalid transaction!';
         error.style.display = 'block';
         return;
@@ -535,7 +535,7 @@ function submitContract() {
     let response = broadcastTransaction(signed_tx);
     hash = response['result']['hash'];
 
-   if (response["result"]["check_tx"]["code"] == 1) {
+   if (response["result"]["code"] == 1) {
      error.innerHTML =
        "Transaction failed! Not enough balance to cover the transaction fee or invalid transaction!";
      error.style.display = "block";
