@@ -66,11 +66,11 @@ function handleRequest(request_event) {
     switch (request.type) {
         case "requestWalletAddress":
             response = {
-                type: "responseWalletAddress",
-                data: {
-                    address: publicKey ? locked : null,
-                    locked: locked,
-                },
+              type: "responseWalletAddress",
+              data: {
+                address: readSecureCookie("publicKey") ? locked : null,
+                locked: locked,
+              },
             };
             response = JSON.stringify(response);
             request_event.source.postMessage(response, request_event.origin);
