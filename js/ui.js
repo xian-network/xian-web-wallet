@@ -609,7 +609,7 @@ function acceptRequest() {
     response_to_wallet = JSON.stringify(response_to_wallet);
     current_request_event.source.postMessage(
       response_to_wallet,
-      request_event.origin
+        current_request_event.origin
     );
     current_request_event = null;
     changePage('wallet');
@@ -626,7 +626,7 @@ function rejectRequest() {
     response_to_wallet = JSON.stringify(response_to_wallet);
     current_request_event.source.postMessage(
       response_to_wallet,
-      request_event.origin
+      current_request_event.origin
     );
     current_request_event = null;
     changePage('wallet');
