@@ -12,7 +12,7 @@ function createWallet() {
 
     // Save the unencrypted private key to the global variable
     unencryptedPrivateKey = _unencryptedPrivateKey;
-
+    locked = false;
     changePage('wallet');
 
 }
@@ -55,7 +55,7 @@ function importWallet() {
     
     // Save the unencrypted private key to the global variable
     unencryptedPrivateKey = _unencryptedPrivateKey;
-
+    locked = false;
     changePage('wallet');
 }
 
@@ -87,6 +87,7 @@ function removeWallet(){
     eraseSecureCookie('publicKey');
     eraseSecureCookie('encryptedPrivateKey');
     unencryptedPrivateKey = null;
+    locked = true;
     changePage('get-started');
 }
 
@@ -103,11 +104,13 @@ function unlockWallet() {
     document.getElementById('passwordError').style.display = 'none';
 
     unencryptedPrivateKey = _unencryptedPrivateKey;
+    locked = false;
     changePage('wallet');
 }
 
 function lockWallet() {
     unencryptedPrivateKey = null;
+    locked = true;
     changePage('password-input');
 }
 
@@ -551,4 +554,87 @@ function submitContract() {
        contractSuccess.style.display = "block";
    }
     
+}
+
+function acceptRequest() {
+    let contract = document.getElementById('contractRequest').innerHTML;
+    let method = document.getElementById('methodRequest').innerHTML;
+    let kwargs = JSON.parse(document.getElementById('kwargsRequest').innerHTML);
+    let stampLimit = document.getElementById('stampLimitRequest').innerHTML;
+    let error = document.getElementById('requestError');
+    let success = document.getElementById('requestSuccess');
+    error.style.display = 'none';
+    success.style.display = 'none';
+
+    let payload = {
+        payload: {
+            chain_id: CHAIN_ID,
+            contract: contract,
+            function: method,
+            kwargs: kwargs,
+            stamps_supplied: parseInt(stampLimit)
+        },
+        metadata: {
+            signature: "",
+        }
+    };
+
+    let signed_tx = signTransaction(payload, unencryptedPrivateKey);
+    let response = broadcastTransaction(signed_tx);
+    hash = response['result']['hash'];
+
+    let response_to_wallet = {
+      type: "responseTransaction",
+      data: {
+        txid: "",
+        status: "",
+      },
+    };
+
+    if (response['result']['code'] == 1) {
+        error.innerHTML = 'Transaction failed! Not enough balance to cover the transaction fee or invalid transaction!';
+        error.style.display = 'block';
+        response_to_wallet.data.status = 'error';
+        response_to_wallet = JSON.stringify(response_to_wallet);
+        current_request_event.source.postMessage(
+          response_to_wallet,
+          request_event.origin
+        );
+        current_request_event = null;
+        changePage('wallet');
+        return;
+    }
+    response_to_wallet.data.txid = hash;
+    response_to_wallet.data.status = 'sent';
+    response_to_wallet = JSON.stringify(response_to_wallet);
+    current_request_event.source.postMessage(
+      response_to_wallet,
+      request_event.origin
+    );
+    current_request_event = null;
+    changePage('wallet');
+}
+
+function rejectRequest() {
+    let response_to_wallet = {
+      type: "responseTransaction",
+      data: {
+        txid: "",
+        status: "rejected",
+      },
+    };
+    response_to_wallet = JSON.stringify(response_to_wallet);
+    current_request_event.source.postMessage(
+      response_to_wallet,
+      request_event.origin
+    );
+    current_request_event = null;
+    changePage('wallet');
+}
+
+function visitDApp() {
+    let dapp_url = prompt("Enter the URL of the DApp");
+    if (dapp_url) {
+      window.open(dapp_url);
+    }
 }
