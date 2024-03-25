@@ -68,7 +68,7 @@ function handleRequest(request_event) {
             response = {
               type: "responseWalletAddress",
               data: {
-                address: readSecureCookie("publicKey") ? locked : null,
+                address: readSecureCookie("publicKey") || null,
                 locked: locked,
               },
             };
