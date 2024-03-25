@@ -611,25 +611,38 @@ function acceptRequest() {
       response_to_wallet,
         current_request_event.origin
     );
+    // Switch focus back to the window that sent the request
+    try {
+        current_request_event.source.focus();
+    }
+    catch (e) {
+        // Do nothing
+    }
     current_request_event = null;
     changePage('wallet');
 }
 
 function rejectRequest() {
-    let response_to_wallet = {
-      type: "responseTransaction",
-      data: {
-        txid: "",
-        status: "rejected",
-      },
-    };
-    response_to_wallet = JSON.stringify(response_to_wallet);
-    current_request_event.source.postMessage(
-      response_to_wallet,
-      current_request_event.origin
-    );
-    current_request_event = null;
-    changePage('wallet');
+  let response_to_wallet = {
+    type: "responseTransaction",
+    data: {
+      txid: "",
+      status: "rejected",
+    },
+  };
+  response_to_wallet = JSON.stringify(response_to_wallet);
+  current_request_event.source.postMessage(
+    response_to_wallet,
+    current_request_event.origin
+  );
+  // Switch focus back to the window that sent the request
+  try {
+    current_request_event.source.focus();
+  } catch (e) {
+    // Do nothing
+  }
+  current_request_event = null;
+  changePage("wallet");
 }
 
 function visitDApp() {
