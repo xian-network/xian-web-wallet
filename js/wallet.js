@@ -45,7 +45,6 @@ function loadWalletPage() {
         }
     });
     tokenList.innerHTML += `<a href="#" class="advanced-tx-link" onclick="changePage('send-advanced-transaction')">Create Advanced Transaction</a>` 
-    tokenList.innerHTML += `<a href="#" class="advanced-tx-link" style="display:none" onclick="visitDApp()">Visit a DApp with Wallet Connection</a>`
 }
 
 // Get current stamp rate
