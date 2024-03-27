@@ -156,6 +156,14 @@ a:hover{
     border-bottom: 1px solid #343a40;
 }
 
+.dark-mode .token-list {
+    border-top: 2px solid #343a40;
+    border-bottom: 2px solid #343a40;
+}
+.dark-mode .token-item {
+    border: 1px solid #343a40;
+}
+
 .stamp-rate{margin-top: 10px;}
 .bottom-0 {
     bottom: 0;
