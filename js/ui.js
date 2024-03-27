@@ -245,6 +245,8 @@ function sendToken() {
     };
 
     let signed_tx = signTransaction(transaction, unencryptedPrivateKey);
+    let conf = confirm("Are you sure you want to send this transaction?");
+    if (!conf) return;
     let response = broadcastTransaction(signed_tx);
     hash = response['result']['hash'];
 
@@ -475,6 +477,8 @@ function sendAdvTx() {
     });
     payload.payload.kwargs = kwargs;
     let signed_tx = signTransaction(payload, unencryptedPrivateKey);
+    let conf = confirm("Are you sure you want to send this transaction?");
+    if (!conf) return;
     let response = broadcastTransaction(signed_tx);
     hash = response['result']['hash'];
 
