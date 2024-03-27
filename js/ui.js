@@ -78,6 +78,16 @@ function copyToClipboard(elementId) {
     alert('Copied to clipboard');
 }
 
+function copyTextToClipboard(text) {
+    let element = document.createElement('textarea');
+    element.value = text;
+    document.body.appendChild(element);
+    element.select();
+    document.execCommand('copy');
+    document.body.removeChild(element);
+    alert('Copied to clipboard');
+}
+
 function removeWallet(){
     let confirm_delete = confirm("Are you sure you want to remove the wallet?");
     if (!confirm_delete) {
@@ -263,18 +273,27 @@ function sendToken() {
 }
 
 function exportPrivateKey() {
-    let exportable = toHexString(unencryptedPrivateKey);
-    // if the key is longer than 64 characters it includes the public key as well. then we need to remove it. we only need the first 64 characters
-    if (exportable.length > 64) {
-        exportable = exportable.substring(0, 64);
+    try {
+        let exportable = toHexString(unencryptedPrivateKey);
+        // if the key is longer than 64 characters it includes the public key as well. then we need to remove it. we only need the first 64 characters
+        if (exportable.length > 64) {
+            exportable = exportable.substring(0, 64);
+        }
+        let element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(exportable));
+        element.setAttribute('download', 'privateKey.txt');
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    } catch (e) {
+        let exportable = toHexString(unencryptedPrivateKey);
+        // if the key is longer than 64 characters it includes the public key as well. then we need to remove it. we only need the first 64 characters
+        if (exportable.length > 64) {
+            exportable = exportable.substring(0, 64);
+        }
+        copyTextToClipboard(exportable);
     }
-    let element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(exportable));
-    element.setAttribute('download', 'privateKey.txt');
-    element.style.display = 'none';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
 }
 
 function loadReceiveTokenPage() {
