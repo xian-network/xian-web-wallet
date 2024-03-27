@@ -66,9 +66,8 @@ a:hover{
 }
 
 .app-logo {
-    width: 100px; /* Adjust based on your logo's size */
+    width: 32px; /* Adjust based on your logo's size */
     height: auto;
-    margin-bottom: 20px;
 }
 
 .app-box {
@@ -128,10 +127,30 @@ a:hover{
 
 .app-name, .app-description {
     text-align: center;
-    margin-bottom: 10px;
-        width: 100%;
+    width: 100%;
     max-width: 400px;
 }
+.app-name{
+    color:unset;
+}
+.app-name > h2{
+    font-size: 1.25rem;
+    margin-bottom: 0;
+}
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.navbar {
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.dark-mode .navbar {
+    background-color: #1e1e1e;
+    box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+}
+
 .stamp-rate{margin-top: 10px;}
 .bottom-0 {
     bottom: 0;
