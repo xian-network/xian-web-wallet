@@ -50,7 +50,7 @@ a:hover{
 
 .dark-mode .app-box {
     background-color: #1e1e1e; /* Darker background */
-    box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1); /* Lighter shadow */
+    border: 1px solid #343a40; /* Darker border */
 }
 
 
@@ -75,9 +75,8 @@ a:hover{
     padding: 20px;
     border-radius: 8px;
     background-color: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 100%;
-     
+         border: 1px solid #ced4da;
     max-width: 400px;
 }
 
@@ -146,15 +145,15 @@ a:hover{
 }
 .navbar {
     background-color: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 1030; /* Ensure it stays above other content */
+    border-bottom: 1px solid #ced4da;
 }
 .dark-mode .navbar {
     background-color: #1e1e1e;
-    box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid #343a40;
 }
 
 .stamp-rate{margin-top: 10px;}
