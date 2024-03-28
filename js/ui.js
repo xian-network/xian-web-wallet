@@ -261,8 +261,7 @@ function sendToken() {
     hash = response['result']['hash'];
 
     if (response['result']['code'] == 1) {
-        errorMsg.innerHTML =
-          "Transaction failed! Not enough balance to cover the transaction fee or invalid transaction!";
+        errorMsg.innerHTML = response["result"]["log"];
         errorMsg.style.display = 'block';
         return;
     }
@@ -502,7 +501,7 @@ function sendAdvTx() {
     hash = response['result']['hash'];
 
     if (response['result']['code'] == 1) {
-        error.innerHTML = 'Transaction failed! Not enough balance to cover the transaction fee or invalid transaction!';
+        error.innerHTML = response["result"]["log"];
         error.style.display = 'block';
         return;
     }
@@ -562,8 +561,7 @@ function submitContract() {
     hash = response['result']['hash'];
 
    if (response["result"]["code"] == 1) {
-     contractError.innerHTML =
-       "Transaction failed! Not enough balance to cover the transaction fee or invalid transaction!";
+     contractError.innerHTML = response["result"]["log"];
        contractError.style.display = "block";
      return;
    } else {
@@ -615,7 +613,7 @@ function acceptRequest() {
     };
 
     if (response['result']['code'] == 1) {
-        error.innerHTML = 'Transaction failed! Not enough balance to cover the transaction fee or invalid transaction!';
+        error.innerHTML = response["result"]["log"];
         error.style.display = 'block';
         response_to_wallet.data.status = 'error';
         response_to_wallet = JSON.stringify(response_to_wallet);
