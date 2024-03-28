@@ -159,22 +159,48 @@ a:hover{
     width: 100%; /* Full-width buttons */
 }
 
+.online-status {
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+    gap: 10px;
+}
+
 .app-name, .app-description {
     text-align: center;
     width: 100%;
     max-width: 400px;
 }
 .app-name{
-    color:unset;
+    color: unset;
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
-.app-name > h2{
+
+.app-name h2{
     font-size: 1.25rem;
     margin-bottom: 0;
 }
 .navbar-brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
+    width: 100%;
+}
+.online-circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+    background-color: #28a745;
+}
+.offline-circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+    background-color: #dc3545;
 }
 .navbar {
     background-color: #fff;

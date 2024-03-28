@@ -141,6 +141,18 @@ function getVariable(contract, variable, key){
     return decoded;
 }
 
+function ping() {
+  try {
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", RPC + '/status', false);
+    xhr.send();
+    return true;
+  }
+  catch(e){
+    return false;
+  }
+}
+
 function getTokenInfo(contract) {
   let tokenInfo = { contract: contract };
 
