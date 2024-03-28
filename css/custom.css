@@ -42,10 +42,12 @@ a:hover{
     z-index: 1050; /* Ensures the toggler stays above most elements */
     border: 1px solid #ced4da;
     background: #fff;
+    color: #121212;
 }
 .dark-mode .dark-mode-toggler {
     border: 1px solid #343a40;
     background: #1e1e1e;
+    color: #e4e6eb;
 }
 
 /* Dark mode specific styles */
