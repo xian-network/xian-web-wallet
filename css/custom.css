@@ -40,6 +40,12 @@ a:hover{
     bottom: 1rem;
     right: 1rem;
     z-index: 1050; /* Ensures the toggler stays above most elements */
+    border: 1px solid #ced4da;
+    background: #fff;
+}
+.dark-mode .dark-mode-toggler {
+    border: 1px solid #343a40;
+    background: #1e1e1e;
 }
 
 /* Dark mode specific styles */
