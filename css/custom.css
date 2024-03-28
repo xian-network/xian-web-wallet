@@ -62,6 +62,31 @@ a:hover{
 }
 
 
+.dark-mode .cm-s-default .cm-keyword { color: #CC99CD; } /* Soft purple for keywords for better distinction */
+.dark-mode .cm-s-default .cm-atom { color: #D6BF55; } /* Golden for atoms, standing out with warmth */
+.dark-mode .cm-s-default .cm-number { color: #F08D49; } /* Soft orange for numbers, easy on the eyes */
+.dark-mode .cm-s-default .cm-def { color: #6699CC; } /* Sky blue for definitions, for clarity */
+.dark-mode .cm-s-default .cm-variable,
+.dark-mode .cm-s-default .cm-punctuation,
+.dark-mode .cm-s-default .cm-property,
+.dark-mode .cm-s-default .cm-operator { color: #AAB2BF; } /* Lighter gray for variables, punctuations, properties, and operators for subtle differentiation */
+.dark-mode .cm-s-default .cm-variable-2 { color: #7EC699; } /* Soft green for second-tier variables, for variety */
+.dark-mode .cm-s-default .cm-variable-3,
+.dark-mode .cm-s-default .cm-type { color: #67D8EF; } /* Cyan for type annotations and third-tier variables, for freshness */
+.dark-mode .cm-s-default .cm-comment { color: #999; } /* Dimmed down for comments, reducing visual noise */
+.dark-mode .cm-s-default .cm-string { color: #FFD479; } /* Soft yellow for strings, for warmth and visibility */
+.dark-mode .cm-s-default .cm-string-2 { color: #FFD479; } /* Keeping string-2 the same as strings for consistency */
+.dark-mode .cm-s-default .cm-meta { color: #555; } /* Darker gray for meta, less prominent */
+.dark-mode .cm-s-default .cm-qualifier { color: #555; } /* Matching meta for qualifiers */
+.dark-mode .cm-s-default .cm-builtin { color: #30A; } /* Soft blue for built-ins, distinguishable */
+.dark-mode .cm-s-default .cm-bracket { color: #FFEE99; } /* Light yellow for brackets, subtle yet visible */
+.dark-mode .cm-s-default .cm-tag { color: #E2777A; } /* Soft red for tags, clear and distinguishable */
+.dark-mode .cm-s-default .cm-attribute { color: #E2777A; } /* Matching tags for attributes for consistency */
+.dark-mode .cm-s-default .cm-hr { color: #999; } /* Grey for horizontal rules, minimal */
+.dark-mode .cm-s-default .cm-link { color: #D6BF55; } /* Golden for links, standing out */
+.dark-mode .cm-s-default .cm-error { color: #FF3333; } /* Bright red for errors, for immediate visibility */
+
+
 .app-container {
     height: 100%;
     min-height: 100vh; /* Use viewport height to ensure full coverage */
