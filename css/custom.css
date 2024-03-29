@@ -21,6 +21,7 @@ a:hover{
     color: #007bff;
     text-decoration: underline;
 }
+
 .ide-icon{
     position: absolute;
     left: 0;
@@ -221,7 +222,15 @@ a:hover{
 .dark-mode .token-item {
     border: 1px solid #343a40;
 }
-
+.dark-mode input, .dark-mode select, .dark-mode textarea {
+    background-color: #121212;
+    color: #e4e6eb;
+    border: 1px solid #343a40;
+}
+.dark-mode input:focus, .dark-mode select:focus, .dark-mode textarea:focus {
+    background-color: #121212;
+    color: #e4e6eb;
+}
 .stamp-rate{margin-top: 10px;}
 .bottom-0 {
     bottom: 0;
