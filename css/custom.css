@@ -4,6 +4,8 @@ html{
 }
 body {
     min-height: 100%;
+    height: 600px;
+    width: 400px;
     margin: 0;
     background-color: #f4f4f4;
     font-family: 'Inter', sans-serif;
@@ -92,11 +94,8 @@ a:hover{
     min-height: 100vh; /* Use viewport height to ensure full coverage */
     margin: 0;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-top: 80px !important;
+    padding-top: 59px !important;
     flex-direction: column;
-    padding: 20px;
 }
 
 .app-logo {
@@ -104,13 +103,20 @@ a:hover{
     height: auto;
 }
 
+.container-fluid {
+    padding: 0;
+}
+
 .app-box {
     padding: 20px;
-    border-radius: 8px;
     background-color: #fff;
     width: 100%;
          border: 1px solid #ced4da;
-    max-width: 400px;
+         border-top: 0px!important;
+         border-left: 0px!important;
+            border-right: 0px!important;
+            height: calc(100vh - 59px);
+            overflow-y: auto;
 }
 
 .app-box-title {
@@ -289,6 +295,13 @@ a:hover{
 
 .token-list {
     padding-top: 20px;
+}
+.app-box{
+    overflow: scroll;
+}
+.app-box::-webkit-scrollbar 
+{
+    width: 0px;
 }
 
 .token-item:last-child {

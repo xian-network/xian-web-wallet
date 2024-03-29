@@ -1,0 +1,11 @@
+{
+    "manifest_version": 3,
+    "name": "Xian Wallet",
+    "version": "1.0",
+    "description": "A cutting-edge self-custody wallet for the Xian Network",
+    "action": {
+      "default_popup": "index.html",
+      "default_icon": "/assets/logo.png"
+    }
+  }
+  
