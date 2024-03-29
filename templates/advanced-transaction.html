@@ -19,7 +19,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="stampLimit">Stamp Limit</label>
+        <label for="stampLimit">Stamp/GAS Limit (1 Xian = <span id="stampRate"></span> Stamps)</label>
         <input type="number" class="form-control" id="stampLimit" placeholder="Enter the stamp limit" required value="150">
     </div>
     <div class="btn-group">
@@ -27,3 +27,7 @@
         <button class="btn btn-secondary" onclick="goToWallet()">Cancel</button>
     </div>
 </div>
+<script>
+    // Get current stamp rate
+    document.getElementById("stampRate").innerHTML = getStampRate();
+</script>

@@ -11,7 +11,7 @@
         <input type="text" class="form-control" id="submitContractName" placeholder="Enter a unique contract name, beginning with 'con_'" required>
     </div>
     <div class="form-group">
-        <label for="submitContractstampLimit">Stamp Limit</label>
+        <label for="submitContractstampLimit">Stamp/GAS Limit (1 Xian = <span id="stampRate"></span> Stamps)</label>
         <input type="number" class="form-control" id="submitContractstampLimit" placeholder="Enter the stamp limit" required value="800">
     </div>
     <div id="wallet-actions" class="btn-group">
@@ -47,4 +47,8 @@
         value: "@construct\ndef seed():\n    pass\n\n@export\ndef test():\n    return 'Hello, World!'",
         mode:  "python",
     });
+
+    // Get current stamp rate
+    document.getElementById("stampRate").innerHTML = getStampRate();
+
 </script>
