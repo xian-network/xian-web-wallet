@@ -18,6 +18,7 @@ a{
     text-decoration: none;
 }
 a:hover{
+    color: #007bff;
     text-decoration: underline;
 }
 .ide-icon{
