@@ -291,7 +291,6 @@ a:hover{
 
 .token-list {
     padding-top: 20px;
-    padding-bottom: 20px;
 }
 
 .token-item:last-child {
@@ -366,10 +365,4 @@ a:hover{
 
 .app-box-description {
     margin-bottom: 10px!important;
-}
-
-.advanced-tx-link{
-    padding-top: 10px;
-    display: block;
-    text-align: center;
 }
