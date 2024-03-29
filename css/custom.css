@@ -26,7 +26,6 @@ a:hover{
     position: absolute;
     left: 0;
     font-size: 1.25rem;
-    padding: 0 15px;
     margin-bottom: 20px;
     cursor: pointer;
 }
@@ -245,7 +244,6 @@ a:hover{
     right: 0; /* Align it to the right */
     /* Adjust the size and padding as needed */
     font-size: 1.25rem;
-    padding: 0 15px;
     margin-bottom: 20px;
     cursor: pointer;
 }
