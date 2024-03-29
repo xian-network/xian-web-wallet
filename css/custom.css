@@ -187,6 +187,7 @@ a:hover{
     align-items: center;
     justify-content: space-between;
     width: 100%;
+    margin-right: 0;
 }
 .online-circle {
     width: 10px;
