@@ -25,6 +25,12 @@ function acceptRequest() {
     let response = broadcastTransaction(signed_tx);
     hash = response['result']['hash'];
 
+    let status = 'success'
+    if (response['result']['code'] == 1) {
+        status = 'error';
+    }
+    prependToTransactionHistory(hash, contract, 'transfer', {to: recipient, amount: amount}, status, new Date().toLocaleString());
+
     let response_to_wallet = {
       type: "responseTransaction",
       data: {
