@@ -12,7 +12,16 @@
         <input type="number" class="form-control" id="tokenAmount" placeholder="Enter the token amount" required>
     </div>
     <div class="btn-group">
-        <button class="btn btn-primary" onclick="sendToken()">Send Token</button>
-        <button class="btn btn-secondary" onclick="goToWallet()">Cancel</button>
+        <button class="btn btn-primary" id="send-token-send-token">Send Token</button>
+        <button class="btn btn-secondary" id="send-token-cancel">Cancel</button>
     </div>
 </div>
+
+<script>
+    document.getElementById('send-token-send-token').addEventListener('click', function() {
+        sendToken();
+    });
+    document.getElementById('send-token-cancel').addEventListener('click', function() {
+        goToWallet();
+    });
+</script>

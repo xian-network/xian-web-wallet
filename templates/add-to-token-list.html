@@ -8,7 +8,16 @@
         <input type="text" class="form-control" id="contractNameAddToken" placeholder="Enter the contract name" required>
     </div>
     <div class="btn-group">
-        <button class="btn btn-primary" onclick="addToken()">Add Token</button>
-        <button class="btn btn-secondary" onclick="goToWallet()">Cancel</button>
+        <button class="btn btn-primary" id="btn-add-token-add">Add Token</button>
+        <button class="btn btn-secondary" id="btn-add-token-cancel">Cancel</button>
     </div>
 </div>
+
+<script>
+    document.getElementById('btn-add-token-add').addEventListener('click', function() {
+        addToken();
+    });
+    document.getElementById('btn-add-token-cancel').addEventListener('click', function() {
+        goToWallet();
+    });
+</script>

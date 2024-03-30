@@ -4,9 +4,19 @@
     <div class="alert alert-danger" role="alert" id="receiveTokenError" style="display: none;"></div>
     <div class="form-group">
         <label for="yourAddressReceive">Your Address</label>
-        <span id="yourAddressReceive" onclick="copyToClipboard('yourAddressReceive')"></span>
+        <span id="yourAddressReceive"></span>
     </div>
     <div class="btn-group">
-        <button class="btn btn-secondary" onclick="goToWallet()">Back</button>
+        <button class="btn btn-secondary" id="receive-token-back">Back</button>
     </div>
 </div>
+
+<script>
+    document.getElementById('receive-token-back').addEventListener('click', function() {
+        goToWallet();
+    });
+
+    document.getElementById('yourAddressReceive').addEventListener('click', function() {
+        copyToClipboard('yourAddressReceive');
+    });
+</script>

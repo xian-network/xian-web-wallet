@@ -15,11 +15,18 @@
         <input type="password" class="form-control" id="import_confirmPassword" placeholder="Confirm your password" required>
     </div>
     <div class="btn-group">
-        <button class="btn btn-primary" onclick="importWallet()">Import Wallet</button>
-        <button class="btn btn-secondary" onclick="changePage('get-started')">Back</button>
+        <button class="btn btn-primary" id="btn-import-wallet-import-wallet">Import Wallet</button>
+        <button class="btn btn-secondary" id="btn-import-wallet-back">Back</button>
     </div>
 </div>
 <script>
+    document.getElementById('btn-import-wallet-back').addEventListener('click', function() {
+        changePage('get-started');
+    });
+    document.getElementById('btn-import-wallet-import-wallet').addEventListener('click', function() {
+        importWallet();
+    });
+
     function inputValidation() {
         const privateKey = document.getElementById('import_privateKey');
         const password = document.getElementById('import_password');

@@ -7,7 +7,7 @@ function loadWalletPage() {
     tokenList.innerHTML = "";
     tokenList.innerHTML += `<div class="title-container">
         <h2 class="token-list-title">Tokens</h2>
-        <i class="fas fa-plus-circle cogwheel-icon" onclick="changePage('add-to-token-list')" title="Add Token"></i>
+        <i class="fas fa-plus-circle cogwheel-icon" title="Add Token"></i>
     </div>`
 
     token_list.forEach((token) => {
@@ -22,17 +22,17 @@ function loadWalletPage() {
     
        
         if (tokenInfo != null) {
-            tokenList.innerHTML += `<div class="token-item">
+            tokenList.innerHTML += `<div class="token-item" data-contract="`+tokenInfo["contract"]+`">
                 <div class="token-details">
                     <div class="token-title-container">
                         <div class="token-name"><span>`+tokenInfo["name"]+`</span> (<span class="token-symbol">`+tokenInfo["symbol"]+`</span>)</div>
-                        ` + (tokenInfo["contract"] === "currency" ? "" : `<i class="fas fa-minus-circle cogwheel-icon" onclick="removeToken('`+tokenInfo["contract"]+`')" title="Remove Token"></i>`) + `
+                        ` + (tokenInfo["contract"] === "currency" ? "" : `<i class="fas fa-minus-circle cogwheel-icon" data-contract="`+tokenInfo["contract"]+`" title="Remove Token"></i>`) + `
                     </div>
                     <div class="token-balance" id="`+tokenInfo["contract"]+`Balance">0</div>
                 </div>    
                 <div class="token-actions">
-                    <button class="btn send-btn" onclick="sendTokenScreen('`+tokenInfo["contract"]+`')"><i class="fas fa-paper-plane"></i> Send</button>
-                    <button class="btn receive-btn" onclick="receiveTokenScreen('`+tokenInfo["contract"]+`')"><i class="fas fa-download"></i> Receive</button>
+                    <button class="btn send-btn"  data-contract="`+tokenInfo["contract"]+`"><i class="fas fa-paper-plane"></i> Send</button>
+                    <button class="btn receive-btn"  data-contract="`+tokenInfo["contract"]+`"><i class="fas fa-download"></i> Receive</button>
                 </div> 
             </div>
             `;
@@ -43,6 +43,25 @@ function loadWalletPage() {
                 
             }
         }
+    });
+
+    document.querySelectorAll('.token-item').forEach(item => {
+        const contract = item.getAttribute('data-contract');
+        item.querySelector('.send-btn').addEventListener('click', function() {
+            sendTokenScreen(contract);
+        });
+        item.querySelector('.receive-btn').addEventListener('click', function() {
+            receiveTokenScreen(contract);
+        });
+        if (contract !== "currency") {
+            item.querySelector('.fas.fa-minus-circle.cogwheel-icon').addEventListener('click', function() {
+                removeTokenScreen(contract);
+            });
+        }
+    });
+
+    document.querySelector('.fas.fa-plus-circle.cogwheel-icon').addEventListener('click', function() {
+        changePage('add-to-token-list');
     });
 
     let local_activity = document.getElementById("local-activity-list");

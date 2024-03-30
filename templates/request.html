@@ -20,7 +20,17 @@
         <p id="stampLimitRequest" style="text-overflow: ellipsis;overflow: hidden;"></p>
     </div>
     <div class="btn-group">
-        <button class="btn btn-primary" onclick="acceptRequest()">Accept Request</button>
-        <button class="btn btn-secondary" onclick="rejectRequest()">Reject Request</button>
+        <button class="btn btn-primary" id="request-accept-request">Accept Request</button>
+        <button class="btn btn-secondary" id="request-reject-request">Reject Request</button>
     </div>
 </div>
+
+<script>
+    document.getElementById('request-accept-request').addEventListener('click', function() {
+        acceptRequest();
+    });
+
+    document.getElementById('request-reject-request').addEventListener('click', function() {
+        rejectRequest();
+    });
+</script>

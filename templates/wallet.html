@@ -1,16 +1,16 @@
 <div class="title-container">
-    <i class="fas fa-code ide-icon" onclick="changePage('ide')" title="IDE"></i>
+    <i class="fas fa-code ide-icon" id="wallet-change-page-ide" title="IDE"></i>
     <h1 class="app-box-title">Overview</h1>
-    <i class="fas fa-cog cogwheel-icon" onclick="changePage('settings')" title="Settings"></i>
+    <i class="fas fa-cog cogwheel-icon" id="wallet-change-page-settings" title="Settings"></i>
 </div>
 <p class="app-box-description">This is your Xian wallet. You can use it to send and receive tokens on the Xian Network.</p>
 <div class="app-box-form">
     <div id="wallet-info">
-        <span class="app-box-form-title"><b>Wallet Address:</b> <span id="walletAddress" onclick="copyToClipboard('walletAddress')"></span></span>
+        <span class="app-box-form-title"><b>Wallet Address:</b> <span id="walletAddress"></span></span>
     </div>
     <div class="wallet-tabs">
-        <a href="#" id="wallet-tokens-tab" class="active" onclick="changeWalletTab('wallet-tokens')">Tokens</a>
-        <a href="#" id="local-activity-tab" onclick="changeWalletTab('local-activity')">Local Activity</a>
+        <a href="#" id="wallet-tokens-tab" id="wallet-change-tab-wallet-tokens" class="active">Tokens</a>
+        <a href="#" id="local-activity-tab" id="wallet-change-tab-local-activity">Local Activity</a>
     </div>
     <div id="wallet-tokens" class="token-list" style="display:block;">
        
@@ -18,15 +18,43 @@
     <div id="local-activity" style="display: none;">
         <div class="title-container">
             <h2 class="token-list-title">Local Activity</h2>
-            <i class="fas fa-trash cogwheel-icon" onclick="clearLocalActivity()" title="Clear Local Activity"></i>
+            <i class="fas fa-trash cogwheel-icon" id="wallet-clear-local-activity" title="Clear Local Activity"></i>
         </div>
         <div id="local-activity-list">
             No activity yet.  
         </div>
     </div>
     <div>
-        <a href="#" onclick="loadWalletPage()"><i class="fas fa-sync-alt"></i> Refresh All</a>
+        <a href="#" id="wallet-refresh-all"><i class="fas fa-sync-alt"></i> Refresh All</a>
     </div>
-
-    
 </div>
+
+<script>
+    document.getElementById('wallet-change-page-settings').addEventListener('click', function() {
+        changePage('settings');
+    });
+
+    document.getElementById('wallet-change-page-ide').addEventListener('click', function() {
+        changePage('ide');
+    });
+
+    document.getElementById('wallet-tokens-tab').addEventListener('click', function() {
+        changeWalletTab('wallet-tokens');
+    });
+
+    document.getElementById('local-activity-tab').addEventListener('click', function() {
+        changeWalletTab('local-activity');
+    });
+
+    document.getElementById('wallet-clear-local-activity').addEventListener('click', function() {
+        clearLocalActivity();
+    });
+
+    document.getElementById('wallet-refresh-all').addEventListener('click', function() {
+        loadWalletPage();
+    });
+
+    document.getElementById('walletAddress').addEventListener('click', function() {
+        copyToClipboard('walletAddress');
+    });
+</script>
