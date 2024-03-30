@@ -98,6 +98,7 @@ function removeWallet(){
     eraseSecureCookie('encryptedPrivateKey');
     unencryptedPrivateKey = null;
     locked = true;
+    localStorage.removeItem('tx_history');
     changePage('get-started');
 }
 
@@ -259,6 +260,11 @@ function sendToken() {
     if (!conf) return;
     let response = broadcastTransaction(signed_tx);
     hash = response['result']['hash'];
+    let status = 'success'
+    if (response['result']['code'] == 1) {
+        status = 'error';
+    }
+    prependToTransactionHistory(hash, contract, 'transfer', {to: recipient, amount: amount}, status, new Date().toLocaleString());
 
     if (response['result']['code'] == 1) {
         errorMsg.innerHTML = response["result"]["log"];
@@ -499,6 +505,11 @@ function sendAdvTx() {
     if (!conf) return;
     let response = broadcastTransaction(signed_tx);
     hash = response['result']['hash'];
+    let status = 'success'
+    if (response['result']['code'] == 1) {
+        status = 'error';
+    }
+    prependToTransactionHistory(hash, contractName, functionName, kwargs, status, new Date().toLocaleString());
 
     if (response['result']['code'] == 1) {
         error.innerHTML = response["result"]["log"];
@@ -559,6 +570,11 @@ function submitContract() {
     let signed_tx = signTransaction(payload, unencryptedPrivateKey);
     let response = broadcastTransaction(signed_tx);
     hash = response['result']['hash'];
+    let status = 'success'
+    if (response['result']['code'] == 1) {
+        status = 'error';
+    }
+    prependToTransactionHistory(hash, 'submission', 'submit_contract', {name: contract, code: contractCode}, status, new Date().toLocaleString());
 
    if (response["result"]["code"] == 1) {
      contractError.innerHTML = response["result"]["log"];
@@ -671,4 +687,16 @@ function visitDApp() {
     if (dapp_url) {
       window.open(dapp_url);
     }
+}
+
+function prependToTransactionHistory(hash, contract, function_name, kwargs, status, timestamp) {
+    tx_history.unshift({
+        hash: hash,
+        contract: contract,
+        function: function_name,
+        kwargs: kwargs,
+        status: status,
+        timestamp: timestamp
+    });
+    localStorage.setItem('tx_history', JSON.stringify(tx_history));
 }

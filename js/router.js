@@ -3,6 +3,7 @@ var app_box = document.getElementById("app-box");
 var publicKey = null;
 var unencryptedPrivateKey = null;
 var locked = true;
+var tx_history = JSON.parse(localStorage.getItem("tx_history")) || [];
 
 function changePage(page, some_data = null) {
   app_page = page;
