@@ -108,19 +108,25 @@ document.addEventListener("DOMContentLoaded", (event) => {
     online_status_element.innerHTML = "Node Status <div class='online-circle' title='Node is Online'></div>"
   }
 
+  Promise.all([
+    readSecureCookie("publicKey"),
+    readSecureCookie("encryptedPrivateKey"),
+  ]).then((values) => {
   if (
-    readSecureCookie("publicKey") &&
-    readSecureCookie("encryptedPrivateKey") &&
+    values[0] &&
+    values[1] &&
     unencryptedPrivateKey != null
   ) {
     changePage("wallet");
   } else if (
-    readSecureCookie("publicKey") &&
-    readSecureCookie("encryptedPrivateKey") &&
+    values[0] &&
+    values[1] &&
     unencryptedPrivateKey == null
   ) {
     changePage("password-input");
   } else {
     changePage("get-started");
   }
+  });
+
 });

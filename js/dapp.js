@@ -65,16 +65,17 @@ function handleRequest(request_event) {
     let response = {};
     switch (request.type) {
         case "requestWalletAddress":
-            response = {
-              type: "responseWalletAddress",
-              data: {
-                address: readSecureCookie("publicKey") || null,
-                locked: locked,
-              },
-            };
-            response = JSON.stringify(response);
-            request_event.source.postMessage(response, request_event.origin);
-            break;
+            readSecureCookie("publicKey").then((publicKey) => {
+                response = {
+                    type: "responseWalletAddress",
+                    data: {
+                        address: publicKey,
+                        locked: locked,
+                    },
+                };
+                response = JSON.stringify(response);
+                request_event.source.postMessage(response, request_event.origin);
+            });
         case "requestTransaction":
             // Check if all expected fields are present
             if (!request.data.contract || !request.data.method || !request.data.kwargs || !request.data.stampLimit) {

@@ -114,20 +114,25 @@ function clearLocalActivity() {
 }
 
 function unlockWallet() {
-    let password = document.getElementById('unlock_password').value;
-    let encryptedPrivateKey = readSecureCookie('encryptedPrivateKey');
-    let publicKey = readSecureCookie('publicKey');
-    let _unencryptedPrivateKey = decryptPrivateKey(encryptedPrivateKey, password, publicKey);
-    if (_unencryptedPrivateKey == null) {
-        document.getElementById('passwordError').style.display = 'block';
-        document.getElementById('passwordError').innerHTML = 'Incorrect password!';
-        return;
-    }
-    document.getElementById('passwordError').style.display = 'none';
+    Promise.all([
+        readSecureCookie('encryptedPrivateKey'),
+        readSecureCookie('publicKey')
+    ]).then((values) => {
+        let password = document.getElementById('unlock_password').value;
+        let encryptedPrivateKey = values[0];
+        let publicKey = values[1];
+        let _unencryptedPrivateKey = decryptPrivateKey(encryptedPrivateKey, password, publicKey);
+        if (_unencryptedPrivateKey == null) {
+            document.getElementById('passwordError').style.display = 'block';
+            document.getElementById('passwordError').innerHTML = 'Incorrect password!';
+            return;
+        }
+        document.getElementById('passwordError').style.display = 'none';
 
-    unencryptedPrivateKey = _unencryptedPrivateKey;
-    locked = false;
-    changePage('wallet');
+        unencryptedPrivateKey = _unencryptedPrivateKey;
+        locked = false;
+        changePage('wallet');
+    });
 }
 
 function lockWallet() {
@@ -137,11 +142,16 @@ function lockWallet() {
 }
 
 function goToWallet() {
-    if (readSecureCookie('publicKey') === null || readSecureCookie('encryptedPrivateKey') === null) {
-        changePage('get-started');
-    } else {
-        changePage('wallet');
-    }
+    Promise.all([
+        readSecureCookie('publicKey'),
+        readSecureCookie('encryptedPrivateKey')
+    ]).then((values) => {
+        if( values[0] === null || values[1] === null) {
+            changePage('get-started');
+        } else {
+            changePage('wallet');
+        }
+    });
 }
 
 function loadSettingsPage() {
@@ -198,16 +208,23 @@ function receiveTokenScreen() {
 }
 
 function refreshBalance(contract) {
-    let balance = getVariable(contract, "balances", readSecureCookie('publicKey'));
-    if (balance === null) {
-        balance = "0";
-    }
-    balance = parseFloat(balance);
-    balance = balance.toFixed(8);
-    document.getElementById(contract+'Balance').innerHTML = balance;
+    Promise.all([
+        readSecureCookie('publicKey')]
+    ).then((values) => {
+        let balance = getVariable(contract, "balances",values[0]);
+        if (balance === null) {
+            balance = "0";
+        }
+        balance = parseFloat(balance);
+        balance = balance.toFixed(8);
+        document.getElementById(contract+'Balance').innerHTML = balance;
+    });
 }
 
 function sendToken() {
+    Promise.all([
+        readSecureCookie('publicKey')]
+    ).then((values) => {
     let contract = document.getElementById('tokenName').innerHTML;
     let recipient = document.getElementById('toAddress').value;
     let amount = document.getElementById('tokenAmount').value;
@@ -238,7 +255,7 @@ function sendToken() {
         return;
     }
 
-    if (amount > parseFloat(getVariable(contract, "balances", readSecureCookie('publicKey')))) {
+    if (amount > parseFloat(getVariable(contract, "balances", values[0]))) {
         errorMsg.innerHTML = 'Insufficient balance!';
         errorMsg.style.display = 'block';
         return;
@@ -286,6 +303,7 @@ function sendToken() {
     successMsg.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/"+hash+"' target='_blank'>"+hash+"</a>";
     successMsg.style.display = 'block';
 
+    });
 }
 
 function exportPrivateKey() {

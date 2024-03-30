@@ -1,7 +1,8 @@
 var token_list = JSON.parse(localStorage.getItem("token_list")) || ["currency"];
 
 function loadWalletPage() {
-    document.getElementById("walletAddress").innerHTML = readSecureCookie("publicKey");
+    Promise.all([readSecureCookie("publicKey")]).then((values) => {
+    document.getElementById("walletAddress").innerHTML = values[0];
     let tokenList = document.getElementById("wallet-tokens");
 
     tokenList.innerHTML = "";
@@ -89,6 +90,7 @@ function loadWalletPage() {
             </div>
         </div>`;
     }
+    });
 }
 
 function changeWalletTab(tab) {

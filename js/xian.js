@@ -60,19 +60,22 @@ function createKeyPairFromSK(privateKey, password) {
 }
 
 function getNonce() {
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", RPC + '/abci_query?path="/get_next_nonce/'+readSecureCookie('publicKey')+'"', false);
-    xhr.send();
-    let response = JSON.parse(xhr.responseText);
-    if (response.result.response.value === "AA==") {
-        return 0;
-    }
-    return parseInt(atob(response.result.response.value), 10);
+    Promise.all([readSecureCookie("publicKey")]).then((values) => {
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", RPC + '/abci_query?path="/get_next_nonce/'+values[0]+'"', false);
+      xhr.send();
+      let response = JSON.parse(xhr.responseText);
+      if (response.result.response.value === "AA==") {
+          return 0;
+      }
+      return parseInt(atob(response.result.response.value), 10);
+    });
 }
 
 function signTransaction(transaction, privateKey) {
+    Promise.all([readSecureCookie("publicKey")]).then((values) => {
     transaction.payload.nonce = getNonce();
-    transaction.payload.sender = readSecureCookie("publicKey");
+    transaction.payload.sender = values[0];
 
     // sort the keys in payload (for deterministic signature generation)
     let orderedPayload = {};
@@ -101,6 +104,7 @@ function signTransaction(transaction, privateKey) {
     transaction.metadata.signature = toHexString(signatureUint8Array);
 
     return transaction;
+});
 }
 
 function broadcastTransaction(signedTransaction) {
