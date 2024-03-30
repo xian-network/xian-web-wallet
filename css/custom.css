@@ -27,6 +27,7 @@ a:hover{
     left: 0;
     font-size: 1.25rem;
     margin-bottom: 20px;
+    color:#007bff;
     cursor: pointer;
 }
 .explorer-url{
@@ -246,10 +247,11 @@ a:hover{
     font-size: 1.25rem;
     margin-bottom: 20px;
     cursor: pointer;
+    color: #007bff;
 }
 
 .cogwheel-icon:hover, .ide-icon:hover {
-   color: #e4e6eb;
+   text-decoration: underline;
 }
 
 #walletAddress {
