@@ -99,6 +99,7 @@ function removeWallet(){
     unencryptedPrivateKey = null;
     locked = true;
     localStorage.removeItem('tx_history');
+    tx_history = [];
     changePage('get-started');
 }
 
