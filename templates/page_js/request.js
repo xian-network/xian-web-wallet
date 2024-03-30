@@ -61,7 +61,7 @@ function acceptRequest() {
         // Do nothing
     }
     current_request_event = null;
-    changePage('wallet');
+    goToWallet();
 }
 
 function rejectRequest() {
