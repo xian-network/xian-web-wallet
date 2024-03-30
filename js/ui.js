@@ -103,6 +103,16 @@ function removeWallet(){
     changePage('get-started');
 }
 
+function clearLocalActivity() {
+    let confirm_clear = confirm("Are you sure you want to clear the local activity?");
+    if (!confirm_clear) {
+        return;
+    }
+    localStorage.removeItem('tx_history');
+    tx_history = [];
+    loadWalletPage();
+}
+
 function unlockWallet() {
     let password = document.getElementById('unlock_password').value;
     let encryptedPrivateKey = readSecureCookie('encryptedPrivateKey');
