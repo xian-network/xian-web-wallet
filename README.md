@@ -4,8 +4,10 @@
 
 Available at https://wallet.xian.org
 
+Or just load it as a Browser Extension!
+
 ## Introduction
-Xian Web Wallet is a cutting-edge, serverless web application tailored for secure wallet management and cryptographic keypair generation, utilizing advanced client-side JavaScript. It introduces wallet features, moving beyond keypair management to a comprehensive wallet solution. By incorporating encrypted private key and public key storage in cookies for enhanced security, it ensures user privacy and security without compromising convenience. Xian Web Wallet represents a significant leap in web-based cryptocurrency management, offering a seamless experience for managing wallet contents and cryptographic assets.
+Xian Web Wallet is a cutting-edge, serverless web application tailored for secure wallet management and cryptographic keypair generation, utilizing advanced client-side JavaScript.
 
 ## Features
 - **Wallet Management**: Intuitive interface for managing your cryptocurrency wallet, including sending and receiving transactions.
@@ -17,16 +19,18 @@ Xian Web Wallet is a cutting-edge, serverless web application tailored for secur
 ## Getting Started
 
 ### Prerequisites
+As Website
 - A web server with HTTPS cert
 - A node that you are allowed to connect to (CORS)
 
-### Installation
-Deploying Xian Web Wallet is straightforward due to its serverless nature. Simply host it on any web server to get started.
+
+As Extension
+- Load the folder as an unpacked extension
 
 ## Security
 Security and privacy are paramount in Xian Web Wallet:
 - Executes all cryptographic functions client-side, ensuring private keys never leave the user's device.
-- Stores keypairs in encrypted cookies, further enhancing security and privacy.
+- Important Keys are encrypted
 - It's recommended to use a strong, unique password for your wallet and ensure your device is secure against unauthorized access.
 
 ## Contributions
