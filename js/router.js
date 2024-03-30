@@ -12,12 +12,7 @@ function changePage(page, some_data = null) {
       .then((response) => response.text())
       .then((htmlContent) => insertHTMLAndExecuteScripts(app_box, htmlContent))
       .then(() => {
-        if (page === "wallet") loadWalletPage();
-        else if (page === "receive-token") loadReceiveTokenPage();
-        else if (page === "settings") loadSettingsPage();
-        else if (page === "send-advanced-transaction")
-          loadAdvancedTransactionPage();
-        else if (page === "send-token")
+        if (page === "send-token")
           document.getElementById("tokenName").innerHTML = some_data;
         else if (page === "add-to-token-list") {
           document.getElementById("addTokenSuccess").style.display = "none";

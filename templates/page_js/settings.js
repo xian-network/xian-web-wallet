@@ -13,3 +13,10 @@ document.getElementById('remove_wallet_export').addEventListener('click', functi
 document.getElementById('settings-save-settings').addEventListener('click', function() {
     saveSettings();
 });
+
+function loadSettingsPage() {
+    document.getElementById('rpc_input').value = RPC;
+    document.getElementById('chain_id_input').value = CHAIN_ID;
+}
+
+loadSettingsPage();
