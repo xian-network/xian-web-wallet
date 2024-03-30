@@ -331,8 +331,11 @@ function exportPrivateKey() {
 }
 
 function loadReceiveTokenPage() {
-  document.getElementById("yourAddressReceive").innerHTML =
-    readSecureCookie("publicKey");
+    Promise.all([
+        readSecureCookie('publicKey')]
+    ).then((values) => {
+        document.getElementById("yourAddressReceive").innerHTML = values[0];
+    });
 }
 
 function addToken() {
