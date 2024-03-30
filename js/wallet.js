@@ -62,6 +62,14 @@ function loadWalletPage() {
             </div>
         </div>`;
     });
+
+    if (local_activity.innerHTML === "") {
+        local_activity.innerHTML = `<div class="activity-item">
+            <div class="activity-details">
+                <div class="activity-hash">No recent activity</div>
+            </div>
+        </div>`;
+    }
 }
 
 function changeWalletTab(tab) {
