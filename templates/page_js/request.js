@@ -29,7 +29,7 @@ function acceptRequest() {
     if (response['result']['code'] == 1) {
         status = 'error';
     }
-    prependToTransactionHistory(hash, contract, 'transfer', {to: recipient, amount: amount}, status, new Date().toLocaleString());
+    prependToTransactionHistory(hash, contract, method, kwargs, status, new Date().toLocaleString());
 
     let response_to_wallet = {
       type: "responseTransaction",
