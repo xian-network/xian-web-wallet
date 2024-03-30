@@ -28,21 +28,4 @@
         <button class="btn btn-secondary" id="settings-back">Back</button>
     </div>
 </div>
-
-<script>
-    document.getElementById('settings-back').addEventListener('click', function() {
-        goToWallet();
-    });
-
-    document.getElementById('private_key_export').addEventListener('click', function() {
-        exportPrivateKey();
-    });
-
-    document.getElementById('remove_wallet_export').addEventListener('click', function() {
-        removeWallet();
-    });
-
-    document.getElementById('settings-save-settings').addEventListener('click', function() {
-        saveSettings();
-    });
-</script>
+<script src="templates/page_js/settings.js"></script>

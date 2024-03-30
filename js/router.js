@@ -85,13 +85,16 @@ function insertHTMLAndExecuteScripts(container, htmlContent) {
   container.innerHTML = htmlContent;
   const scripts = container.querySelectorAll("script");
   scripts.forEach((originalScript) => {
-    const script = document.createElement("script");
     if (originalScript.src) {
+      const script = document.createElement("script");
       script.src = originalScript.src;
+      script.onload = () => {
+        console.log(`Script loaded: ${script.src}`);
+      };
+      document.head.appendChild(script);
     } else {
-      script.textContent = originalScript.textContent;
+      console.warn("Inline script execution is blocked by CSP");
     }
-    document.head.appendChild(script).parentNode.removeChild(script);
   });
 }
 

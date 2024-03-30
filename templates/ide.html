@@ -19,18 +19,6 @@
         <button class="btn btn-secondary" id="btn-ide-go-to-wallet">Back</button>
     </div>
 </div>
-<script>
-    document.getElementById('btn-ide-submit-contract').addEventListener('click', function() {
-        submitContract();
-    });
-    document.getElementById('btn-ide-go-to-wallet').addEventListener('click', function() {
-        goToWallet();
-    });
-
-    document.getElementById('ide-send-adv-tx').addEventListener('click', function() {
-        changePage('send-advanced-transaction');
-    });
-</script>
 
 <style>
     .app-box {
@@ -55,13 +43,4 @@
         margin-bottom: 10px;
     }
 </style>
-<script>
-    var editor = CodeMirror(document.querySelector('#editor'), {
-        value: "@construct\ndef seed():\n    pass\n\n@export\ndef test():\n    return 'Hello, World!'",
-        mode:  "python",
-    });
-
-    // Get current stamp rate
-    document.getElementById("stampRate").innerHTML = getStampRate();
-
-</script>
+<script src="templates/page_js/ide.js"></script>
