@@ -1,3 +1,25 @@
+function unlockWallet() {
+    Promise.all([
+        readSecureCookie('encryptedPrivateKey'),
+        readSecureCookie('publicKey')
+    ]).then((values) => {
+        let password = document.getElementById('unlock_password').value;
+        let encryptedPrivateKey = values[0];
+        let publicKey = values[1];
+        let _unencryptedPrivateKey = decryptPrivateKey(encryptedPrivateKey, password, publicKey);
+        if (_unencryptedPrivateKey == null) {
+            document.getElementById('passwordError').style.display = 'block';
+            document.getElementById('passwordError').innerHTML = 'Incorrect password!';
+            return;
+        }
+        document.getElementById('passwordError').style.display = 'none';
+
+        unencryptedPrivateKey = _unencryptedPrivateKey;
+        locked = false;
+        changePage('wallet');
+    });
+}
+
 document.getElementById('btn-password-input-unlock-wallet').addEventListener('click', function() {
     unlockWallet();
 });

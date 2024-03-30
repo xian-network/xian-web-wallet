@@ -108,6 +108,47 @@ function changeWalletTab(tab) {
     }
 }
 
+function clearLocalActivity() {
+    let confirm_clear = confirm("Are you sure you want to clear the local activity?");
+    if (!confirm_clear) {
+        return;
+    }
+    localStorage.removeItem('tx_history');
+    tx_history = [];
+    loadWalletPage();
+}
+
+function sendTokenScreen(contract) {
+    changePage('send-token', contract);
+}
+
+function receiveTokenScreen() {
+    changePage('receive-token');
+}
+
+function removeToken(contract) {
+    let confirmation = confirm("Are you sure you want to remove this token?");
+    if (!confirmation) return;
+    token_list = token_list.filter((token) => token !== contract);
+    localStorage.setItem("token_list", JSON.stringify(token_list));
+    loadWalletPage();
+  }
+
+
+function refreshBalance(contract) {
+    Promise.all([
+        readSecureCookie('publicKey')]
+    ).then((values) => {
+        let balance = getVariable(contract, "balances",values[0]);
+        if (balance === null) {
+            balance = "0";
+        }
+        balance = parseFloat(balance);
+        balance = balance.toFixed(8);
+        document.getElementById(contract+'Balance').innerHTML = balance;
+    });
+}
+
 document.getElementById('wallet-change-page-settings').addEventListener('click', function() {
     changePage('settings');
 });

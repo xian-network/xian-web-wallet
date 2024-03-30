@@ -1,3 +1,100 @@
+function sendAdvTx() {
+  let contractName = document.getElementById("contractName").value;
+  let functionName = document.getElementById("functionName").value;
+  let error = document.getElementById("sendAdvTxError");
+  let success = document.getElementById("sendAdvTxSuccess");
+  error.style.display = "none";
+  success.style.display = "none";
+  let args = document.getElementById("adv_args");
+  let list_kwargs = document.getElementById("adv_kwargs");
+  let kwargs = {};
+  let stamps = document.getElementById("stampLimit").value;
+  let payload = {
+      payload: {
+          chain_id: CHAIN_ID,
+          contract: contractName,
+          function: functionName,
+          kwargs: {},
+          stamps_supplied: parseInt(stamps)
+      },
+      metadata: {
+          signature: "",
+      }
+  };
+  
+  let functionInfo = getContractFunctions(contractName).methods.find(
+      (func) => func.name === functionName
+  );
+  functionInfo.arguments.forEach((arg) => {
+      let value = document.getElementById(arg.name).value;
+      let expectedType = arg.type;
+      if (value === "") {
+          error.innerHTML = "All fields are required!";
+          error.style.display = "block";
+          return;
+      }
+      if (expectedType === "int") {
+          if (isNaN(value)) {
+              error.innerHTML = "Invalid value for " + arg.name + "!";
+              error.style.display = "block";
+              return;
+          }
+          value = parseInt(value);
+      }
+      if (expectedType === "float") {
+          if (isNaN(value)) {
+              error.innerHTML = "Invalid value for " + arg.name + "!";
+              error.style.display = "block";
+              return;
+          }
+          value = parseFloat(value);
+      }
+      if (expectedType === "bool") {
+          if (value !== "true" && value !== "false") {
+              error.innerHTML = "Invalid value for " + arg.name + "!";
+              error.style.display = "block";
+              return;
+          }
+          value = value === "true";
+      }
+      if (expectedType === "str") {
+          value = value.toString();
+      }
+      if (expectedType === "dict" || expectedType === "list") {
+          try {
+              value = JSON.parse(value);
+          } catch (e) {
+              error.innerHTML = "Invalid value for " + arg.name + "!";
+              error.style.display = "block";
+              return;
+          }
+      }
+      kwargs[arg.name] = value;
+  });
+  payload.payload.kwargs = kwargs;
+  let signed_tx = signTransaction(payload, unencryptedPrivateKey);
+  let conf = confirm("Are you sure you want to send this transaction?");
+  if (!conf) return;
+  let response = broadcastTransaction(signed_tx);
+  hash = response['result']['hash'];
+  let status = 'success'
+  if (response['result']['code'] == 1) {
+      status = 'error';
+  }
+  prependToTransactionHistory(hash, contractName, functionName, kwargs, status, new Date().toLocaleString());
+
+  if (response['result']['code'] == 1) {
+      error.innerHTML = response["result"]["log"];
+      error.style.display = 'block';
+      return;
+  }
+
+  else {
+      success.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
+      success.style.display = 'block';
+  }
+}
+ 
  // Get current stamp rate
  document.getElementById("stampRate").innerHTML = getStampRate();
 

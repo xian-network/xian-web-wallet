@@ -26,6 +26,24 @@ function inputValidation() {
         }
     }
 }
+function createWallet() {
+    let password = document.getElementById('password').value;
+
+    let keyPair = createKeyPair(password);
+    let publicKey = keyPair.publicKey;
+    let encryptedPrivateKey = keyPair.encryptedPrivateKey;
+    let _unencryptedPrivateKey = keyPair.unencryptedPrivateKey;
+    
+    // Save the public key and the encrypted private key
+    createSecureCookie('publicKey', publicKey, 9999);
+    createSecureCookie('encryptedPrivateKey', encryptedPrivateKey, 9999);
+
+    // Save the unencrypted private key to the global variable
+    unencryptedPrivateKey = _unencryptedPrivateKey;
+    locked = false;
+    changePage('wallet');
+
+}
 inputValidation();
 
 document.getElementById('confirmPassword').addEventListener('keyup', function(event) {

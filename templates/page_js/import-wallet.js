@@ -1,3 +1,45 @@
+function importWallet() {
+    let password = document.getElementById('import_password').value;
+    let confirmPassword = document.getElementById('import_confirmPassword').value;
+    let privateKey = document.getElementById('import_privateKey').value;
+    let importWalletError = document.getElementById('importWalletError');
+
+    if (privateKey.length !== 64) {
+        importWalletError.innerHTML = 'Invalid private key!';
+        importWalletError.style.display = 'block';
+        return;
+    }
+
+    if (password.length < 6) {
+        importWalletError.innerHTML = 'Password must be at least 6 characters long!';
+        importWalletError.style.display = 'block';
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        importWalletError.innerHTML = 'Passwords do not match!';
+        importWalletError.style.display = 'block';
+        return;
+    }
+
+    importWalletError.style.display = 'none';
+
+    let keyPair = createKeyPairFromSK(privateKey, password);
+    console.log(keyPair);
+    let publicKey = keyPair.publicKey;
+    let encryptedPrivateKey = keyPair.encryptedPrivateKey;
+    let _unencryptedPrivateKey = keyPair.unencryptedPrivateKey;
+    
+    // Save the public key and the encrypted private key
+    createSecureCookie('publicKey', publicKey, 9999);
+    createSecureCookie('encryptedPrivateKey', encryptedPrivateKey, 9999);
+    
+    // Save the unencrypted private key to the global variable
+    unencryptedPrivateKey = _unencryptedPrivateKey;
+    locked = false;
+    changePage('wallet');
+}
+
 document.getElementById('btn-import-wallet-back').addEventListener('click', function() {
     changePage('get-started');
 });
