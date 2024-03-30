@@ -44,4 +44,37 @@ function loadWalletPage() {
             }
         }
     });
+
+    let local_activity = document.getElementById("local-activity-list");
+    local_activity.innerHTML = "";
+    tx_history.forEach((tx) => {
+        local_activity.innerHTML += `
+        <div class="activity-item">
+            <div class="activity-details">
+                <div class="activity-hash">`+tx["hash"]+`</div>
+                <div class="activity-contract">`+tx["contract"]+`</div>
+                <div class="activity-function">`+tx["function"]+`</div>
+                <div class="activity-status">`+tx["status"]+`</div>
+                <div class="activity-timestamp">`+tx["timestamp"]+`</div>
+            </div>
+            <div class="activity-actions">
+                <a href="https://explorer.xian.org/tx/`+tx["hash"]+`" target="_blank"><i class="fas fa-eye"></i> View</a>
+            </div>
+        </div>`;
+    });
+}
+
+function changeWalletTab(tab) {
+    if (tab === "wallet-tokens") {
+        document.getElementById("wallet-tokens").style.display = "block";
+        document.getElementById("local-activity").style.display = "none";
+        document.getElementById("wallet-tokens-tab").classList.add("active");
+        document.getElementById("local-activity-tab").classList.remove("active");
+    }
+    else {
+        document.getElementById("wallet-tokens").style.display = "none";
+        document.getElementById("local-activity").style.display = "block";
+        document.getElementById("wallet-tokens-tab").classList.remove("active");
+        document.getElementById("local-activity-tab").classList.add("active");
+    }
 }

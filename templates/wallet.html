@@ -8,11 +8,23 @@
     <div id="wallet-info">
         <span class="app-box-form-title"><b>Wallet Address:</b> <span id="walletAddress" onclick="copyToClipboard('walletAddress')"></span></span>
     </div>
-    <div id="wallet-tokens" class="token-list">
+    <div class="wallet-tabs">
+        <a href="#" id="wallet-tokens-tab" class="active" onclick="changeWalletTab('wallet-tokens')">Tokens</a>
+        <a href="#" id="local-activity-tab" onclick="changeWalletTab('local-activity')">Local Activity</a>
+    </div>
+    <div id="wallet-tokens" class="token-list" style="display:block;">
        
     </div>
+    <div id="local-activity" style="display: none;">
+        <div class="title-container">
+            <h2 class="token-list-title">Local Activity</h2>
+        </div>
+        <div id="local-activity-list">
+            No activity yet.  
+        </div>
+    </div>
     <div>
-        <a href="#" onclick="loadWalletPage()"><i class="fas fa-sync-alt"></i> Refresh</a>
+        <a href="#" onclick="loadWalletPage()"><i class="fas fa-sync-alt"></i> Refresh All</a>
     </div>
 
     

@@ -253,6 +253,87 @@ a:hover{
 .cogwheel-icon:hover, .ide-icon:hover {
    text-decoration: underline;
 }
+#local-activity{
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+#local-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Adjusts the space between activity items */
+}
+
+.activity-item {
+    display: flex;
+    flex-direction: column; /* Stacks the details and actions on top of each other */
+    border: 1px solid #343a40;
+    border-radius: 5px;
+    overflow: hidden; /* Ensures the content fits within the borders */
+}
+
+.activity-details, .activity-actions {
+    padding: 15px;
+    display: flex;
+    flex-wrap: wrap; /* Allows items to wrap onto the next line on smaller screens */
+    gap: 10px; /* Adjusts spacing between details and actions */
+}
+
+.activity-details > div, .activity-actions > a {
+    flex: 1 1 200px; /* Allows flex items to grow and shrink but not smaller than 200px */
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap; /* Ensures the text is on one line and cuts off with ellipsis if too long */
+}
+
+.activity-actions {
+    justify-content: flex-end; /* Aligns actions to the right */
+    border-top: 1px solid #dee2e6; /* Adds a separator between details and actions */
+}
+
+.activity-actions a {
+    display: flex;
+    align-items: center; /* Centers the icon and text vertically */
+    gap: 5px; /* Adds space between the icon and text */
+}
+
+/* Optional: Enhance visibility for clickable actions */
+.activity-actions a:hover {
+    text-decoration: underline;
+    color: #007bff;
+}
+
+.wallet-tabs {
+    display: flex;
+    gap: 10px; /* Space between tabs */
+    padding-top: 20px;
+    justify-content: center; /* Aligns tabs to the center */
+}
+
+.wallet-tabs a {
+    text-decoration: none;
+    color: #007bff; /* Primary color for consistency */
+    padding: 10px 20px;
+    border: 1px solid transparent; /* Ensures the layout doesn't shift when border is added on hover or focus */
+    border-radius: 5px 5px 0 0; /* Rounded corners at the top */
+    transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.wallet-tabs a:hover, .wallet-tabs a:focus {
+
+}
+
+/* Active tab style */
+.wallet-tabs a.active {
+    border-color: #ced4da #ced4da transparent; /* Borders on the sides and top, transparent at the bottom */
+    
+    border-bottom: 1px solid #ced4da;
+    border-top: 0px;
+    border-left:0px;
+    border-right:0px;
+    margin-bottom: -1px; /* Aligns the active tab with the content box */
+}
+
 
 #walletAddress {
     overflow: hidden;
