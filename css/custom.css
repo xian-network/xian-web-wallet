@@ -267,9 +267,12 @@ a:hover{
 .activity-item {
     display: flex;
     flex-direction: column; /* Stacks the details and actions on top of each other */
-    border: 1px solid #343a40;
     border-radius: 5px;
     overflow: hidden; /* Ensures the content fits within the borders */
+    border: 1px solid #ced4da;
+}
+.dark-mode .activity-item {
+    border: 1px solid #343a40;
 }
 
 .activity-details, .activity-actions {
