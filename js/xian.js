@@ -60,21 +60,34 @@ function createKeyPairFromSK(privateKey, password) {
 }
 
 function getNonce() {
-    Promise.all([readSecureCookie("publicKey")]).then((values) => {
-      let xhr = new XMLHttpRequest();
-      xhr.open("POST", RPC + '/abci_query?path="/get_next_nonce/'+values[0]+'"', false);
-      xhr.send();
-      let response = JSON.parse(xhr.responseText);
-      if (response.result.response.value === "AA==") {
-          return 0;
-      }
-      return parseInt(atob(response.result.response.value), 10);
-    });
+  return Promise.all([readSecureCookie("publicKey")]).then((values) => {
+      return new Promise((resolve, reject) => {
+          let xhr = new XMLHttpRequest();
+          xhr.open("POST", RPC + '/abci_query?path="/get_next_nonce/'+values[0]+'"', true); // Should be true for asynchronous
+          xhr.onload = function() {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                  let response = JSON.parse(xhr.responseText);
+                  if (response.result.response.value === "AA==") {
+                      resolve(0);
+                  } else {
+                      resolve(parseInt(atob(response.result.response.value), 10));
+                  }
+              } else {
+                  reject("Failed to fetch nonce: HTTP status " + xhr.status);
+              }
+          };
+          xhr.onerror = function() {
+              reject("Network error");
+          };
+          xhr.send();
+      });
+  });
 }
 
+
 function signTransaction(transaction, privateKey) {
-    return Promise.all([readSecureCookie("publicKey")]).then((values) => {
-      transaction.payload.nonce = getNonce();
+    return Promise.all([readSecureCookie("publicKey"), getNonce()]).then((values) => {
+      transaction.payload.nonce = values[1];
       transaction.payload.sender = values[0];
 
       // sort the keys in payload (for deterministic signature generation)
@@ -102,15 +115,14 @@ function signTransaction(transaction, privateKey) {
 
       // Convert the signature into a hex string
       transaction.metadata.signature = toHexString(signatureUint8Array);
-      
       return transaction;
   });
 }
 
 function broadcastTransaction(signedTransaction) {
     // Broadcast the transaction as hex
+    signedTransaction = signedTransaction[0];
     signedTransaction = toHexString(new TextEncoder().encode(JSON.stringify(signedTransaction)));
-
     let xhr = new XMLHttpRequest();
     xhr.open("POST", RPC + '/broadcast_tx_sync?tx="' + signedTransaction + '"', false);
     xhr.send();
