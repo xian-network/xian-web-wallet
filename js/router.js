@@ -14,10 +14,7 @@ function changePage(page, some_data = null) {
       .then(() => {
         if (page === "send-token")
           document.getElementById("tokenName").innerHTML = some_data;
-        else if (page === "add-to-token-list") {
-          document.getElementById("addTokenSuccess").style.display = "none";
-          document.getElementById("addTokenError").style.display = "none";
-        } else if (page === "request") {
+        else if (page === "request") {
           document.getElementById("requestFrom").innerHTML =
             some_data["event"].origin;
           document.getElementById("requestFrom2").innerHTML =
