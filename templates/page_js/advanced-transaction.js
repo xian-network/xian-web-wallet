@@ -69,6 +69,14 @@ function sendAdvTx() {
               return;
           }
       }
+      if (expectedType === "Any") {
+            try {
+                value = JSON.parse(value);
+            }
+            catch (e) {
+                value = value.toString();
+            }
+        }
       kwargs[arg.name] = value;
   });
   payload.payload.kwargs = kwargs;
