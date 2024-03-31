@@ -76,10 +76,16 @@ function changePage(page, some_data = null) {
 function insertHTMLAndExecuteScripts(container, htmlContent) {
   container.innerHTML = htmlContent;
   const scripts = container.querySelectorAll("script");
+
+  // Identify and remove previously loaded scripts to prevent duplicates
+  const oldScripts = document.querySelectorAll('script[data-script="dynamic"]');
+  oldScripts.forEach(script => script.remove());
+
   scripts.forEach((originalScript) => {
     if (originalScript.src) {
       const script = document.createElement("script");
       script.src = originalScript.src;
+      script.setAttribute('data-script', 'dynamic'); // Mark script for identification
       script.onload = () => {
         console.log(`Script loaded: ${script.src}`);
       };
@@ -89,6 +95,7 @@ function insertHTMLAndExecuteScripts(container, htmlContent) {
     }
   });
 }
+
 
 document.addEventListener("DOMContentLoaded", (event) => {
   let online_status = ping();
