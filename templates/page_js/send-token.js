@@ -59,8 +59,7 @@ function sendToken() {
             signature: "",
         }
     };
-
-    let signed_tx = signTransaction(transaction, unencryptedPrivateKey);
+    Promise.all([signTransaction(transaction, unencryptedPrivateKey)]).then((signed_tx) => {
     let conf = confirm("Are you sure you want to send this transaction?");
     if (!conf) return;
     let response = broadcastTransaction(signed_tx);
@@ -81,6 +80,7 @@ function sendToken() {
     successMsg.style.display = 'block';
 
     });
+});
 }
 
 document.getElementById('send-token-send-token').addEventListener('click', function() {

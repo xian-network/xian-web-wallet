@@ -73,38 +73,38 @@ function getNonce() {
 }
 
 function signTransaction(transaction, privateKey) {
-    Promise.all([readSecureCookie("publicKey")]).then((values) => {
-    transaction.payload.nonce = getNonce();
-    transaction.payload.sender = values[0];
+    return Promise.all([readSecureCookie("publicKey")]).then((values) => {
+      transaction.payload.nonce = getNonce();
+      transaction.payload.sender = values[0];
 
-    // sort the keys in payload (for deterministic signature generation)
-    let orderedPayload = {};
-    Object.keys(transaction.payload).sort().forEach(function(key) {
-        orderedPayload[key] = transaction.payload[key];
-    });
+      // sort the keys in payload (for deterministic signature generation)
+      let orderedPayload = {};
+      Object.keys(transaction.payload).sort().forEach(function(key) {
+          orderedPayload[key] = transaction.payload[key];
+      });
 
-    let serializedTransaction = JSON.stringify(orderedPayload);
-    let transactionUint8Array = new TextEncoder().encode(serializedTransaction);
+      let serializedTransaction = JSON.stringify(orderedPayload);
+      let transactionUint8Array = new TextEncoder().encode(serializedTransaction);
 
-    let combinedKey = new Uint8Array(64);
-    combinedKey.set(privateKey);
-    combinedKey.set(fromHexString(transaction.payload.sender), 32);
+      let combinedKey = new Uint8Array(64);
+      combinedKey.set(privateKey);
+      combinedKey.set(fromHexString(transaction.payload.sender), 32);
 
 
-    // Use nacl.sign.detached to get the signature
-    let signatureUint8Array = nacl.sign.detached(
-      transactionUint8Array,
-      combinedKey
-    );
-    
-    // Add the ordered payload to the transaction
-    transaction.payload = orderedPayload;
+      // Use nacl.sign.detached to get the signature
+      let signatureUint8Array = nacl.sign.detached(
+        transactionUint8Array,
+        combinedKey
+      );
+      
+      // Add the ordered payload to the transaction
+      transaction.payload = orderedPayload;
 
-    // Convert the signature into a hex string
-    transaction.metadata.signature = toHexString(signatureUint8Array);
-
-    return transaction;
-});
+      // Convert the signature into a hex string
+      transaction.metadata.signature = toHexString(signatureUint8Array);
+      
+      return transaction;
+  });
 }
 
 function broadcastTransaction(signedTransaction) {

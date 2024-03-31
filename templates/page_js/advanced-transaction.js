@@ -72,27 +72,28 @@ function sendAdvTx() {
       kwargs[arg.name] = value;
   });
   payload.payload.kwargs = kwargs;
-  let signed_tx = signTransaction(payload, unencryptedPrivateKey);
-  let conf = confirm("Are you sure you want to send this transaction?");
-  if (!conf) return;
-  let response = broadcastTransaction(signed_tx);
-  hash = response['result']['hash'];
-  let status = 'success'
-  if (response['result']['code'] == 1) {
-      status = 'error';
-  }
-  prependToTransactionHistory(hash, contractName, functionName, kwargs, status, new Date().toLocaleString());
+  Promise.all([signTransaction(payload, unencryptedPrivateKey)]).then((signed_tx) => {
+    let conf = confirm("Are you sure you want to send this transaction?");
+    if (!conf) return;
+    let response = broadcastTransaction(signed_tx);
+    hash = response['result']['hash'];
+    let status = 'success'
+    if (response['result']['code'] == 1) {
+        status = 'error';
+    }
+    prependToTransactionHistory(hash, contractName, functionName, kwargs, status, new Date().toLocaleString());
 
-  if (response['result']['code'] == 1) {
-      error.innerHTML = response["result"]["log"];
-      error.style.display = 'block';
-      return;
-  }
+    if (response['result']['code'] == 1) {
+        error.innerHTML = response["result"]["log"];
+        error.style.display = 'block';
+        return;
+    }
 
-  else {
-      success.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
-      success.style.display = 'block';
-  }
+    else {
+        success.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
+        success.style.display = 'block';
+    }
+  });
 }
  
  // Get current stamp rate

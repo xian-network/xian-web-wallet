@@ -46,8 +46,7 @@ function submitContract() {
             signature: "",
         }
     };
-
-    let signed_tx = signTransaction(payload, unencryptedPrivateKey);
+    Promise.all([signTransaction(payload, unencryptedPrivateKey)]).then((signed_tx) => {
     let response = broadcastTransaction(signed_tx);
     hash = response['result']['hash'];
     let status = 'success'
@@ -70,7 +69,7 @@ function submitContract() {
        "</a>";
        contractSuccess.style.display = "block";
    }
-    
+    });
 }
 
 // Get current stamp rate

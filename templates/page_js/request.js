@@ -20,8 +20,8 @@ function acceptRequest() {
             signature: "",
         }
     };
-
-    let signed_tx = signTransaction(payload, unencryptedPrivateKey);
+    Promise.all([signTransaction(payload, unencryptedPrivateKey)]).then((signed_tx) => {
+   
     let response = broadcastTransaction(signed_tx);
     hash = response['result']['hash'];
 
@@ -68,6 +68,7 @@ function acceptRequest() {
     }
     current_request_event = null;
     goToWallet();
+});
 }
 
 function rejectRequest() {
