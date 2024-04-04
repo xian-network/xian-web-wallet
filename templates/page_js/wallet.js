@@ -1,6 +1,10 @@
 var token_list = JSON.parse(localStorage.getItem("token_list")) || ["currency"];
 
 function loadWalletPage() {
+    let spinner = document.getElementById("wallet-refresh-all");
+    spinner = spinner.querySelector("i");
+    spinner.classList.add("fa-spin");
+
     Promise.all([readSecureCookie("publicKey")]).then((values) => {
     document.getElementById("walletAddress").innerHTML = values[0];
     let tokenList = document.getElementById("wallet-tokens");
@@ -91,6 +95,7 @@ function loadWalletPage() {
         </div>`;
     }
     });
+    spinner.classList.remove("fa-spin");
 }
 
 function changeWalletTab(tab) {
