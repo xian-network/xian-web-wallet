@@ -28,6 +28,36 @@ function changePage(page, some_data = null) {
           document.getElementById("stampLimitRequest").innerHTML =
             some_data["data"]["stampLimit"];
         }
+        else if (page === "password-input") {
+          document.getElementById("side-nav").style.display = "none";
+          document.getElementById("app-box").style.borderTopLeftRadius = "8px";
+          document.getElementById("app-box").style.borderBottomLeftRadius = "8px";
+          document.getElementById("app-box").style.borderLeftWidth = "1px";
+        }
+        else if (page === "create-wallet") {
+          document.getElementById("side-nav").style.display = "none";
+          document.getElementById("app-box").style.borderTopLeftRadius = "8px";
+          document.getElementById("app-box").style.borderBottomLeftRadius = "8px";
+          document.getElementById("app-box").style.borderLeftWidth = "1px";
+        }
+        else if (page === "import-wallet") {
+          document.getElementById("side-nav").style.display = "none";
+          document.getElementById("app-box").style.borderTopLeftRadius = "8px";
+          document.getElementById("app-box").style.borderBottomLeftRadius = "8px";
+          document.getElementById("app-box").style.borderLeftWidth = "1px";
+        }
+        else if (page === "get-started") {
+          document.getElementById("side-nav").style.display = "none";
+          document.getElementById("app-box").style.borderTopLeftRadius = "8px";
+          document.getElementById("app-box").style.borderBottomLeftRadius = "8px";
+          document.getElementById("app-box").style.borderLeftWidth = "1px";
+        }
+        else{
+          document.getElementById("side-nav").style.display = "flex";
+          document.getElementById("app-box").style.borderLeftWidth = "0px";
+          document.getElementById("app-box").style.borderTopLeftRadius = "0px";
+          document.getElementById("app-box").style.borderBottomLeftRadius = "0px";
+        }
       });
   };
 

@@ -96,13 +96,40 @@ a:hover{
     justify-content: center;
     align-items: center;
     padding-top: 80px !important;
-    flex-direction: column;
     padding: 20px;
 }
 
 .app-logo {
     width: 32px; /* Adjust based on your logo's size */
     height: auto;
+}
+
+.side-nav {
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    border-radius: 8px;
+    width: auto;
+    border: 1px solid #ced4da;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    background-color: #fff;
+    height: auto;
+}
+.side-nav-item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.side-nav-item i {
+    width: 32px;
+    height: auto;
+}
+
+.dark-mode .side-nav {
+    border: 1px solid #343a40;
+    background-color: #1e1e1e;
 }
 
 .app-box {
@@ -112,6 +139,7 @@ a:hover{
     width: 100%;
          border: 1px solid #ced4da;
     max-width: 400px;
+    min-width: 300px;
 }
 
 .app-box-title {

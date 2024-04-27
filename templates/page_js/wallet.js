@@ -154,13 +154,7 @@ function refreshBalance(contract) {
     });
 }
 
-document.getElementById('wallet-change-page-settings').addEventListener('click', function() {
-    changePage('settings');
-});
 
-document.getElementById('wallet-change-page-ide').addEventListener('click', function() {
-    changePage('ide');
-});
 
 document.getElementById('wallet-tokens-tab').addEventListener('click', function() {
     changeWalletTab('wallet-tokens');

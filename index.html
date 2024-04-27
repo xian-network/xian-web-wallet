@@ -29,19 +29,29 @@
     </nav>
     
     <div class="app-container">
-
-        <div class="app-box" id="app-box">
-           
-        </div>
-        
-        <div class="github-link" style="display: none;">
-            <a href="https://github.com/xian-network/xian-web-wallet" target="_blank">
-                <i class="fab fa-github"></i>
-            </a>
+        <div style="display: flex;">
+            <div class="side-nav" id="side-nav" style="display: none;">
+                <div class="side-nav-item" id="side-change-page-wallet">
+                    <i class="fas fa-home" title="Wallet Overview" ></i>
+                    Wallet Overview
+                </div>
+                <div class="side-nav-item" id="side-change-page-ide">
+                    <i class="fas fa-code"  title="IDE"></i>
+                    IDE
+                </div>
+                <div class="side-nav-item" id="side-change-page-settings">
+                    <i class="fas fa-cog
+                    "  title="Settings"></i>
+                    Settings
+                </div>
+            </div>
+            <div class="app-box" id="app-box">
+            
+            </div>
         </div>
     </div>
 
-    <button class="btn dark-mode-toggler" id="darkModeToggler">
+    <button class="btn dark-mode-toggler" id="darkModeToggler" title="Toggle Dark Mode">
         <i class="fas fa-moon"></i> <!-- Default icon -->
     </button>   
 
@@ -53,5 +63,6 @@
     <script src="js/helpers.js"></script>
     <script src="js/providers/codemirror.js"></script>
     <script src="js/providers/python.js"></script>
+    <script src="js/index.js?v=1"></script>
 </body>
 </html>
