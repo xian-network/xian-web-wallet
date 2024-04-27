@@ -99,6 +99,16 @@ a:hover{
     padding: 20px;
 }
 
+.wrap-app{
+    display: flex; max-width: 100%;
+}
+
+@media (max-width: 768px) {
+    .wrap-app{
+        flex-direction: column;
+    }
+}
+
 .app-logo {
     width: 32px; /* Adjust based on your logo's size */
     height: auto;
