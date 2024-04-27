@@ -33,8 +33,13 @@ function changePage(page, some_data = null) {
           if (window.innerWidth > 768) {
             document.getElementById("app-box").style.borderTopLeftRadius = "8px";
             document.getElementById("app-box").style.borderBottomLeftRadius = "8px";
-            document.getElementById("app-box").style.borderLeftWidth = "1px";
+           
           }
+          else{
+            document.getElementById("app-box").style.borderTopLeftRadius = "8px";
+            document.getElementById("app-box").style.borderTopRightRadius = "8px";
+          }
+          document.getElementById("app-box").style.borderLeftWidth = "1px";
         }
         else{
           document.getElementById("side-nav").style.display = "flex";
@@ -42,6 +47,13 @@ function changePage(page, some_data = null) {
             document.getElementById("app-box").style.borderLeftWidth = "0px";
             document.getElementById("app-box").style.borderTopLeftRadius = "0px";
             document.getElementById("app-box").style.borderBottomLeftRadius = "0px";
+          }
+          else{
+            document.getElementById("app-box").style.borderTopLeftRadius = "0px";
+            document.getElementById("app-box").style.borderTopRightRadius = "0px";
+            document.getElementById("side-nav").style.borderTopRightRadius = "8px";
+            document.getElementById("side-nav").style.borderBottomLeftRadius = "0px";
+            document.getElementById("side-nav").style.borderBottomWidth = "0px";
           }
         }
       });
