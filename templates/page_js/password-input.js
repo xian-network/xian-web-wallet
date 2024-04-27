@@ -20,6 +20,21 @@ function unlockWallet() {
     });
 }
 
+function removeWallet(){
+    let confirm_delete = confirm("Are you sure you want to remove the wallet?");
+    if (!confirm_delete) {
+        return;
+    }
+    // Removes the wallet
+    eraseSecureCookie('publicKey');
+    eraseSecureCookie('encryptedPrivateKey');
+    unencryptedPrivateKey = null;
+    locked = true;
+    localStorage.removeItem('tx_history');
+    tx_history = [];
+    changePage('get-started');
+}
+
 document.getElementById('btn-password-input-unlock-wallet').addEventListener('click', function() {
     unlockWallet();
 });
