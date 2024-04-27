@@ -45,11 +45,13 @@ function changePage(page, some_data = null) {
           document.getElementById("side-nav").style.display = "flex";
           if (window.innerWidth > 768) {
             document.getElementById("app-box").style.borderLeftWidth = "0px";
+           
             document.getElementById("app-box").style.borderTopLeftRadius = "0px";
             document.getElementById("app-box").style.borderTopRightRadius = "8px";
             document.getElementById("app-box").style.borderBottomLeftRadius = "0px";
             document.getElementById("side-nav").style.borderBottomLeftRadius = "8px";
             document.getElementById("side-nav").style.borderTopRightRadius = "0px";
+            document.getElementById("side-nav").style.borderBottomWidth = "1px";
           }
           else{
             document.getElementById("app-box").style.borderTopLeftRadius = "0px";
