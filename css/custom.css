@@ -125,6 +125,7 @@ a:hover{
     border-bottom-right-radius: 0px;
     background-color: #fff;
     height: auto;
+    min-width: 200px;
 }
 .side-nav-item {
     display: flex;
