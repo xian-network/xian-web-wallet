@@ -1,6 +1,10 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    //Accept only messages from extention background script
+    // Message from background.js
     if(sender.id === chrome.runtime.id && sender.origin === "null"){ 
+        
+    }
+    // Message from site this extension is injected into
+    else{
         
     }
 });
