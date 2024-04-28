@@ -1,7 +1,5 @@
 # Xian Web Wallet & Extension
 
-[![CodeQL](https://github.com/crosschainer/xian-web-wallet/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/crosschainer/xian-web-wallet/actions/workflows/github-code-scanning/codeql)
-
 Available at https://wallet.xian.org
 
 Or just load it as a Browser Extension!
