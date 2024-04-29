@@ -11,6 +11,8 @@ if (runningAsExtension()) {
                 return;
             }
             changePage('request-transaction', message, sendResponse);
+            // Focus on the extension window
+            window.focus();
         }
 
         return true;
