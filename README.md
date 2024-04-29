@@ -29,6 +29,19 @@ Security and privacy are paramount in Xian Web Wallet:
 - Important Keys are encrypted
 - It's recommended to use a strong, unique password for your wallet and ensure your device is secure against unauthorized access.
 
+## dApp Integration
+**Only for Extension**
+
+Request Wallet Information
+```javascript
+document.dispatchEvent(new CustomEvent('xianWalletGetInfo'));
+document.addEventListener('xianWalletInfo', function(event) {
+    console.log(event.detail);
+});
+```
+
+
+
 ## Contributions
 We warmly welcome contributions to Xian Web Wallet. To contribute, fork the repository, make your changes, and submit a pull request.
 
