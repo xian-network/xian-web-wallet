@@ -6,26 +6,17 @@ const isJSON = (json) => {
 }
 
 document.addEventListener('xianWalletGetInfo', (event) => {
-    const detail = event.detail
     getWalletInfo()
 });
 
 document.addEventListener('xianWalletSendTx', (event) => {
-    const detail = event.detail
-    if (isJSON(detail)) {
-        xianWalletSendTx(detail)}
-    else{
-        const errors = ['Expected event detail to be JSON string']
-        document.dispatchEvent(new CustomEvent('xianWalletTxStatus', {detail: {errors, rejected: detail}}));
-        return
-    }
+    xianWalletSendTx(event.detail)
 });
 
 const xianWalletSendTx = (detail) => { 
     chrome.runtime.sendMessage({type: 'dAppSendTransaction', data: detail}, (response) => {
-        if (chrome.runtime.lastError) return
-        if(response !== 'ok'){
-            returnTxStatusToPage(response)
+        if(!chrome.runtime.lastError || response !== 'ok'){
+            document.dispatchEvent(new CustomEvent('xianWalletTxStatus', {detail: response}));
         }
     });
 }
@@ -38,12 +29,11 @@ const getWalletInfo = () => {
     });
 }
 
-
 // Docs
-// Dispatch xianWalletGetInfo event to send request for wallet info
-// document.dispatchEvent(new CustomEvent('xianWalletGetInfo'));
-// Listen for xianWalletInfo event to get wallet info response
-document.addEventListener('xianWalletInfo', (event) => {
-    const detail = event.detail
-    console.log(detail)
+// Listen for transaction status
+document.addEventListener('xianWalletTxStatus', function(event) {
+    console.log(event.detail); // { address: 'wallet_address', locked: true/false, chainId: 'chainId_of_wallet' }
 });
+
+// Request transaction
+//document.dispatchEvent(new CustomEvent('xianWalletSendTx', {detail: {contract:"currency", method:"transfer", kwargs:{"to":"wallet_address", "amount":1000}, stampLimit:30}}));

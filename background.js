@@ -34,6 +34,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             sendResponse({address: '', locked: true, chainId: ''});
             return;
         }
+        if (!appTabId && message.type === 'dAppSendTransaction') { // If the extension is not open, return an error response
+            sendResponse({errors: ['Extension not open']});
+            return;
+        }
         // Forward the message to the extension window
         chrome.runtime.sendMessage(message, sendResponse);
     }

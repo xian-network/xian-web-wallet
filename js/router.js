@@ -4,8 +4,9 @@ var publicKey = null;
 var unencryptedPrivateKey = null;
 var locked = true;
 var tx_history = JSON.parse(localStorage.getItem("tx_history")) || [];
+var sendResponse = null;
 
-function changePage(page, some_data = null) {
+function changePage(page, some_data = null, send_response = null) {
   app_page = page;
   const loadHtmlAndScripts = (htmlPath) => {
     fetch(htmlPath)
@@ -14,19 +15,16 @@ function changePage(page, some_data = null) {
       .then(() => {
         if (page === "send-token")
           document.getElementById("tokenName").innerHTML = some_data;
-        else if (page === "request") {
-          document.getElementById("requestFrom").innerHTML =
-            some_data["event"].origin;
-          document.getElementById("requestFrom2").innerHTML =
-            some_data["event"].origin;
-          document.getElementById("contractRequest").innerHTML =
+        else if (page === "request-transaction") {
+          document.getElementById("requestTransactionContract").innerHTML =
             some_data["data"]["contract"];
-          document.getElementById("methodRequest").innerHTML =
+          document.getElementById("requestTransactionFunction").innerHTML =
             some_data["data"]["method"];
-          document.getElementById("kwargsRequest").innerHTML =
+          document.getElementById("requestTransactionParams").innerHTML =
             JSON.stringify(some_data["data"]["kwargs"]);
-          document.getElementById("stampLimitRequest").innerHTML =
+          document.getElementById("requestTransactionStampLimit").innerHTML =
             some_data["data"]["stampLimit"];
+            sendResponse = send_response;
         }
         else if (page === "password-input" || page === "create-wallet" || page === "import-wallet" || page === "get-started") {
           document.getElementById("side-nav").style.display = "none";
@@ -100,8 +98,8 @@ function changePage(page, some_data = null) {
     case "ide":
       loadHtmlAndScripts("templates/ide.html");
       break;
-    case "request":
-      loadHtmlAndScripts("templates/request.html");
+    case "request-transaction":
+      loadHtmlAndScripts("templates/request-transaction.html");
       break;
     default:
       break;

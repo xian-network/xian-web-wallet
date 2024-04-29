@@ -43,6 +43,29 @@ document.addEventListener('xianWalletInfo', function(event) {
 document.dispatchEvent(new CustomEvent('xianWalletGetInfo'));
 ```
 
+Request Transaction
+```javascript
+// Listen for transaction response
+document.addEventListener('xianWalletTxStatus', function(event) {
+    console.log(event.detail); // { status: 'sent', txid: 'transaction_id' }
+});
+
+// Request transaction
+document.dispatchEvent(new CustomEvent('xianWalletSendTx', {
+    detail:
+        {
+            contract:"currency", 
+            method:"transfer", 
+            kwargs:{
+                "to":"wallet_address",
+                "amount":1000
+            }, 
+            stampLimit:30
+        }
+    }
+));
+```
+
 
 
 ## Contributions
