@@ -14,6 +14,10 @@ document.getElementById('side-lock-wallet').addEventListener('click', function()
     lockWallet();
 });
 
+document.getElementById('side-change-page-govenance').addEventListener('click', function() {
+    changePage('governance');
+});
+
 function lockWallet() {
     let confirm_lock = confirm("Are you sure you want to lock the wallet?");
     if (!confirm_lock) {
