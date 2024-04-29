@@ -30,9 +30,8 @@ chrome.action.onClicked.addListener(function(tab) {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'dAppSendTransaction' || message.type === 'getWalletInfo') {
-        // If the extension window is not open, return an error
-        if (!appTabId) {
-            sendResponse({error: 'Extension window is not open'});
+        if (!appTabId && message.type === 'getWalletInfo') { // If the extension is not open, return an empty response
+            sendResponse({address: '', locked: true, chainId: ''});
             return;
         }
         // Forward the message to the extension window
