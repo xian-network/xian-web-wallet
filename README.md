@@ -34,10 +34,13 @@ Security and privacy are paramount in Xian Web Wallet:
 
 Request Wallet Information
 ```javascript
-document.dispatchEvent(new CustomEvent('xianWalletGetInfo'));
+// Listen for wallet info
 document.addEventListener('xianWalletInfo', function(event) {
     console.log(event.detail); // { address: 'wallet_address', locked: true/false, chainId: 'chainId_of_wallet' }
 });
+
+// Request wallet info
+document.dispatchEvent(new CustomEvent('xianWalletGetInfo'));
 ```
 
 
