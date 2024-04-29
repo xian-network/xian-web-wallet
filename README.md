@@ -36,7 +36,7 @@ Request Wallet Information
 ```javascript
 document.dispatchEvent(new CustomEvent('xianWalletGetInfo'));
 document.addEventListener('xianWalletInfo', function(event) {
-    console.log(event.detail);
+    console.log(event.detail); // { address: 'wallet_address', locked: true/false, chainId: 'chainId_of_wallet' }
 });
 ```
 
