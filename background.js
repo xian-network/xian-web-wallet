@@ -26,3 +26,18 @@ chrome.action.onClicked.addListener(function(tab) {
         });
     }
 });
+
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'dAppSendTransaction' || message.type === 'getWalletInfo') {
+        // If the extension window is not open, return an error
+        if (!appTabId) {
+            sendResponse({error: 'Extension window is not open'});
+            return;
+        }
+        // Forward the message to the extension window
+        chrome.runtime.sendMessage(message, sendResponse);
+    }
+    // Make sure to return true to indicate that you will send a response asynchronously
+    return true;
+});

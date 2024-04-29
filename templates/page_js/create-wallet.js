@@ -30,16 +30,17 @@ function createWallet() {
     let password = document.getElementById('password').value;
 
     let keyPair = createKeyPair(password);
-    let publicKey = keyPair.publicKey;
+    let public_key = keyPair.publicKey;
     let encryptedPrivateKey = keyPair.encryptedPrivateKey;
     let _unencryptedPrivateKey = keyPair.unencryptedPrivateKey;
     
     // Save the public key and the encrypted private key
-    createSecureCookie('publicKey', publicKey, 9999);
+    createSecureCookie('publicKey', public_key, 9999);
     createSecureCookie('encryptedPrivateKey', encryptedPrivateKey, 9999);
 
     // Save the unencrypted private key to the global variable
     unencryptedPrivateKey = _unencryptedPrivateKey;
+    publicKey = public_key;
     locked = false;
     changePage('wallet');
 

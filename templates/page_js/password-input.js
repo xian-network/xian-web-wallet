@@ -5,8 +5,8 @@ function unlockWallet() {
     ]).then((values) => {
         let password = document.getElementById('unlock_password').value;
         let encryptedPrivateKey = values[0];
-        let publicKey = values[1];
-        let _unencryptedPrivateKey = decryptPrivateKey(encryptedPrivateKey, password, publicKey);
+        let public_key = values[1];
+        let _unencryptedPrivateKey = decryptPrivateKey(encryptedPrivateKey, password, public_key);
         if (_unencryptedPrivateKey == null) {
             document.getElementById('passwordError').style.display = 'block';
             document.getElementById('passwordError').innerHTML = 'Incorrect password!';
@@ -15,6 +15,7 @@ function unlockWallet() {
         document.getElementById('passwordError').style.display = 'none';
 
         unencryptedPrivateKey = _unencryptedPrivateKey;
+        publicKey = public_key;
         locked = false;
         changePage('wallet');
     });

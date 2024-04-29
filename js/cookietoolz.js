@@ -1,6 +1,8 @@
 // Helper function to check if running as an extension
 function runningAsExtension() {
-    return (typeof chrome !== "undefined" && chrome.storage) || (typeof browser !== "undefined" && browser.storage);
+    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.id) {
+        return true;
+    }
 }
 
 
