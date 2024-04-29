@@ -47,7 +47,7 @@ Request Transaction
 ```javascript
 // Listen for transaction response
 document.addEventListener('xianWalletTxStatus', function(event) {
-    console.log(event.detail); // { status: 'sent', txid: 'transaction_id' }
+    console.log(event.detail); // { status: 'sent', txid: 'transaction_id' } or { errors: []}
 });
 
 // Request transaction

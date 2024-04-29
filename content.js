@@ -28,12 +28,3 @@ const getWalletInfo = () => {
         }
     });
 }
-
-// Docs
-// Listen for transaction status
-document.addEventListener('xianWalletTxStatus', function(event) {
-    console.log(event.detail); // { address: 'wallet_address', locked: true/false, chainId: 'chainId_of_wallet' }
-});
-
-// Request transaction
-//document.dispatchEvent(new CustomEvent('xianWalletSendTx', {detail: {contract:"currency", method:"transfer", kwargs:{"to":"wallet_address", "amount":1000}, stampLimit:30}}));
