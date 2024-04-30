@@ -159,7 +159,7 @@ a:hover{
     background-color: #fff;
     width: 100%;
     border: 1px solid #ced4da;
-
+    overflow: auto;
 }
 
 .app-box-title {

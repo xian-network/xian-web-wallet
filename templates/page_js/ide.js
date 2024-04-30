@@ -3,6 +3,8 @@ var editor = CodeMirror(document.querySelector('#editor'), {
     mode:  "python",
 });
 
+editor.setSize('100%', null);
+
 function submitContract() {
     let contract = document.getElementById("submitContractName").value;
     let contractError = document.getElementById("submitContractError");
