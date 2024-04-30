@@ -94,13 +94,13 @@ a:hover{
     margin: 0;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     padding-top: 80px !important;
     padding: 20px;
 }
 
 .wrap-app{
-    display: flex; max-width: 100%;
+    display: flex; max-width: 100%;width: 100%;align-self: stretch;
 }
 
 @media (max-width: 768px) {
@@ -148,15 +148,14 @@ a:hover{
     border-radius: 8px;
     background-color: #fff;
     width: 100%;
-         border: 1px solid #ced4da;
-    max-width: 1080px;
+    border: 1px solid #ced4da;
+
 }
 
 .app-box-title {
     margin-bottom: 20px;
     font-size: 1.5rem;
     text-align: center;
-    flex-grow: 1;
 }
 
 .title-container {

@@ -2,10 +2,10 @@
     <h1 class="app-box-title">IDE</h1>
 </div>
 <p class="app-box-description">This is the most basic form of the Xian IDE. You can use it to write and deploy smart contracts on the Xian Network. Find standardized smart contract templates <a href="https://github.com/xian-network/xian-standard-contracts" target="_blank">here</a> and docs <a href="https://github.com/xian-network/smart-contracts-docs" target="_blank">here</a>. Deployed Smart Contracts can be directly interacted with by using <a href="#" class="advanced-tx-link" id="ide-send-adv-tx">Advanced Transactions</a>.
-<div class="app-box-form">
+<div class="app-box-form" style="flex-grow: 1;display: flex;flex-direction: column;">
     <div class="alert alert-danger" role="alert" id="submitContractError" style="display: none;"></div>
     <div class="alert alert-success" role="alert" id="submitContractSuccess" style="display: none;"></div>
-    <div id="editor"></div>
+    <div id="editor" style="flex-grow:1"></div>
     <div class="form-group">
         <label for="submitContractName">Contract Name</label>
         <input type="text" class="form-control" id="submitContractName" placeholder="Enter a unique contract name, beginning with 'con_'" required>
@@ -21,8 +21,8 @@
 </div>
 
 <style>
-    .app-box {
-        max-width: 1080px;
+    #editor > .CodeMirror {
+        height: 100%;
     }
     .app-box-form .CodeMirror {
         color: #121212; /* Dark text */

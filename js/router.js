@@ -27,38 +27,38 @@ function changePage(page, some_data = null, send_response = null) {
             sendResponse = send_response;
         }
         else if (page === "password-input" || page === "create-wallet" || page === "import-wallet" || page === "get-started") {
-          document.getElementById("side-nav").style.display = "none";
+          document.getElementsByClassName("side-nav")[0].style.display = "none";
           if (window.innerWidth > 768) {
-            document.getElementById("app-box").style.borderTopLeftRadius = "8px";
-            document.getElementById("app-box").style.borderBottomLeftRadius = "8px";
+            document.getElementsByClassName("app-box")[0].style.borderTopLeftRadius = "8px";
+            document.getElementsByClassName("app-box")[0].style.borderBottomLeftRadius = "8px";
            
           }
           else{
-            document.getElementById("app-box").style.borderTopLeftRadius = "8px";
-            document.getElementById("app-box").style.borderTopRightRadius = "8px";
+            document.getElementsByClassName("app-box")[0].style.borderTopLeftRadius = "8px";
+            document.getElementsByClassName("app-box")[0].style.borderTopRightRadius = "8px";
           }
-          document.getElementById("app-box").style.borderLeftWidth = "1px";
+          document.getElementsByClassName("app-box")[0].style.borderLeftWidth = "1px";
         }
         else{
-          document.getElementById("side-nav").style.display = "flex";
+          document.getElementsByClassName("side-nav")[0].style.display = "flex";
           if (window.innerWidth > 768) {
-            document.getElementById("app-box").style.borderLeftWidth = "0px";
+            document.getElementsByClassName("app-box")[0].style.borderLeftWidth = "0px";
            
-            document.getElementById("app-box").style.borderTopLeftRadius = "0px";
-            document.getElementById("app-box").style.borderTopRightRadius = "8px";
-            document.getElementById("app-box").style.borderBottomLeftRadius = "0px";
-            document.getElementById("side-nav").style.borderBottomLeftRadius = "8px";
-            document.getElementById("side-nav").style.borderTopRightRadius = "0px";
-            document.getElementById("side-nav").style.borderBottomWidth = "1px";
+            document.getElementsByClassName("app-box")[0].style.borderTopLeftRadius = "0px";
+            document.getElementsByClassName("app-box")[0].style.borderTopRightRadius = "8px";
+            document.getElementsByClassName("app-box")[0].style.borderBottomLeftRadius = "0px";
+            document.getElementsByClassName("side-nav")[0].style.borderBottomLeftRadius = "8px";
+            document.getElementsByClassName("side-nav")[0].style.borderTopRightRadius = "0px";
+            document.getElementsByClassName("side-nav")[0].style.borderBottomWidth = "1px";
           }
           else{
-            document.getElementById("app-box").style.borderTopLeftRadius = "0px";
-            document.getElementById("app-box").style.borderTopRightRadius = "0px";
-            document.getElementById("app-box").style.borderBottomLeftRadius = "8px";
-            document.getElementById("app-box").style.borderLeftWidth = "1px";
-            document.getElementById("side-nav").style.borderTopRightRadius = "8px";
-            document.getElementById("side-nav").style.borderBottomLeftRadius = "0px";
-            document.getElementById("side-nav").style.borderBottomWidth = "0px";
+            document.getElementsByClassName("app-box")[0].style.borderTopLeftRadius = "0px";
+            document.getElementsByClassName("app-box")[0].style.borderTopRightRadius = "0px";
+            document.getElementsByClassName("app-box")[0].style.borderBottomLeftRadius = "8px";
+            document.getElementsByClassName("app-box")[0].style.borderLeftWidth = "1px";
+            document.getElementsByClassName("side-nav")[0].style.borderTopRightRadius = "8px";
+            document.getElementsByClassName("side-nav")[0].style.borderBottomLeftRadius = "0px";
+            document.getElementsByClassName("side-nav")[0].style.borderBottomWidth = "0px";
           }
         }
       });
