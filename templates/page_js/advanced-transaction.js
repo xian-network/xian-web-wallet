@@ -111,9 +111,6 @@ function sendAdvTx() {
      sendAdvTx();
  });
 
- document.getElementById('btn-adv-tx-ide').addEventListener('click', function() {
-     changePage('ide');
- });
 
  function loadAdvancedTransactionPage() {
     document.getElementById("adv_args").style.display = "none";
