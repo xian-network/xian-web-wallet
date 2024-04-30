@@ -47,6 +47,15 @@ function saveSettings() {
     RPC = rpc;
     CHAIN_ID = chain_id;
 
+    let online_status = ping();
+    let online_status_element = document.getElementById("onlineStatus");
+    if (!online_status) {
+        online_status_element.innerHTML = "Node Status <div class='offline-circle' title='Node is Offline'></div>"
+    }
+    else {
+        online_status_element.innerHTML = "Node Status <div class='online-circle' title='Node is Online'></div>"
+    }
+
 
     settingsSuccess.style.display = 'block';
     settingsSuccess.innerHTML = 'Settings saved successfully!';
