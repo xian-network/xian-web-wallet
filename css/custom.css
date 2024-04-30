@@ -107,6 +107,12 @@ a:hover{
     .wrap-app{
         flex-direction: column;
     }
+    #token-list{
+        height: 1px;
+    }
+    #local-activity{
+        height: 1px;
+    }
 }
 
 .app-logo {
