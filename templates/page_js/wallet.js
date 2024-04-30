@@ -100,14 +100,14 @@ function loadWalletPage() {
 
 function changeWalletTab(tab) {
     if (tab === "wallet-tokens") {
-        document.getElementById("wallet-tokens").style.display = "block";
+        document.getElementById("wallet-tokens").style.display = "flex";
         document.getElementById("local-activity").style.display = "none";
         document.getElementById("wallet-tokens-tab").classList.add("active");
         document.getElementById("local-activity-tab").classList.remove("active");
     }
     else {
         document.getElementById("wallet-tokens").style.display = "none";
-        document.getElementById("local-activity").style.display = "block";
+        document.getElementById("local-activity").style.display = "flex";
         document.getElementById("wallet-tokens-tab").classList.remove("active");
         document.getElementById("local-activity-tab").classList.add("active");
     }
