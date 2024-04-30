@@ -60,7 +60,7 @@ function loadWalletPage() {
         });
         if (contract !== "currency") {
             item.querySelector('.fas.fa-minus-circle.cogwheel-icon').addEventListener('click', function() {
-                removeTokenScreen(contract);
+                removeToken(contract);
             });
         }
     });
