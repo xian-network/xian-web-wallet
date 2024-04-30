@@ -107,7 +107,11 @@ a:hover{
     .wrap-app{
         flex-direction: column;
     }
-    #token-list{
+    
+}
+
+@media (min-width: 768px) {
+    .token-list{
         height: 1px;
     }
     #local-activity{
