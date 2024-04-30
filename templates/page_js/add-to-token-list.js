@@ -6,7 +6,6 @@ function addToken() {
     let contractNameAddToken = document.getElementById(
       "contractNameAddToken"
     ).value;
-    contractNameAddToken = contractNameAddToken.trim();
     // only allow alphanumeric characters and underscores
     if (!/^[a-zA-Z0-9_]*$/.test(contractNameAddToken)) {
       errorMsg.style.display = "block";
