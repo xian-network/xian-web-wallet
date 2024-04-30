@@ -7,6 +7,12 @@ function addToken() {
       "contractNameAddToken"
     ).value;
     contractNameAddToken = contractNameAddToken.trim();
+    // only allow alphanumeric characters and underscores
+    if (!/^[a-zA-Z0-9_]*$/.test(contractNameAddToken)) {
+      errorMsg.style.display = "block";
+      errorMsg.innerHTML = "Invalid contract name!";
+      return;
+    }
     let token_info = null;
     try {
       token_info = getTokenInfo(contractNameAddToken);
