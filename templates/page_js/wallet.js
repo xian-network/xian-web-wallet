@@ -36,8 +36,8 @@ function loadWalletPage() {
                     <div class="token-balance" id="`+tokenInfo["contract"]+`Balance">0</div>
                 </div>    
                 <div class="token-actions">
-                    <button class="btn send-btn" style="max-width:10rem"  data-contract="`+tokenInfo["contract"]+`"><i class="fas fa-paper-plane"></i> Send</button>
-                    <button class="btn receive-btn" style="max-width:10rem" data-contract="`+tokenInfo["contract"]+`"><i class="fas fa-download"></i> Receive</button>
+                    <button class="btn send-btn" style="max-width:15rem"  data-contract="`+tokenInfo["contract"]+`"><i class="fas fa-paper-plane"></i> Send</button>
+                    <button class="btn receive-btn" style="max-width:15rem" data-contract="`+tokenInfo["contract"]+`"><i class="fas fa-download"></i> Receive</button>
                 </div> 
             </div>
             `;

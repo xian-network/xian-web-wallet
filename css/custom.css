@@ -190,7 +190,22 @@ a:hover{
 .app-box .btn-group {
     gap: 10px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+}
+
+@media (max-width: 768px) {
+    .app-box .btn-group {
+        flex-direction: column;
+        max-width: 100%;
+    }
+}
+@media (min-width: 768px) {
+    button {
+        max-width: 15rem;
+    }
+    .form-control {
+        max-width: 25rem;
+    }
 }
 
 .kwarg-group{
