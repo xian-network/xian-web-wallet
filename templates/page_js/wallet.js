@@ -12,7 +12,7 @@ function loadWalletPage() {
     tokenList.innerHTML = "";
     tokenList.innerHTML += `<div class="title-container">
         <h2 class="token-list-title">Tokens</h2>
-        <i class="fas fa-plus-circle cogwheel-icon" title="Add Token"></i>
+        <div class="cogwheel-icon" style="font-size:1rem"><i class="fas fa-plus-circle" title="Add Token"></i> Add Token</div>
     </div>`
 
     token_list.forEach((token) => {
