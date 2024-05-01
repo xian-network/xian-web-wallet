@@ -114,6 +114,20 @@ a:hover{
     .token-list{
         height: 1px;
     }
+    .token-actions{
+        flex-direction: row;
+    }
+    .token-actions button {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items: center;
+    }
+    .token-item {
+        display: flex;
+        flex-direction: row!important;
+        justify-content: space-between!important;
+    }
     #local-activity{
         height: 1px;
     }
