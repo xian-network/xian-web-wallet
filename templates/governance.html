@@ -4,5 +4,25 @@
     <div class="alert alert-danger" role="alert" id="governanceError" style="display: none;"></div>
     <div class="alert alert-success" role="alert" id="governanceSuccess" style="display: none;"></div>
     <span id="validator-state"></span>
+    <div>
+        <h2 class="governance-sub-title">Stamp Rate</h2>
+        <p>1 Xian = <span id="stamp-rate-governance"></span> Stamps</p>
+    </div>
+    <div>
+        <h2 class="governance-sub-title">DAO Balance</h2>
+        <p><span id="dao-balance-governance"></span> Xian</p>
+    </div>
+    <div class="governance-section">
+        <h2 class="governance-sub-title">Transaction Rewards Distribution</h2>
+        <p><span class="label-gov">Foundation:</span> <span class="value-gov" id="transaction-rewards-foundation-governance"></span>%</p>
+        <p><span class="label-gov">Validators:</span> <span class="value-gov" id="transaction-rewards-validators-governance"></span>%</p>
+        <p><span class="label-gov">Developers:</span> <span class="value-gov" id="transaction-rewards-developers-governance"></span>%</p>
+        <p><span class="label-gov">Burned:</span> <span class="value-gov" id="transaction-rewards-burn-governance"></span>%</p>
+    </div>
+    <div class="governance-section">
+        <h2 class="governance-sub-title">Validators</h2>
+        <p><span class="label-gov">Number of Validators:</span> <span class="value-gov" id="number-of-validators-governance"></span></p>
+    </div>
+    
 </div>
 <script src="templates/page_js/governance.js"></script>

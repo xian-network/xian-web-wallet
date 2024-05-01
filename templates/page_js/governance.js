@@ -9,6 +9,29 @@ function getValidatorState() {
     }
     built_html += ".</span>";
     document.getElementById('validator-state').innerHTML = built_html;
+    document.getElementById('number-of-validators-governance').innerHTML = JSON.parse(validator_list).length;
+}
+
+function getDAOBalance() {
+    let balance = getVariable("currency", "balances", "dao");
+    if (balance === null) {
+        balance = "0";
+    }
+    balance = parseFloat(balance);
+    balance = balance.toFixed(8);
+    document.getElementById("dao-balance-governance").innerHTML = balance;
+}
+
+function getRewardPercentages() {
+    let reward_percentages = getVariable("rewards", "S", "value");
+    reward_percentages = JSON.parse(reward_percentages);
+    document.getElementById("transaction-rewards-validators-governance").innerHTML = parseFloat(reward_percentages[0]["__fixed__"] * 100);
+    document.getElementById("transaction-rewards-burn-governance").innerHTML = parseFloat(reward_percentages[1]["__fixed__"] * 100);
+    document.getElementById("transaction-rewards-foundation-governance").innerHTML =  parseFloat(reward_percentages[2]["__fixed__"] * 100);
+    document.getElementById("transaction-rewards-developers-governance").innerHTML =  parseFloat(reward_percentages[3]["__fixed__"] * 100);
 }
 
 getValidatorState();
+getDAOBalance();
+getRewardPercentages();
+document.getElementById("stamp-rate-governance").innerHTML = getStampRate();

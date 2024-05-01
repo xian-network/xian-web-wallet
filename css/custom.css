@@ -17,11 +17,35 @@ a{
     color: #007bff;
     text-decoration: none;
 }
+
+.governance-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.governance-section p {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.label-gov {
+    min-width: 200px; /* Adjust this value based on your longest label */
+    margin-right: 10px; /* Space between the label and the value */
+}
+
+.value-gov {
+}
+
 a:hover{
     color: #007bff;
     text-decoration: underline;
 }
-
+.governance-sub-title{
+    font-size: 1.25rem;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
 .ide-icon{
     position: absolute;
     left: 0;
