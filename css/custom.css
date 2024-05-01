@@ -28,6 +28,9 @@ a{
     justify-content: flex-start;
     align-items: center;
 }
+.governance-section-buttons button {
+    background-color: #f4f4f4;
+}
 .governance-section-flex{
     display: flex;
     flex-direction: column;
@@ -157,6 +160,16 @@ a:hover{
     }
     #local-activity{
         height: 1px;
+    }
+    .governance-section-wrapper{
+        flex-direction: row;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .governance-section-buttons button {
+        width: 16rem!important;
+        max-width: 100%;
     }
 }
 

@@ -7,7 +7,6 @@ var tx_history = JSON.parse(localStorage.getItem("tx_history")) || [];
 var sendResponse = null;
 
 function changePage(page, some_data = null, send_response = null) {
-  if (app_page === page) return;
   app_page = page;
   const loadHtmlAndScripts = (htmlPath) => {
     fetch(htmlPath)
