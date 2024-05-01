@@ -28,7 +28,10 @@ a{
     justify-content: flex-start;
     align-items: center;
 }
-
+.governance-section-flex{
+    display: flex;
+    flex-direction: column;
+}
 .label-gov {
     min-width: 200px; /* Adjust this value based on your longest label */
     margin-right: 10px; /* Space between the label and the value */
