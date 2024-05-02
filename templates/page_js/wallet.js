@@ -65,7 +65,7 @@ function loadWalletPage() {
         }
     });
 
-    document.querySelector('.fas.fa-plus-circle.cogwheel-icon').addEventListener('click', function() {
+    document.querySelector('.fas.fa-plus-circle').addEventListener('click', function() {
         changePage('add-to-token-list');
     });
 
