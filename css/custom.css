@@ -31,16 +31,24 @@ a{
 .governance-section-buttons button {
     background-color: #f4f4f4;
 }
+.governance-section-buttons-colored button {
+    background-color: #f4f4f4;
+}
+
 .governance-section-flex{
     display: flex;
     flex-direction: column;
 }
+.title-container-governance{
+    margin-top:1rem;
+}
 .label-gov {
-    min-width: 200px; /* Adjust this value based on your longest label */
+    min-width: 250px; /* Adjust this value based on your longest label */
     margin-right: 10px; /* Space between the label and the value */
 }
 
 .value-gov {
+    
 }
 
 a:hover{
@@ -169,6 +177,10 @@ a:hover{
     }
     .governance-section-buttons button {
         width: 16rem!important;
+        max-width: 100%;
+    }
+    .governance-section-buttons-colored button {
+        width: 8rem!important;
         max-width: 100%;
     }
 }
