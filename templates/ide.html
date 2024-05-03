@@ -7,6 +7,7 @@
     <div class="alert alert-success" role="alert" id="submitContractSuccess" style="display: none;"></div>
     <div class="tabs-editor" id="tabs-editor"></div>
     <div id="editor" style="flex-grow:1"></div>
+    <div id="submission-form">
     <div class="form-group">
         <label for="submitContractName">Contract Name</label>
         <input type="text" class="form-control" id="submitContractName" placeholder="Unique, beginning with 'con_'" required>
@@ -19,6 +20,7 @@
         <button class="btn btn-primary" id="btn-ide-submit-contract">Deploy Contract</button>
         <button class="btn btn-secondary" id="btn-ide-go-to-wallet" style="display:none">Back</button>
     </div>
+</div>
 </div>
 
 <style>
@@ -100,6 +102,7 @@
         border: 1px solid #ced4da;
         border-radius: 8px;
         background-color: #f8f9fa;
+        position: relative;
     }
 </style>
 <script src="templates/page_js/ide.js"></script>
