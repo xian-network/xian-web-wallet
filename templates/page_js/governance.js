@@ -13,7 +13,7 @@ function getValidatorState() {
         })
         .catch(error => {
             console.error("Error getting validator state:", error);
-            document.getElementById('validator-state').innerHTML = "<span>ERR</span>";
+            document.getElementById('validator-state').innerHTML = "<span>ERR getting validator state</span>";
             document.getElementById('number-of-validators-governance').innerHTML = "ERR";
         });
 }
