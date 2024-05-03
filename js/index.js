@@ -1,3 +1,22 @@
+// Save the original fetch function
+const originalFetch = window.fetch;
+
+// Define a function to wrap fetch with timeout
+function fetchWithTimeout(url, options, timeout = 5000) {
+    return Promise.race([
+        originalFetch(url, options),
+        new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Request timeout')), timeout)
+        )
+    ]);
+}
+
+// Override the global fetch function
+window.fetch = function(url, options) {
+    return fetchWithTimeout(url, options);
+};
+
+
 document.getElementById('side-change-page-settings').addEventListener('click', function() {
     changePage('settings');
 });
