@@ -1,65 +1,66 @@
 var token_list = JSON.parse(localStorage.getItem("token_list")) || ["currency"];
 
 function loadWalletPage() {
-    let spinner = document.getElementById("wallet-refresh-all");
-    spinner.querySelector("i").classList.add("fa-spin");
+    document.getElementById("wallet-refresh-all").querySelector("i").classList.add("fa-spin");
 
-    readSecureCookie("publicKey").then((publicKey) => {
-        document.getElementById("walletAddress").innerHTML = publicKey;
+    // Start by reading the publicKey
+    readSecureCookie("publicKey")
+        .then((publicKey) => {
+            document.getElementById("walletAddress").innerHTML = publicKey;
+            let tokenList = document.getElementById("wallet-tokens");
+            tokenList.innerHTML = `<div class="title-container">
+                <h2 class="token-list-title">Tokens</h2>
+                <div class="cogwheel-icon add-token-link" style="font-size:1rem">
+                    <i class="fas fa-plus-circle" title="Add Token"></i> Add Token
+                </div>
+            </div>`;
 
-        let tokenList = document.getElementById("wallet-tokens");
-        tokenList.innerHTML = `<div class="title-container">
-            <h2 class="token-list-title">Tokens</h2>
-            <div class="cogwheel-icon add-token-link" style="font-size:1rem">
-                <i class="fas fa-plus-circle" title="Add Token"></i> Add Token
-            </div>
-        </div>`;
-
-        document.querySelector('.add-token-link').addEventListener('click', function() {
-            changePage('add-to-token-list');
-        });
-
-        // Prepare promises for each token info fetch with error handling
-        const tokenInfoPromises = token_list.map(token =>
-            getTokenInfo(token).catch(e => {
-                console.error("Error fetching token info:", e);
-                return null;  // Return null to handle errors locally
-            })
-        );
-
-        // Wait for all token info fetches to complete
-        Promise.all(tokenInfoPromises).then(tokenInfos => {
-            tokenInfos.forEach(tokenInfo => {
-                if (tokenInfo) {
-                    tokenList.innerHTML += `<div class="token-item" data-contract="${tokenInfo.contract}">
-                        <div class="token-details">
-                            <div class="token-title-container">
-                                <div class="token-name"><span>${tokenInfo.name}</span> (<span class="token-symbol">${tokenInfo.symbol}</span>)</div>
-                            ${tokenInfo.contract === "currency" ? "" : `<i class="fas fa-minus-circle cogwheel-icon" data-contract="${tokenInfo.contract}" title="Remove Token"></i>`}
-                            </div>
-                            <div class="token-balance" id="${tokenInfo.contract}Balance">0</div>
-                        </div>
-                        <div class="token-actions">
-                            <button class="btn send-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="fas fa-paper-plane"></i> Send</button>
-                            <button class="btn receive-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="fas fa-download"></i> Receive</button>
-                        </div>
-                    </div>`;
-                }
-                refreshBalance(tokenInfo.contract);
+            // Attach event listener to add token link
+            document.querySelector('.add-token-link').addEventListener('click', function() {
+                changePage('add-to-token-list');
             });
 
-            setupTokenEventListeners();  // Refactor event listener setup into a separate function
-        }).catch(error => {
-            console.error("Error handling token data:", error);
-        }).finally(() => {
-        
-            spinner.classList.remove("fa-spin");
-        });
+            // Fetch information for each token with error handling for each promise
+            const tokenInfoPromises = token_list.map(token =>
+                getTokenInfo(token).catch(e => {
+                    console.error("Error fetching token info for token:", token, e);
+                    return null;  // Return null so other fetches can continue
+                })
+            );
 
-    }).catch(error => {
-        console.error("Error reading secure cookie:", error);
-        spinner.classList.remove("fa-spin");
-    });
+            // Process each token information
+            return Promise.all(tokenInfoPromises)
+                .then(tokenInfos => {
+                    tokenInfos.forEach(tokenInfo => {
+                        if (tokenInfo) {
+                            tokenList.innerHTML += `<div class="token-item" data-contract="${tokenInfo.contract}">
+                                <div class="token-details">
+                                    <div class="token-title-container">
+                                        <div class="token-name"><span>${tokenInfo.name}</span> (<span class="token-symbol">${tokenInfo.symbol}</span>)</div>
+                                        ${tokenInfo.contract === "currency" ? "" : `<i class="fas fa-minus-circle cogwheel-icon" data-contract="${tokenInfo.contract}" title="Remove Token"></i>`}
+                                    </div>
+                                    <div class="token-balance" id="${tokenInfo.contract}Balance">0</div>
+                                </div>
+                                <div class="token-actions">
+                                    <button class="btn send-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="fas fa-paper-plane"></i> Send</button>
+                                    <button class="btn receive-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="fas fa-download"></i> Receive</button>
+                                </div>
+                            </div>`;
+                            refreshBalance(tokenInfo.contract);
+                        }
+                    });
+                   
+                    setupTokenEventListeners();  // Setup event listeners after tokens are loaded
+                });
+            
+        })
+        .catch(error => {
+            console.error("Error loading wallet page:", error);
+        })
+        .finally(() => {
+            document.getElementById("wallet-refresh-all").querySelector("i").classList.remove("fa-spin");
+        });
+        
 }
 
 function setupTokenEventListeners() {
@@ -78,6 +79,7 @@ function setupTokenEventListeners() {
         }
     });
 }
+
 
 
 function changeWalletTab(tab) {
