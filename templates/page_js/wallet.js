@@ -140,17 +140,24 @@ function removeToken(contract) {
   }
 
 
-function refreshBalance(contract) {
+  function refreshBalance(contract) {
     Promise.all([
-        readSecureCookie('publicKey')]
-    ).then((values) => {
-        let balance = getVariable(contract, "balances",values[0]);
-        if (balance === null) {
-            balance = "0";
-        }
-        balance = parseFloat(balance);
-        balance = balance.toFixed(8);
-        document.getElementById(contract+'Balance').innerHTML = balance;
+        readSecureCookie('publicKey')
+    ]).then((values) => {
+        const publicKey = values[0];
+        getVariable(contract, "balances", publicKey)
+            .then(balance => {
+                let formattedBalance = "0";
+                if (balance !== null) {
+                    formattedBalance = parseFloat(balance).toFixed(8);
+                }
+                document.getElementById(contract + 'Balance').innerHTML = formattedBalance;
+            })
+            .catch(error => {
+                console.error("Error fetching balance:", error);
+            });
+    }).catch(error => {
+        console.error("Error reading secure cookie:", error);
     });
 }
 

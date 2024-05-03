@@ -157,16 +157,19 @@ function getContractCode(contract) {
     return decoded;
 }
 
-function getVariable(contract, variable, key){
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", RPC + '/abci_query?path="/get/'+contract+'.'+variable+':'+key+'"', false);
-    xhr.send();
-    let response = JSON.parse(xhr.responseText);
-    if (response.result.response.value === "AA==") {
-        return null;
-    }
-    let decoded = atob(response.result.response.value);
-    return decoded;
+async function getVariable(contract, variable, key) {
+  try {
+      const response = await fetch(RPC + '/abci_query?path="/get/' + contract + '.' + variable + ':' + key + '"');
+      const data = await response.json();
+      if (data.result.response.value === "AA==") {
+          return null;
+      }
+      return atob(data.result.response.value);
+  } catch (error) {
+      console.error("Error fetching variable:", error);
+      // reraise the error
+      throw error;
+  }
 }
 
 async function ping() {
