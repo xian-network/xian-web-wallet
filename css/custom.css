@@ -249,7 +249,8 @@ a:hover{
 
 .token-title-container > .cogwheel-icon{
     margin-bottom: 0;
-    padding-right: 4px;
+    margin-right: 0.5rem;
+    position: relative;
 }
 
 .app-box .btn-group {
