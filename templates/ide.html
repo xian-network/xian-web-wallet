@@ -5,9 +5,7 @@
 <div class="app-box-form" style="flex-grow: 1;display: flex;flex-direction: column;">
     <div class="alert alert-danger" role="alert" id="submitContractError" style="display: none;"></div>
     <div class="alert alert-success" role="alert" id="submitContractSuccess" style="display: none;"></div>
-    <div class="tabs-editor" style="
-   
-"><div class="tab-editor">contract.py</div></div>
+    <div class="tabs-editor" id="tabs-editor"></div>
     <div id="editor" style="flex-grow:1"></div>
     <div class="form-group">
         <label for="submitContractName">Contract Name</label>
@@ -54,7 +52,8 @@
     }
     .tabs-editor{
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
+        gap: 5px;
         padding: 5px;
         border: 1px solid #ced4da;
         background-color: #f8f9fa;
@@ -67,17 +66,39 @@
         border: 1px solid #343a40;
         color: #e4e6eb;
     }
+    .dark-mode .add-tab-button{
+        background-color: #1e1e1e;
+        border: 1px solid #343a40;
+        color: #e4e6eb;
+    }
     .tab-editor{
         padding: 5px;
         cursor: pointer;
         border: 1px solid #ced4da;
         border-radius: 8px;
         background-color: #f8f9fa;
+
+        display: flex;
+    align-items: center;
+    gap: 5px;
     }
     .dark-mode .tab-editor{
         background-color: #1e1e1e;
         border: 1px solid #343a40;
         color: #e4e6eb;
+    }
+    .tab-editor.active{
+        background-color: #fff;
+    }
+    .dark-mode .tab-editor.active{
+        background-color: #343a40;
+    }
+    .add-tab-button{
+        padding: 5px;
+        cursor: pointer;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        background-color: #f8f9fa;
     }
 </style>
 <script src="templates/page_js/ide.js"></script>
