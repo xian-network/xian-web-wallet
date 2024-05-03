@@ -1,6 +1,7 @@
 var editor = CodeMirror(document.querySelector('#editor'), {
     value: "@construct\ndef seed():\n    pass\n\n@export\ndef test():\n    return 'Hello, World!'",
     mode:  "python",
+    lineNumbers: true,
 });
 
 editor.setSize('100%', null);
