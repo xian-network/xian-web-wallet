@@ -18,6 +18,10 @@ function acceptRequest() {
     };
     Promise.all([signTransaction(payload, unencryptedPrivateKey)]).then((signed_tx) => {
     broadcastTransaction(signed_tx).then((response) => {
+        let status = 'success'
+        if (response['result']['code'] == 1) {
+            status = 'error';
+        }
         hash = response['result']['hash'];
         prependToTransactionHistory(hash, contract, method, kwargs, status, new Date().toLocaleString());
 

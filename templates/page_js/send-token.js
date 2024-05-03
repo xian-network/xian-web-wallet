@@ -60,15 +60,18 @@ function sendToken() {
                     signature: "",
                 }
             };
-            signTransaction(transaction, unencryptedPrivateKey).then(signed_tx => {
+            Promise.all([signTransaction(transaction, unencryptedPrivateKey)]).then(signed_tx => {
                 let conf = confirm("Are you sure you want to send this transaction?");
                 if (!conf) return;
+                
                 broadcastTransaction(signed_tx).then(response => {
+                    console.log(response)
                     const hash = response['result']['hash'];
                     let status = 'success';
                     if (response['result']['code'] == 1) {
                         status = 'error';
                     }
+                    
                     prependToTransactionHistory(hash, contract, 'transfer', {to: recipient, amount: amount}, status, new Date().toLocaleString());
 
                     if (response['result']['code'] == 1) {
