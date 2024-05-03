@@ -2,35 +2,40 @@ var token_list = JSON.parse(localStorage.getItem("token_list")) || ["currency"];
 
 function loadWalletPage() {
     let spinner = document.getElementById("wallet-refresh-all");
-    spinner = spinner.querySelector("i");
-    spinner.classList.add("fa-spin");
+    spinner.querySelector("i").classList.add("fa-spin");
 
-    Promise.all([readSecureCookie("publicKey")])
-        .then(values => {
-            document.getElementById("walletAddress").innerHTML = values[0];
+    readSecureCookie("publicKey").then((publicKey) => {
+        document.getElementById("walletAddress").innerHTML = publicKey;
 
-            let tokenList = document.getElementById("wallet-tokens");
-            tokenList.innerHTML = "";
+        let tokenList = document.getElementById("wallet-tokens");
+        tokenList.innerHTML = `<div class="title-container">
+            <h2 class="token-list-title">Tokens</h2>
+            <div class="cogwheel-icon add-token-link" style="font-size:1rem">
+                <i class="fas fa-plus-circle" title="Add Token"></i> Add Token
+            </div>
+        </div>`;
 
-            tokenList.innerHTML += `<div class="title-container">
-                <h2 class="token-list-title">Tokens</h2>
-                <div class="cogwheel-icon add-token-link" style="font-size:1rem"><i class="fas fa-plus-circle" title="Add Token"></i> Add Token</div>
-            </div>`;
+        document.querySelector('.add-token-link').addEventListener('click', function() {
+            changePage('add-to-token-list');
+        });
 
-            document.querySelector('.add-token-link').addEventListener('click', function() {
-                changePage('add-to-token-list');
-            });
+        // Prepare promises for each token info fetch with error handling
+        const tokenInfoPromises = token_list.map(token =>
+            getTokenInfo(token).catch(e => {
+                console.error("Error fetching token info:", e);
+                return null;  // Return null to handle errors locally
+            })
+        );
 
-            return Promise.all(token_list.map(token => getTokenInfo(token)));
-        })
-        .then(tokenInfos => {
+        // Wait for all token info fetches to complete
+        Promise.all(tokenInfoPromises).then(tokenInfos => {
             tokenInfos.forEach(tokenInfo => {
-                if (tokenInfo != null) {
-                    token_list.innerHTML += `<div class="token-item" data-contract="${tokenInfo.contract}">
+                if (tokenInfo) {
+                    tokenList.innerHTML += `<div class="token-item" data-contract="${tokenInfo.contract}">
                         <div class="token-details">
                             <div class="token-title-container">
                                 <div class="token-name"><span>${tokenInfo.name}</span> (<span class="token-symbol">${tokenInfo.symbol}</span>)</div>
-                                ${tokenInfo.contract === "currency" ? "" : `<i class="fas fa-minus-circle cogwheel-icon" data-contract="${tokenInfo.contract}" title="Remove Token"></i>`}
+                            ${tokenInfo.contract === "currency" ? "" : `<i class="fas fa-minus-circle cogwheel-icon" data-contract="${tokenInfo.contract}" title="Remove Token"></i>`}
                             </div>
                             <div class="token-balance" id="${tokenInfo.contract}Balance">0</div>
                         </div>
@@ -39,62 +44,37 @@ function loadWalletPage() {
                             <button class="btn receive-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="fas fa-download"></i> Receive</button>
                         </div>
                     </div>`;
-
-                    try {
-                        refreshBalance(tokenInfo.contract);
-                    } catch (e) {
-                        console.error("Error refreshing balance for", tokenInfo.contract, ":", e.message);
-                    }
                 }
             });
 
-            document.querySelectorAll('.token-item').forEach(item => {
-                const contract = item.getAttribute('data-contract');
-                item.querySelector('.send-btn').addEventListener('click', function() {
-                    sendTokenScreen(contract);
-                });
-                item.querySelector('.receive-btn').addEventListener('click', function() {
-                    receiveTokenScreen(contract);
-                });
-                if (contract !== "currency") {
-                    item.querySelector('.fas.fa-minus-circle.cogwheel-icon').addEventListener('click', function() {
-                        removeToken(contract);
-                    });
-                }
-            });
-
-            let local_activity = document.getElementById("local-activity-list");
-            local_activity.innerHTML = "";
-            tx_history.forEach((tx) => {
-                local_activity.innerHTML += `
-                <div class="activity-item">
-                    <div class="activity-details">
-                        <div class="activity-hash">${tx.hash}</div>
-                        <div class="activity-contract">${tx.contract}</div>
-                        <div class="activity-function">${tx.function}</div>
-                        <div class="activity-status">${tx.status}</div>
-                        <div class="activity-timestamp">${tx.timestamp}</div>
-                    </div>
-                    <div class="activity-actions">
-                        <a href="https://explorer.xian.org/tx/${tx.hash}" target="_blank"><i class="fas fa-eye"></i> View</a>
-                    </div>
-                </div>`;
-            });
-
-            if (local_activity.innerHTML === "") {
-                local_activity.innerHTML = `<div class="activity-item">
-                    <div class="activity-details">
-                        <div class="activity-hash">No recent activity</div>
-                    </div>
-                </div>`;
-            }
-        })
-        .catch(error => {
-            console.error("Error loading wallet page:", error.message);
-        })
-        .finally(() => {
+            setupTokenEventListeners();  // Refactor event listener setup into a separate function
+        }).catch(error => {
+            console.error("Error handling token data:", error);
+        }).finally(() => {
             spinner.classList.remove("fa-spin");
         });
+
+    }).catch(error => {
+        console.error("Error reading secure cookie:", error);
+        spinner.classList.remove("fa-spin");
+    });
+}
+
+function setupTokenEventListeners() {
+    document.querySelectorAll('.token-item').forEach(item => {
+        const contract = item.getAttribute('data-contract');
+        item.querySelector('.send-btn').addEventListener('click', function() {
+            sendTokenScreen(contract);
+        });
+        item.querySelector('.receive-btn').addEventListener('click', function() {
+            receiveTokenScreen(contract);
+        });
+        if (contract !== "currency") {
+            item.querySelector('.fas.fa-minus-circle').addEventListener('click', function() {
+                removeToken(contract);
+            });
+        }
+    });
 }
 
 
