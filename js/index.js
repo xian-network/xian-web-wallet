@@ -1,3 +1,19 @@
+// Override the XMLHttpRequest object's prototype
+XMLHttpRequest.prototype.originalOpen = XMLHttpRequest.prototype.open;
+
+// Define a new open function with custom timeout
+XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+  // Default timeout in milliseconds
+  var timeout = 4000; // 4 seconds timeout
+  
+  // Call the original open function with the provided arguments
+  this.originalOpen(method, url, async, user, password);
+
+  // Set the timeout for the current XMLHttpRequest instance
+  this.timeout = timeout;
+};
+
+
 document.getElementById('side-change-page-settings').addEventListener('click', function() {
     changePage('settings');
 });
