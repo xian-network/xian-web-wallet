@@ -15,10 +15,6 @@ function loadWalletPage() {
                 </div>
             </div>`;
 
-            // Attach event listener to add token link
-            document.querySelector('.add-token-link').addEventListener('click', function() {
-                changePage('add-to-token-list');
-            });
 
             // Fetch information for each token with error handling for each promise
             const tokenInfoPromises = token_list.map(token =>
@@ -77,6 +73,10 @@ function setupTokenEventListeners() {
                 removeToken(contract);
             });
         }
+    });
+    // Attach event listener to add token link
+    document.querySelector('.add-token-link').addEventListener('click', function() {
+        changePage('add-to-token-list');
     });
 }
 
