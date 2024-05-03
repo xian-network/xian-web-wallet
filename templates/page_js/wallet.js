@@ -32,9 +32,9 @@ function loadWalletPage() {
                             tokenList.innerHTML += `<div class="token-item" data-contract="${tokenInfo.contract}">
                                 <div class="token-details">
                                     <div class="token-title-container">
-                                        <div class="token-name"><span>${tokenInfo.name}</span> (<span class="token-symbol">${tokenInfo.symbol}</span>)</div>
                                         ${tokenInfo.contract === "currency" ? "" : `<i class="fas fa-minus-circle cogwheel-icon" data-contract="${tokenInfo.contract}" title="Remove Token"></i>`}
-                                    </div>
+                                        <div class="token-name"><span>${tokenInfo.name}</span> (<span class="token-symbol">${tokenInfo.symbol}</span>)</div>
+                                        </div>
                                     <div class="token-balance" id="${tokenInfo.contract}Balance">0</div>
                                 </div>
                                 <div class="token-actions">
