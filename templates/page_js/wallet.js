@@ -45,12 +45,14 @@ function loadWalletPage() {
                         </div>
                     </div>`;
                 }
+                refreshBalance(tokenInfo.contract);
             });
 
             setupTokenEventListeners();  // Refactor event listener setup into a separate function
         }).catch(error => {
             console.error("Error handling token data:", error);
         }).finally(() => {
+        
             spinner.classList.remove("fa-spin");
         });
 
