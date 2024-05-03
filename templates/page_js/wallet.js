@@ -12,7 +12,7 @@ function loadWalletPage() {
     tokenList.innerHTML = "";
     tokenList.innerHTML += `<div class="title-container">
         <h2 class="token-list-title">Tokens</h2>
-        <div class="cogwheel-icon" style="font-size:1rem"><i class="fas fa-plus-circle" title="Add Token"></i> Add Token</div>
+        <div class="cogwheel-icon add-token-link" style="font-size:1rem"><i class="fas fa-plus-circle" title="Add Token"></i> Add Token</div>
     </div>`
 
     token_list.forEach((token) => {
@@ -65,7 +65,7 @@ function loadWalletPage() {
         }
     });
 
-    document.querySelector('.fas.fa-plus-circle').addEventListener('click', function() {
+    document.querySelector('.add-token-link').addEventListener('click', function() {
         changePage('add-to-token-list');
     });
 
