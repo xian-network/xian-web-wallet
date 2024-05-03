@@ -331,6 +331,13 @@ a:hover{
     margin-right: 5px;
     background-color: #dc3545;
 }
+.grey-circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+    background-color: #6c757d;
+}
 .navbar {
     background-color: #fff;
     position: fixed;

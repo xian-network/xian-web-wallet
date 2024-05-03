@@ -34,4 +34,15 @@ function getRewardPercentages() {
 getValidatorState();
 getDAOBalance();
 getRewardPercentages();
-document.getElementById("stamp-rate-governance").innerHTML = getStampRate();
+
+ // Get current stamp rate
+ getStampRate().then((rate) => {
+    if(rate === null) {
+        document.getElementById("stamp-rate-governance").innerHTML = "ERR";
+        return;
+    } 
+    document.getElementById("stamp-rate-governance").innerHTML = rate;
+}).catch((error) => {
+    console.error("Error getting stamp rate:", error.message);
+    document.getElementById("stamp-rate-governance").innerHTML = "ERR";
+});

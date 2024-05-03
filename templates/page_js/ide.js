@@ -198,7 +198,17 @@ function submitContract() {
 }
 
 // Get current stamp rate
-document.getElementById("stampRate").innerHTML = getStampRate();
+ // Get current stamp rate
+ getStampRate().then((rate) => {
+    if(rate === null) {
+        document.getElementById("stampRate").innerHTML = "ERR";
+        return;
+    } 
+    document.getElementById("stampRate").innerHTML = rate;
+}).catch((error) => {
+    console.error("Error getting stamp rate:", error.message);
+    document.getElementById("stampRate").innerHTML = "ERR";
+});
 
 document.getElementById('btn-ide-submit-contract').addEventListener('click', function() {
     submitContract();

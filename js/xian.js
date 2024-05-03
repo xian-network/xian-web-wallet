@@ -169,70 +169,64 @@ function getVariable(contract, variable, key){
     return decoded;
 }
 
-function ping() {
+async function ping() {
   try {
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", RPC + '/status', false);
-    xhr.send();
-    return true;
-  }
-  catch(e){
+    const response = await fetch(RPC + '/status');
+    return response.ok;
+  } catch {
     return false;
   }
 }
 
-function getTokenInfo(contract) {
+async function getTokenInfo(contract) {
   let tokenInfo = { contract: contract };
 
   if (contract === "currency") {
-    tokenInfo["name"] = "Xian";
-    tokenInfo["symbol"] = "Xian";
-    return tokenInfo;
+      tokenInfo["name"] = "Xian";
+      tokenInfo["symbol"] = "Xian";
+      return tokenInfo;
   }
 
-  let request = new XMLHttpRequest();
-  request.open(
-    "GET",
-    RPC + '/abci_query?path="/get/' + contract + '.metadata:token_name"',
-    false
-  );
-  request.send();
-  if (request.status === 200) {
-    let response = JSON.parse(request.responseText);
-    if (response.result.response.value === "AA==") {
-      tokenInfo["name"] = null;
-    } else {
-      let tokenName = atob(response.result.response.value);
-      tokenInfo["name"] = tokenName;
-    }
-  }
+  try {
+      const nameResponse = await fetch(RPC + '/abci_query?path="/get/' + contract + '.metadata:token_name"');
+      if (nameResponse.status === 200) {
+          const nameData = await nameResponse.json();
+          if (nameData.result.response.value === "AA==") {
+              tokenInfo["name"] = null;
+          } else {
+              let tokenName = atob(nameData.result.response.value);
+              tokenInfo["name"] = tokenName;
+          }
+      }
 
-  request = new XMLHttpRequest();
-  request.open(
-    "GET",
-    RPC + '/abci_query?path="/get/' + contract + '.metadata:token_symbol"',
-    false
-  );
-  request.send();
-  if (request.status === 200) {
-    let response = JSON.parse(request.responseText);
-    if (response.result.response.value === "AA==") {
-      tokenInfo["symbol"] = null;
-    } else {
-      let tokenSymbol = atob(response.result.response.value);
-      tokenInfo["symbol"] = tokenSymbol;
-    }
+      const symbolResponse = await fetch(RPC + '/abci_query?path="/get/' + contract + '.metadata:token_symbol"');
+      if (symbolResponse.status === 200) {
+          const symbolData = await symbolResponse.json();
+          if (symbolData.result.response.value === "AA==") {
+              tokenInfo["symbol"] = null;
+          } else {
+              let tokenSymbol = atob(symbolData.result.response.value);
+              tokenInfo["symbol"] = tokenSymbol;
+          }
+      }
+
+      return tokenInfo;
+  } catch (error) {
+      console.error("Error retrieving token info:", error);
+      return tokenInfo;
   }
-  return tokenInfo;
 }
 
-function getStampRate() {
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", RPC + '/abci_query?path="/get/stamp_cost.S:value"', false);
-    xhr.send();
-    let response = JSON.parse(xhr.responseText);
-    if (response.result.response.value === "AA==") {
-        return null;
-    }
-    return parseInt(atob(response.result.response.value), 10);
+async function getStampRate() {
+  try {
+      const response = await fetch(RPC + '/abci_query?path="/get/stamp_cost.S:value"');
+      const data = await response.json();
+      if (data.result.response.value === "AA==") {
+          return null;
+      }
+      return parseInt(atob(data.result.response.value), 10);
+  } catch (error) {
+      console.error("Error fetching stamp rate:", error);
+      return null;
+  }
 }

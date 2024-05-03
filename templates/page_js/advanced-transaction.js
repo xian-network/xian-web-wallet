@@ -105,7 +105,16 @@ function sendAdvTx() {
 }
  
  // Get current stamp rate
- document.getElementById("stampRate").innerHTML = getStampRate();
+ getStampRate().then((rate) => {
+        if(rate === null) {
+            document.getElementById("stampRate").innerHTML = "ERR";
+            return;
+        } 
+        document.getElementById("stampRate").innerHTML = rate;
+    }).catch((error) => {
+        console.error("Error getting stamp rate:", error.message);
+        document.getElementById("stampRate").innerHTML = "ERR";
+    });
 
  document.getElementById('btn-adv-tx-send').addEventListener('click', function() {
      sendAdvTx();
