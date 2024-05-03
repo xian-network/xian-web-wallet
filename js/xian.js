@@ -141,11 +141,11 @@ async function getContractFunctions(contract) {
           return JSON.parse(decoded);
       } else {
           console.error('Failed to fetch contract functions:', response.status);
-          return null;
+          throw new Error("Failed to fetch contract functions");
       }
   } catch (error) {
       console.error('Error fetching contract functions:', error);
-      return null;
+      throw error;
   }
 }
 

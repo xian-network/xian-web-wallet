@@ -101,14 +101,14 @@ function sendAdvTx() {
                     success.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
                     success.style.display = 'block';
                 }
-            }).catch(error => {
-                console.error('Error sending advanced transaction:', error);
-                alert('Error sending advanced transaction: ' + error.message);
+            }).catch(error_ => {
+                console.error('Error sending advanced transaction:', error_);
+                alert('Error sending advanced transaction: ' + error_.message);
             });
         })
-        .catch(error => {
-            console.error('Error sending advanced transaction:', error);
-            alert('Error sending advanced transaction: ' + error.message);
+        .catch(error_ => {
+            console.error('Error sending advanced transaction:', error_);
+            alert('Error sending advanced transaction: ' + error_.message);
         });
 }
 
@@ -158,8 +158,8 @@ function sendAdvTx() {
                       "<option value='" + func.name + "'>" + func.name + "</option>";
                 });
             })
-            .catch(error => {
-                console.error('RPC error:', error);
+            .catch(error_ => {
+                console.error('RPC error:', error_);
                 error.innerHTML = "RPC error!";
                 error.style.display = "block";
             });
@@ -200,8 +200,8 @@ function sendAdvTx() {
                     });
                 }
             })
-            .catch(error => {
-                console.error('RPC error:', error);
+            .catch(error_ => {
+                console.error('RPC error:', error_);
                 error.innerHTML = "RPC error!";
                 error.style.display = "block";
             });
