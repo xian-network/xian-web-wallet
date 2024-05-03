@@ -63,7 +63,7 @@ function loadContractFromExplorer() {
         return;
     }
 
-    let contractCode = getContractCode(contract);
+    getContractCode(contract).then((contractCode) => {
     if (contractCode === null) {
         alert('Contract not found!');
         return;
@@ -77,6 +77,11 @@ function loadContractFromExplorer() {
     addTab(tab_name, contractCode);
     changeTab(tab_name);
     refreshTabList();
+
+    }).catch((error) => {
+        console.error('Error loading contract:', error.message);
+        alert('Error loading contract!');
+    });
 }
 
 
@@ -172,28 +177,33 @@ function submitContract() {
         }
     };
     Promise.all([signTransaction(payload, unencryptedPrivateKey)]).then((signed_tx) => {
-    let response = broadcastTransaction(signed_tx);
-    hash = response['result']['hash'];
-    let status = 'success'
-    if (response['result']['code'] == 1) {
-        status = 'error';
-    }
-    prependToTransactionHistory(hash, 'submission', 'submit_contract', {name: contract, code: contractCode}, status, new Date().toLocaleString());
+    broadcastTransaction(signed_tx).then((response) => {
+        hash = response['result']['hash'];
+        let status = 'success'
+        if (response['result']['code'] == 1) {
+            status = 'error';
+        }
+        prependToTransactionHistory(hash, 'submission', 'submit_contract', {name: contract, code: contractCode}, status, new Date().toLocaleString());
 
-   if (response["result"]["code"] == 1) {
-     contractError.innerHTML = response["result"]["log"];
-       contractError.style.display = "block";
-     return;
-   } else {
-     contractSuccess.innerHTML =
-       "Transaction sent successfully! Explorer: " +
-       "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
-       hash +
-       "' target='_blank'>" +
-       hash +
-       "</a>";
-       contractSuccess.style.display = "block";
-   }
+    if (response["result"]["code"] == 1) {
+        contractError.innerHTML = response["result"]["log"];
+        contractError.style.display = "block";
+        return;
+    } else {
+        contractSuccess.innerHTML =
+        "Transaction sent successfully! Explorer: " +
+        "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
+        hash +
+        "' target='_blank'>" +
+        hash +
+        "</a>";
+        contractSuccess.style.display = "block";
+    }
+    }).catch((error) => {
+        console.error("Error submitting contract:", error.message);
+        contractError.innerHTML = "Error submitting contract!";
+        contractError.style.display = "block";
+    });
     });
 }
 

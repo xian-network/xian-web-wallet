@@ -59,29 +59,24 @@ function createKeyPairFromSK(privateKey, password) {
     };
 }
 
-function getNonce() {
-  return Promise.all([readSecureCookie("publicKey")]).then((values) => {
-      return new Promise((resolve, reject) => {
-          let xhr = new XMLHttpRequest();
-          xhr.open("POST", RPC + '/abci_query?path="/get_next_nonce/'+values[0]+'"', true); // Should be true for asynchronous
-          xhr.onload = function() {
-              if (xhr.status >= 200 && xhr.status < 300) {
-                  let response = JSON.parse(xhr.responseText);
-                  if (response.result.response.value === "AA==") {
-                      resolve(0);
-                  } else {
-                      resolve(parseInt(atob(response.result.response.value), 10));
-                  }
-              } else {
-                  reject("Failed to fetch nonce: HTTP status " + xhr.status);
-              }
-          };
-          xhr.onerror = function() {
-              reject("Network error");
-          };
-          xhr.send();
-      });
-  });
+async function getNonce() {
+  try {
+      const [publicKey] = await Promise.all([readSecureCookie("publicKey")]);
+      const response = await fetch(RPC + '/abci_query?path="/get_next_nonce/' + publicKey + '"');
+      
+      if (response.ok) {
+          const responseData = await response.json();
+          if (responseData.result.response.value === "AA==") {
+              return 0;
+          } else {
+              return parseInt(atob(responseData.result.response.value), 10);
+          }
+      } else {
+          throw new Error("Failed to fetch nonce: HTTP status " + response.status);
+      }
+  } catch (error) {
+      throw new Error("Error fetching nonce: " + error.message);
+  }
 }
 
 
@@ -119,42 +114,59 @@ function signTransaction(transaction, privateKey) {
   });
 }
 
-function broadcastTransaction(signedTransaction) {
-    // Broadcast the transaction as hex
-    signedTransaction = signedTransaction[0];
-    signedTransaction = toHexString(new TextEncoder().encode(JSON.stringify(signedTransaction)));
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", RPC + '/broadcast_tx_sync?tx="' + signedTransaction + '"', false);
-    xhr.send();
-    
-    let response = JSON.parse(xhr.responseText);
-    return response;
-    
+async function broadcastTransaction(signedTransaction) {
+  // Broadcast the transaction as hex
+  signedTransaction = signedTransaction[0];
+  signedTransaction = toHexString(new TextEncoder().encode(JSON.stringify(signedTransaction)));
+
+  try {
+      const response = await fetch(RPC + '/broadcast_tx_sync?tx="' + signedTransaction + '"');
+      const responseData = await response.json();
+      return responseData;
+  } catch (error) {
+      console.error('Error broadcasting transaction:', error);
+      throw error;
+  }
 }
 
-function getContractFunctions(contract) {
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", RPC + '/abci_query?path="/contract_methods/' + contract + '"', false);
-    xhr.send();
-  let response = JSON.parse(xhr.responseText);
-    if (response.result.response.value === "AA==" || response.result.response.value === null) {
-        return null;
-    }
-  
-    let decoded = atob(response.result.response.value);
-    return JSON.parse(decoded);
+async function getContractFunctions(contract) {
+  try {
+      const response = await fetch(RPC + '/abci_query?path="/contract_methods/' + contract + '"');
+      if (response.ok) {
+          const responseData = await response.json();
+          if (responseData.result.response.value === "AA==" || responseData.result.response.value === null) {
+              return null;
+          }
+          const decoded = atob(responseData.result.response.value);
+          return JSON.parse(decoded);
+      } else {
+          console.error('Failed to fetch contract functions:', response.status);
+          return null;
+      }
+  } catch (error) {
+      console.error('Error fetching contract functions:', error);
+      return null;
+  }
 }
 
-function getContractCode(contract) {
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", RPC + '/abci_query?path="/contract/' + contract + '"', false);
-    xhr.send();
-    let response = JSON.parse(xhr.responseText);
-    if (response.result.response.value === "AA==") {
-        return null;
-    }
-    let decoded = atob(response.result.response.value);
-    return decoded;
+
+async function getContractCode(contract) {
+  try {
+      const response = await fetch(RPC + '/abci_query?path="/contract/' + contract + '"');
+      if (response.ok) {
+          const responseData = await response.json();
+          if (responseData.result.response.value === "AA==") {
+              return null;
+          }
+          return atob(responseData.result.response.value);
+      } else {
+          console.error('Failed to fetch contract code:', response.status);
+          return null;
+      }
+  } catch (error) {
+      console.error('Error fetching contract code:', error);
+      return null;
+  }
 }
 
 async function getVariable(contract, variable, key) {

@@ -17,19 +17,22 @@ function acceptRequest() {
         }
     };
     Promise.all([signTransaction(payload, unencryptedPrivateKey)]).then((signed_tx) => {
-   
-    let response = broadcastTransaction(signed_tx);
-    hash = response['result']['hash'];
-    prependToTransactionHistory(hash, contract, method, kwargs, status, new Date().toLocaleString());
+    broadcastTransaction(signed_tx).then((response) => {
+        hash = response['result']['hash'];
+        prependToTransactionHistory(hash, contract, method, kwargs, status, new Date().toLocaleString());
 
-    if (response['result']['code'] == 1) {
-        sendResponse({errors: [response['result']['log']]});
+        if (response['result']['code'] == 1) {
+            sendResponse({errors: [response['result']['log']]});
+            changePage('wallet');
+        }
+        else {
+            sendResponse({status: 'sent', txid: hash});
+            changePage('wallet');
+        }
+    }).catch((error) => {
+        alert('RPC ERR');
         changePage('wallet');
-    }
-    else {
-        sendResponse({status: 'sent', txid: hash});
-        changePage('wallet');
-    }
+    });
 });
 }
 
