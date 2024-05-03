@@ -119,6 +119,7 @@ var editor = CodeMirror(document.querySelector('#editor'), {
     value: code_storage[current_tab],
     mode:  "python",
     lineNumbers: true,
+    indentUnit: 4,
 });
 
 editor.setSize('100%', null);
