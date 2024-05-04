@@ -41,6 +41,11 @@ function changeTab(tab_name) {
 }
 
 function addNewTab() {
+    let dropdown = document.querySelector('.dropdown-content');
+    if (dropdown) {
+        dropdown.remove();
+    }
+
     let tab_name = prompt('Enter new file name:');
     if (tab_name === null) {
         return;
@@ -49,14 +54,19 @@ function addNewTab() {
     if (Object.keys(code_storage).includes(tab_name)) {
         alert('File already exists!');
         return;
-
     }
+
     addTab(tab_name);
     changeTab(tab_name);
     refreshTabList();
 }
 
+
 function loadContractFromExplorer() {
+    let dropdown = document.querySelector('.dropdown-content');
+    if (dropdown) {
+        dropdown.remove();
+    }
     let contract = prompt('Enter contract name:');
 
     if (contract === null) {
@@ -102,22 +112,40 @@ function showDropdown() {
     dropdown.classList.add('dropdown-content');
     dropdown.style.borderRadius = '8px';
     dropdown.style.padding = '0.5rem';
-    dropdown.style.marginTop = '0.5rem';
-    dropdown.style.left = '0';
+
+    // Append dropdown directly to body
+    document.body.appendChild(dropdown);
+
+    let buttonRect = document.querySelector('.add-tab-button').getBoundingClientRect();
+    dropdown.style.left = buttonRect.left + 'px';
+    dropdown.style.top = buttonRect.bottom + 'px';
+
+    // Check if the dropdown extends beyond the right edge of the viewport
+    const dropdownWidth = dropdown.offsetWidth;
+    const viewportWidth = window.innerWidth;
+    const dropdownRight = buttonRect.left + dropdownWidth;
+
+    if (dropdownRight > viewportWidth) {
+        // If it extends beyond the viewport's right edge, adjust its position
+        dropdown.style.left = 'auto';
+        dropdown.style.right = '0';
+    }
 
     let newTab = document.createElement('div');
     newTab.innerHTML = 'New File';
     newTab.addEventListener('click', addNewTab);
+    newTab.style.cursor = 'pointer';
 
     let loadContract = document.createElement('div');
     loadContract.innerHTML = 'Load Contract';
     loadContract.addEventListener('click', loadContractFromExplorer);
+    loadContract.style.cursor = 'pointer';
 
     dropdown.appendChild(newTab);
     dropdown.appendChild(loadContract);
-
-    document.querySelector('.add-tab-button').appendChild(dropdown);
 }
+
+
 
 
 var editor = CodeMirror(document.querySelector('#editor'), {
