@@ -309,7 +309,7 @@ function refreshTabList() {
     });
     let addTabButton = document.createElement('div');
     addTabButton.className = 'add-tab-button';
-    addTabButton.innerHTML = '+';
+    addTabButton.innerHTML = '<i class="fas fa-plus"></i>';
     addTabButton.addEventListener('click', showDropdown);
 
     document.getElementById('tabs-editor').appendChild(addTabButton);
