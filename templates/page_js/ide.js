@@ -166,6 +166,7 @@ function submitContract() {
     let contractError = document.getElementById("submitContractError");
     let contractSuccess = document.getElementById("submitContractSuccess");
     let stampLimit = document.getElementById("submitContractstampLimit").value;
+    let constructorKwargs = document.getElementById("submitContractconstructorKwargs").value;
     contractError.style.display = 'none';
     contractSuccess.style.display = 'none';
 
@@ -204,6 +205,18 @@ function submitContract() {
             signature: "",
         }
     };
+
+    if (constructorKwargs !== "") {
+        try {
+            payload.payload.kwargs.constructor_args = JSON.parse(constructorKwargs);
+        }
+        catch (error) {
+            contractError.innerHTML = 'Invalid constructor kwargs!';
+            contractError.style.display = 'block';
+            return;
+        }
+    }
+
     Promise.all([signTransaction(payload, unencryptedPrivateKey)]).then((signed_tx) => {
     broadcastTransaction(signed_tx).then((response) => {
         hash = response['result']['hash'];
