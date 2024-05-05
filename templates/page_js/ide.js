@@ -1,4 +1,4 @@
-var code_storage = JSON.parse(localStorage.getItem('code_storage')) || {"contract": "@construct\ndef seed():\n    pass\n\n@export\ndef test():\n    return 'Hello, World!'"};
+var code_storage = JSON.parse(localStorage.getItem('code_storage')) || { "contract": "@construct\ndef seed():\n    pass\n\n@export\ndef test():\n    return 'Hello, World!'" };
 var current_tab = Object.keys(code_storage)[0];
 
 function saveCode() {
@@ -6,7 +6,7 @@ function saveCode() {
     localStorage.setItem('code_storage', JSON.stringify(code_storage));
 }
 
-function addTab(tab_name, code='') {
+function addTab(tab_name, code = '') {
     code_storage[tab_name] = code;
     localStorage.setItem('code_storage', JSON.stringify(code_storage));
 }
@@ -61,6 +61,39 @@ function addNewTab() {
     refreshTabList();
 }
 
+function addNewTokenTab() {
+    let dropdown = document.querySelector('.dropdown-content');
+    if (dropdown) {
+        dropdown.remove();
+    }
+
+    let tab_name = prompt('Enter new file name:');
+    if (tab_name === null) {
+        return;
+    }
+
+    if (Object.keys(code_storage).includes(tab_name)) {
+        alert('File already exists!');
+        return;
+    }
+
+    fetch('https://raw.githubusercontent.com/xian-network/xian-standard-contracts/main/token/XSC001/token.py').then((response) => {
+        if (!response.ok) {
+            alert('Error loading token contract!');
+            return;
+        }
+        response.text().then((response) => {
+            addTab(tab_name, response);
+            changeTab(tab_name);
+            refreshTabList();
+        }).catch((error) => {
+            console.error('Error loading token contract:', error.message);
+            alert('Error loading token contract!');
+        });
+    });
+}
+
+
 
 function loadContractFromExplorer() {
     let dropdown = document.querySelector('.dropdown-content');
@@ -74,19 +107,19 @@ function loadContractFromExplorer() {
     }
 
     getContractCode(contract).then((contractCode) => {
-    if (contractCode === null) {
-        alert('Contract not found!');
-        return;
-    }
+        if (contractCode === null) {
+            alert('Contract not found!');
+            return;
+        }
 
-    let tab_name = contract + '(Read-Only)';
-    if (Object.keys(code_storage).includes(tab_name)) {
-        alert('File already exists!');
-        return;
-    }
-    addTab(tab_name, contractCode);
-    changeTab(tab_name);
-    refreshTabList();
+        let tab_name = contract + '(Read-Only)';
+        if (Object.keys(code_storage).includes(tab_name)) {
+            alert('File already exists!');
+            return;
+        }
+        addTab(tab_name, contractCode);
+        changeTab(tab_name);
+        refreshTabList();
 
     }).catch((error) => {
         console.error('Error loading contract:', error.message);
@@ -136,12 +169,18 @@ function showDropdown() {
     newTab.addEventListener('click', addNewTab);
     newTab.style.cursor = 'pointer';
 
+    let newTokenTab = document.createElement('div');
+    newTokenTab.innerHTML = 'New Token';
+    newTokenTab.addEventListener('click', addNewTokenTab);
+    newTokenTab.style.cursor = 'pointer';
+
     let loadContract = document.createElement('div');
     loadContract.innerHTML = 'Load Contract';
     loadContract.addEventListener('click', loadContractFromExplorer);
     loadContract.style.cursor = 'pointer';
 
     dropdown.appendChild(newTab);
+    dropdown.appendChild(newTokenTab);
     dropdown.appendChild(loadContract);
 }
 
@@ -150,7 +189,7 @@ function showDropdown() {
 
 var editor = CodeMirror(document.querySelector('#editor'), {
     value: code_storage[current_tab],
-    mode:  "python",
+    mode: "python",
     lineNumbers: true,
     indentUnit: 4,
 });
@@ -220,56 +259,56 @@ function submitContract() {
     }
 
     Promise.all([signTransaction(payload, unencryptedPrivateKey)]).then((signed_tx) => {
-    broadcastTransaction(signed_tx).then((response) => {
-        hash = response['result']['hash'];
-        let status = 'success'
-        if (response['result']['code'] == 1) {
-            status = 'error';
-        }
-        prependToTransactionHistory(hash, 'submission', 'submit_contract', {name: contract, code: contractCode}, status, new Date().toLocaleString());
-    if (response["result"]["code"] == 1) {
-        contractError.innerHTML = response["result"]["log"];
-        contractError.style.display = "block";
-        return;
-    } else {
-        contractSuccess.innerHTML =
-        "Transaction sent successfully! Explorer: " +
-        "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
-        hash +
-        "' target='_blank'>" +
-        hash +
-        "</a>";
-        contractSuccess.style.display = "block";
-    }
-    }).catch((error) => {
-        console.error("Error submitting contract:", error.message);
-        contractError.innerHTML = "Error submitting contract!";
-        contractError.style.display = "block";
-    });
+        broadcastTransaction(signed_tx).then((response) => {
+            hash = response['result']['hash'];
+            let status = 'success'
+            if (response['result']['code'] == 1) {
+                status = 'error';
+            }
+            prependToTransactionHistory(hash, 'submission', 'submit_contract', { name: contract, code: contractCode }, status, new Date().toLocaleString());
+            if (response["result"]["code"] == 1) {
+                contractError.innerHTML = response["result"]["log"];
+                contractError.style.display = "block";
+                return;
+            } else {
+                contractSuccess.innerHTML =
+                    "Transaction sent successfully! Explorer: " +
+                    "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
+                    hash +
+                    "' target='_blank'>" +
+                    hash +
+                    "</a>";
+                contractSuccess.style.display = "block";
+            }
+        }).catch((error) => {
+            console.error("Error submitting contract:", error.message);
+            contractError.innerHTML = "Error submitting contract!";
+            contractError.style.display = "block";
+        });
     });
 }
 
 // Get current stamp rate
- // Get current stamp rate
- getStampRate().then((rate) => {
-    if(rate === null) {
+// Get current stamp rate
+getStampRate().then((rate) => {
+    if (rate === null) {
         document.getElementById("stampRate").innerHTML = "ERR";
         return;
-    } 
+    }
     document.getElementById("stampRate").innerHTML = rate;
 }).catch((error) => {
     console.error("Error getting stamp rate:", error.message);
     document.getElementById("stampRate").innerHTML = "ERR";
 });
 
-document.getElementById('btn-ide-submit-contract').addEventListener('click', function() {
+document.getElementById('btn-ide-submit-contract').addEventListener('click', function () {
     submitContract();
 });
-document.getElementById('btn-ide-go-to-wallet').addEventListener('click', function() {
+document.getElementById('btn-ide-go-to-wallet').addEventListener('click', function () {
     goToWallet();
 });
 
-document.getElementById('ide-send-adv-tx').addEventListener('click', function() {
+document.getElementById('ide-send-adv-tx').addEventListener('click', function () {
     changePage('send-advanced-transaction');
 });
 
@@ -279,9 +318,9 @@ function refreshTabList() {
         let tabElement = document.createElement('div');
         tabElement.className = 'tab-editor';
         tabElement.innerHTML = tab;
-        tabElement.addEventListener('click', function() {
+        tabElement.addEventListener('click', function () {
             changeTab(tab);
-            
+
         });
         document.getElementById('tabs-editor').appendChild(tabElement);
 
@@ -291,8 +330,8 @@ function refreshTabList() {
 
         let closeTab = document.createElement('i');
         closeTab.className = 'fas fa-times';
-        
-        closeTab.addEventListener('click', function(event) {
+
+        closeTab.addEventListener('click', function (event) {
             event.stopPropagation(); // Prevent click event from propagating to the tab itself
 
             // Prompt user if they want to remove the tab
