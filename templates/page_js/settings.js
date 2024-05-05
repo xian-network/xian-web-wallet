@@ -20,7 +20,7 @@ function saveSettings() {
     settingsError.style.display = 'none';
 
     let rpc = document.getElementById('rpc_input').value;
-    if (rpc === "" || chain_id === "") {
+    if (rpc === "") {
         settingsError.style.display = 'block';
         settingsError.innerHTML = 'All fields are required!';
         return;
