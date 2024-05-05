@@ -165,7 +165,7 @@ function showDropdown() {
     }
 
     let newTab = document.createElement('div');
-    newTab.innerHTML = 'New File';
+    newTab.innerHTML = 'New Blank File';
     newTab.addEventListener('click', addNewTab);
     newTab.style.cursor = 'pointer';
 
