@@ -170,6 +170,8 @@ function submitContract() {
     contractError.style.display = 'none';
     contractSuccess.style.display = 'none';
 
+    window.scrollTo(0, 0);
+
     if (contract === "") {
         contractError.innerHTML = 'Contract name is required!';
         contractError.style.display = 'block';
@@ -225,8 +227,6 @@ function submitContract() {
             status = 'error';
         }
         prependToTransactionHistory(hash, 'submission', 'submit_contract', {name: contract, code: contractCode}, status, new Date().toLocaleString());
-        // scroll to top
-        window.scrollTo(0, 0);
     if (response["result"]["code"] == 1) {
         contractError.innerHTML = response["result"]["log"];
         contractError.style.display = "block";
