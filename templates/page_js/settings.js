@@ -27,9 +27,9 @@ function saveSettings() {
     }
 
     // rpc has to start with https and not end with a slash
-    if (!rpc.startsWith('https://')) {
+    if (!rpc.startsWith('http')) {
         settingsError.style.display = 'block';
-        settingsError.innerHTML = 'RPC must start with https://';
+        settingsError.innerHTML = 'RPC must start with http or https';
         return;
     }
 
