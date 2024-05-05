@@ -20,8 +20,6 @@ function saveSettings() {
     settingsError.style.display = 'none';
 
     let rpc = document.getElementById('rpc_input').value;
-    let chain_id = document.getElementById('chain_id_input').value;
-
     if (rpc === "" || chain_id === "") {
         settingsError.style.display = 'block';
         settingsError.innerHTML = 'All fields are required!';
@@ -43,9 +41,7 @@ function saveSettings() {
 
 
     localStorage.setItem("rpc", rpc);
-    localStorage.setItem("chain_id", chain_id);
     RPC = rpc;
-    CHAIN_ID = chain_id;
     let online_status_element = document.getElementById("onlineStatus");
 
     ping().then(online_status => {
@@ -60,10 +56,16 @@ function saveSettings() {
         online_status_element.innerHTML = "Node Status <div class='offline-circle' title='Node is Offline'></div>"
     });
 
-
-    settingsSuccess.style.display = 'block';
-    settingsSuccess.innerHTML = 'Settings saved successfully!';
-    
+    getChainID().then(chain_id => {
+        if (chain_id === null) {
+            settingsError.style.display = 'block';
+            settingsError.innerHTML = 'Error getting chain id. Please check your RPC settings.';
+            return;
+        }
+        CHAIN_ID = chain_id;
+        settingsSuccess.style.display = 'block';
+        settingsSuccess.innerHTML = 'Settings saved successfully!';
+    });
 }
 
 function exportPrivateKey() {
@@ -108,7 +110,6 @@ document.getElementById('settings-save-settings').addEventListener('click', func
 
 function loadSettingsPage() {
     document.getElementById('rpc_input').value = RPC;
-    document.getElementById('chain_id_input').value = CHAIN_ID;
 }
 
 loadSettingsPage();

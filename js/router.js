@@ -148,6 +148,10 @@ document.addEventListener("DOMContentLoaded", (event) => {
         online_status_element.innerHTML = "Node Status <div class='offline-circle' title='Node is Offline'></div>"
     });
 
+    getChainID().then(chain_id => {
+      CHAIN_ID = chain_id;
+  });
+
   Promise.all([
     readSecureCookie("publicKey"),
     readSecureCookie("encryptedPrivateKey"),

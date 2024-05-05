@@ -1,6 +1,5 @@
 var RPC = localStorage.getItem("rpc") || "https://testnet.xian.org";
-var CHAIN_ID = localStorage.getItem("chain_id") || "xian-testnet-1";
-
+var CHAIN_ID = null;
 function toHexString(byteArray) {
     return Array.from(byteArray, function(byte) {
         return ('0' + (byte & 0xFF).toString(16)).slice(-2);
@@ -242,6 +241,18 @@ async function getStampRate() {
       return parseInt(atob(data.result.response.value), 10);
   } catch (error) {
       console.error("Error fetching stamp rate:", error);
+      return null;
+  }
+}
+
+async function getChainID() {
+  try {
+      const response = await fetch(RPC + '/genesis');
+      const data = await response.json();
+      CHAIN_ID = data.result.genesis["chain_id"]
+        return CHAIN_ID;
+  } catch (error) {
+      console.error("Error fetching chain ID:", error);
       return null;
   }
 }
