@@ -32,10 +32,13 @@ function changeTab(tab_name) {
     if (current_tab.endsWith('(Read-Only)')) {
         editor.setOption('readOnly', true);
         document.getElementById('submission-form').style.display = 'none';
+        buildFunctionBoxes();
+        document.getElementById('function-boxes').style.display = 'flex';
     }
     else {
         editor.setOption('readOnly', false);
         document.getElementById('submission-form').style.display = 'block';
+        document.getElementById('function-boxes').style.display = 'none';
     }
     refreshTabList();
 }
@@ -198,7 +201,179 @@ editor.setSize('100%', null);
 if (current_tab.endsWith('(Read-Only)')) {
     editor.setOption('readOnly', true);
     document.getElementById('submission-form').style.display = 'none';
+    buildFunctionBoxes();
 }
+
+function buildFunctionBoxes() {
+    getContractFunctions(current_tab.replace('(Read-Only)', '')).then((functions) => {
+        let functionBoxes = document.getElementById('function-boxes');
+        functionBoxes.innerHTML = '';
+        console.log(functions);
+        functions.methods.forEach((func) => {
+            let functionBox = document.createElement('div');
+            functionBox.className = 'function-box';
+            // func.name is the function name
+            // func.arguments is the list of arguments
+            
+            functionBox.innerHTML = `<h3>` + func.name + `</h3>`;
+
+            let functionArgs = document.createElement('div');
+            functionArgs.className = 'function-args';
+            func.arguments.forEach((arg) => {
+                let argElement = document.createElement('div');
+                argElement.innerHTML = arg.name + ' (' + arg.type + ')';
+                argElement.className = 'form-group kwarg-group';
+
+                let argValue = document.createElement('input');
+                argValue.type = 'text';
+                argValue.className = 'function-arg-value form-control';
+                argValue.id = current_tab + '-' + func.name + '-' + arg.name;
+
+                argElement.appendChild(argValue);
+                functionArgs.appendChild(argElement);
+            });
+            // Always add a stamp limit field
+            let argElement = document.createElement('div');
+            argElement.innerHTML = 'stamp_limit (int)';
+            argElement.className = 'function-arg kwarg-group';
+
+            let argValue = document.createElement('input');
+            argValue.type = 'text';
+            argValue.className = 'function-arg-value form-control';
+            argValue.id = current_tab + '-' + func.name + '-stamp_limit';
+
+            argElement.appendChild(argValue);
+            functionArgs.appendChild(argElement);
+            functionBox.appendChild(functionArgs);
+
+            let functionButton = document.createElement('button');
+            functionButton.className = 'btn btn-primary';
+            functionButton.innerHTML = 'Execute';
+            functionButton.addEventListener('click', function () {
+                let prompt = confirm('Are you sure you want to execute this function?');
+                if (!prompt) {
+                    return;
+                }
+                let contractName = current_tab.replace('(Read-Only)', '');
+                let functionName = func.name;
+                let stampLimit = document.getElementById(current_tab + '-' + func.name + '-stamp_limit').value;
+                let error = document.getElementById('submitContractError');
+                let success = document.getElementById('submitContractSuccess');
+
+                error.style.display = 'none';
+                success.style.display = 'none';
+
+                let args = {};
+                func.arguments.forEach((arg) => {
+                    let value = document.getElementById(current_tab + '-' + func.name + '-' + arg.name).value;
+                    let expectedType = arg.type;
+                    if (value === "") {
+                        error.innerHTML = "All fields are required!";
+                        error.style.display = "block";
+                        return;
+                    }
+                    if (expectedType === "int") {
+                        if (isNaN(value)) {
+                            error.innerHTML = "Invalid value for " + arg.name + "!";
+                            error.style.display = "block";
+                            return;
+                        }
+                        value = parseInt(value);
+                    }
+                    if (expectedType === "float") {
+                        if (isNaN(value)) {
+                            error.innerHTML = "Invalid value for " + arg.name + "!";
+                            error.style.display = "block";
+                            return;
+                        }
+                        value = parseFloat(value);
+                    }
+                    if (expectedType === "bool") {
+                        if (value !== "true" && value !== "false") {
+                            error.innerHTML = "Invalid value for " + arg.name + "!";
+                            error.style.display = "block";
+                            return;
+                        }
+                        value = value === "true";
+                    }
+                    if (expectedType === "str") {
+                        value = value.toString();
+                    }
+                    if (expectedType === "dict" || expectedType === "list") {
+                        try {
+                            value = JSON.parse(value);
+                        } catch (e) {
+                            error.innerHTML = "Invalid value for " + arg.name + "!";
+                            error.style.display = "block";
+                            return;
+                        }
+                    }
+                    if (expectedType === "Any") {
+                        try {
+                            value = JSON.parse(value);
+                        } catch (e) {
+                            value = value.toString();
+                        }
+                    }
+                    args[arg.name] = value;
+                });
+
+                let payload = {
+                    payload: {
+                        chain_id: CHAIN_ID,
+                        contract: contractName,
+                        function: functionName,
+                        kwargs: args,
+                        stamps_supplied: parseInt(stampLimit)
+                    },
+                    metadata: {
+                        signature: "",
+                    }
+                };
+                window.scrollTo(0, 0);
+                Promise.all([signTransaction(payload, unencryptedPrivateKey)]).then((signed_tx) => {
+                    broadcastTransaction(signed_tx).then((response) => {
+                        hash = response['result']['hash'];
+                        let status = 'success'
+                        if (response['result']['code'] == 1) {
+                            status = 'error';
+                        }
+                        prependToTransactionHistory(hash, contractName, functionName, args, status, new Date().toLocaleString());
+                        if (response["result"]["code"] == 1) {
+                            error.innerHTML = response["result"]["log"];
+                            error.style.display = "block";
+                            return;
+                        } else {
+                            success.innerHTML =
+                                "Transaction sent successfully! Explorer: " +
+                                "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
+                                hash +
+                                "' target='_blank'>" +
+                                hash +
+                                "</a>";
+                            success.style.display = "block";
+                        }
+                    }).catch((error) => {
+                        console.error("Error executing contract function:", error.message);
+                        error.innerHTML = "Error executing contract function!";
+                        error.style.display = "block";
+                    });
+                }).catch((error) => {
+                    console.error("Error executing contract function:", error.message);
+                    error.innerHTML = "Error executing contract function!";
+                    error.style.display = "block";
+                });
+                });
+
+            functionBox.appendChild(functionButton);
+            functionBoxes.appendChild(functionBox);
+        });
+        
+    }).catch((error) => {
+        console.error('Error getting contract functions:', error.message);
+    });
+}
+
 
 function submitContract() {
     let contract = document.getElementById("submitContractName").value;
