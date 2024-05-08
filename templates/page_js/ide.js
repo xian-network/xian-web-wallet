@@ -59,6 +59,11 @@ function addNewTab() {
         return;
     }
 
+    if (tab_name.trim() === '') {
+        alert('File name cannot be empty!');
+        return;
+    }
+
     addTab(tab_name);
     changeTab(tab_name);
     refreshTabList();
@@ -77,6 +82,11 @@ function addNewTokenTab() {
 
     if (Object.keys(code_storage).includes(tab_name)) {
         alert('File already exists!');
+        return;
+    }
+
+    if (tab_name.trim() === '') {
+        alert('File name cannot be empty!');
         return;
     }
 
