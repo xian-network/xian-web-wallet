@@ -34,7 +34,6 @@ function acceptRequest() {
             changePage('wallet');
         }
     }).catch((error) => {
-        alert('RPC ERR');
         changePage('wallet');
     });
 });
