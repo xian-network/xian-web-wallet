@@ -54,6 +54,32 @@ function loadWalletPage() {
             console.error("Error loading wallet page:", error);
         })
         .finally(() => {
+            let local_activity = document.getElementById("local-activity-list");
+            local_activity.innerHTML = "";
+            tx_history.forEach((tx) => {
+                local_activity.innerHTML += `
+                <div class="activity-item">
+                    <div class="activity-details">
+                        <div class="activity-hash">`+tx["hash"]+`</div>
+                        <div class="activity-contract">`+tx["contract"]+`</div>
+                        <div class="activity-function">`+tx["function"]+`</div>
+                        <div class="activity-status">`+tx["status"]+`</div>
+                        <div class="activity-timestamp">`+tx["timestamp"]+`</div>
+                    </div>
+                    <div class="activity-actions">
+                        <a href="https://explorer.xian.org/tx/`+tx["hash"]+`" target="_blank"><i class="fas fa-eye"></i> View</a>
+                    </div>
+                </div>`;
+            });
+        
+            if (local_activity.innerHTML === "") {
+                local_activity.innerHTML = `<div class="activity-item">
+                    <div class="activity-details">
+                        <div class="activity-hash">No recent activity</div>
+                    </div>
+                </div>`;
+            }
+            
             document.getElementById("wallet-refresh-all").querySelector("i").classList.remove("fa-spin");
         });
         
