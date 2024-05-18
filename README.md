@@ -2,7 +2,7 @@
 
 Available at https://wallet.xian.org
 
-Or just load it as a Browser Extension!
+Or get it as a browser extension to interact with dApps. https://chromewebstore.google.com/detail/xian-wallet/kcimjjhplbcgkcnanijkolfillgfanlc
 
 ## Introduction
 Xian Web Wallet is a cutting-edge, serverless web application tailored for secure wallet management and cryptographic keypair generation, utilizing advanced client-side JavaScript.
