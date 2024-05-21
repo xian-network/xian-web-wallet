@@ -12,9 +12,7 @@
     "background": {
         "service_worker": "background.js"
     },
-    "content_security_policy": {
-      "extension_pages": "script-src 'self' https://cdn.jsdelivr.net/pyodide/v0.21.3/full/; object-src 'self'"
-    },
+    
     "content_scripts": [
         {
           "matches": ["<all_urls>"],
