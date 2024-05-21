@@ -197,7 +197,7 @@ function showDropdown() {
     dropdown.appendChild(loadContract);
 }
 async function lintCode(code) {
-    fetch(RPC + '/abci_query?path="/lint/' + code + '"', {
+    fetch(RPC + '/abci_query?path="/lint/' + btoa(code) + '"', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
