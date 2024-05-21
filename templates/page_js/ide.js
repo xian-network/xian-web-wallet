@@ -208,7 +208,10 @@ async function lintCode(code) {
             return [];
         }
         response.json().then((data) => {
-            return parseLintOutput(data['stdout'] + data['stderr']);
+            let lintinfo = data['result']['response']['value'];
+            let lintinfo_decoded = atob(lintinfo);
+            lintinfo_decoded = JSON.parse(lintinfo_decoded);
+            return parseLintOutput(lintinfo_decoded['stdout'] + lintinfo_decoded['stderr']);
         }).catch((error) => {
             console.error('Error parsing lint output:', error.message);
             return [];
