@@ -197,29 +197,31 @@ function showDropdown() {
     dropdown.appendChild(loadContract);
 }
 async function lintCode(code) {
-    fetch(RPC + '/abci_query?path="/lint/' + btoa(code) + '"', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }).then((response) => {
+    try {
+        const response = await fetch(RPC + '/abci_query?path="/lint/' + btoa(code) + '"', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
         if (!response.ok) {
             console.error('Failed to lint code:', response.status);
             return [];
         }
-        response.json().then((data) => {
-            let lintinfo = data['result']['response']['value'];
-            let lintinfo_decoded = atob(lintinfo);
-            lintinfo_decoded = JSON.parse(lintinfo_decoded);
-            return parseLintOutput(lintinfo_decoded['stdout'] + lintinfo_decoded['stderr']);
-        }).catch((error) => {
-            console.error('Error parsing lint output:', error.message);
-            return [];
-        });
-    }).catch((error) => {
+        
+        const data = await response.json();
+        let lintinfo = data['result']['response']['value'];
+        let lintinfo_decoded = atob(lintinfo);
+        lintinfo_decoded = JSON.parse(lintinfo_decoded);
+        lintinfo_decoded = lintinfo_decoded['stdout'] + lintinfo_decoded['stderr'];
+        console.log(lintinfo_decoded);
+        return parseLintOutput(lintinfo_decoded);
+        
+    } catch (error) {
         console.error('Error linting code:', error.message);
         return [];
-    });
+    }
 }
 
 var whitelistedPatterns = [
@@ -240,7 +242,6 @@ var whitelistedPatterns = [
     'crypto',
     'Any'
 ];
-
 function parseLintOutput(output) {
     let errors = [];
     let lines = output.split('\n');
@@ -262,8 +263,10 @@ function parseLintOutput(output) {
     return errors;
 }
 
-function pythonLinter(text, options, cm) {
-    return lintCode(text).then(errors => {
+async function pythonLinter(text, options, cm) {
+    try {
+        const errors = await lintCode(text);
+        console.log(errors);
         let lintErrors = errors.map(error => ({
             message: error.message,
             severity: error.severity,
@@ -271,8 +274,12 @@ function pythonLinter(text, options, cm) {
             to: CodeMirror.Pos(error.line, error.col)
         }));
         return lintErrors;
-    });
+    } catch (error) {
+        console.error('Error in pythonLinter:', error.message);
+        return [];
+    }
 }
+
 
 CodeMirror.registerHelper("lint", "python", pythonLinter);
 
