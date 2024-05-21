@@ -196,16 +196,95 @@ function showDropdown() {
     dropdown.appendChild(newTokenTab);
     dropdown.appendChild(loadContract);
 }
+async function lintCode(code) {
+    let pyodide = await pyodideReadyPromise;
+    await pyodide.loadPackage('micropip');
+    await pyodide.runPythonAsync(`
+        import micropip
+        await micropip.install('pyflakes')
+    `);
 
+    let lintScript = `
+from pyflakes.api import check
+from pyflakes.reporter import Reporter
+from io import StringIO
 
+code = """${code.replace(/"/g, '\\"')}"""
 
+stdout = StringIO()
+stderr = StringIO()
+reporter = Reporter(stdout, stderr)
+check(code, "<string>", reporter)
+stdout_output = stdout.getvalue()
+stderr_output = stderr.getvalue()
+(stdout_output, stderr_output)
+    `;
+    let [stdout_output, stderr_output] = await pyodide.runPythonAsync(lintScript);
+    return parseLintOutput(stdout_output + stderr_output);
+}
+
+const whitelistedPatterns = [
+    'export',
+    'construct',
+    'Hash',
+    'Variable',
+    'ctx',
+    'now',
+    'random',
+    'ForeignHash',
+    'ForeignVariable',
+    'block_num',
+    'block_hash',
+    'importlib',
+    'hashlib',
+    'datetime',
+    'crypto'
+];
+
+function parseLintOutput(output) {
+    let errors = [];
+    let lines = output.split('\n');
+    for (let line of lines) {
+        let match = line.match(/<string>:(\d+):(\d+):\s*(.+)/);
+        if (match) {
+            let message = match[3];
+            let isWhitelisted = whitelistedPatterns.some(pattern => message.includes(pattern));
+            if (!isWhitelisted) {
+                errors.push({
+                    line: parseInt(match[1]) - 1,
+                    col: parseInt(match[2]) - 1,
+                    message: message,
+                    severity: 'error'  // Default to 'error'
+                });
+            }
+        }
+    }
+    return errors;
+}
+
+function pythonLinter(text, options, cm) {
+    return lintCode(text).then(errors => {
+        let lintErrors = errors.map(error => ({
+            message: error.message,
+            severity: error.severity,
+            from: CodeMirror.Pos(error.line, error.col),
+            to: CodeMirror.Pos(error.line, error.col)
+        }));
+        return lintErrors;
+    });
+}
+
+CodeMirror.registerHelper("lint", "python", pythonLinter);
 
 var editor = CodeMirror(document.querySelector('#editor'), {
     value: code_storage[current_tab],
-    mode: "python",
+    mode: 'python',
     lineNumbers: true,
     indentUnit: 4,
+    gutters: ["CodeMirror-lint-markers"],
+    lint: true,
 });
+
 
 editor.setSize('100%', null);
 if (current_tab.endsWith('(Read-Only)')) {
