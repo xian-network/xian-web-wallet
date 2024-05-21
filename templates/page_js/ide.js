@@ -197,7 +197,7 @@ function showDropdown() {
     dropdown.appendChild(loadContract);
 }
 async function lintCode(code) {
-    fetch(RPC + '/lint/' + code, {
+    fetch(RPC + '/abci_query?path="/lint/' + code + '"', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -219,7 +219,7 @@ async function lintCode(code) {
     });
 }
 
-const whitelistedPatterns = [
+var whitelistedPatterns = [
     'export',
     'construct',
     'Hash',
