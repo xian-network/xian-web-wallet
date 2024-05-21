@@ -1,7 +1,3 @@
-var pyodideReadyPromise = loadPyodide({
-    indexURL : "https://cdn.jsdelivr.net/pyodide/v0.21.3/full/"
-  });
-
 // Save the original fetch function
 const originalFetch = window.fetch;
 

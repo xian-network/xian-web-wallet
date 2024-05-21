@@ -197,30 +197,26 @@ function showDropdown() {
     dropdown.appendChild(loadContract);
 }
 async function lintCode(code) {
-    let pyodide = await pyodideReadyPromise;
-    await pyodide.loadPackage('micropip');
-    await pyodide.runPythonAsync(`
-        import micropip
-        await micropip.install('pyflakes')
-    `);
-
-    let lintScript = `
-from pyflakes.api import check
-from pyflakes.reporter import Reporter
-from io import StringIO
-
-code = """${code.replace(/"/g, '\\"')}"""
-
-stdout = StringIO()
-stderr = StringIO()
-reporter = Reporter(stdout, stderr)
-check(code, "<string>", reporter)
-stdout_output = stdout.getvalue()
-stderr_output = stderr.getvalue()
-(stdout_output, stderr_output)
-    `;
-    let [stdout_output, stderr_output] = await pyodide.runPythonAsync(lintScript);
-    return parseLintOutput(stdout_output + stderr_output);
+    fetch(RPC + '/lint/' + code, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then((response) => {
+        if (!response.ok) {
+            console.error('Failed to lint code:', response.status);
+            return [];
+        }
+        response.json().then((data) => {
+            return parseLintOutput(data['stdout'] + data['stderr']);
+        }).catch((error) => {
+            console.error('Error parsing lint output:', error.message);
+            return [];
+        });
+    }).catch((error) => {
+        console.error('Error linting code:', error.message);
+        return [];
+    });
 }
 
 const whitelistedPatterns = [
@@ -238,7 +234,8 @@ const whitelistedPatterns = [
     'importlib',
     'hashlib',
     'datetime',
-    'crypto'
+    'crypto',
+    'Any'
 ];
 
 function parseLintOutput(output) {
