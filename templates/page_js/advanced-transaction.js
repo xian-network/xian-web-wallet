@@ -8,7 +8,7 @@ function sendAdvTx() {
     let args = document.getElementById("adv_args");
     let list_kwargs = document.getElementById("adv_kwargs");
     let kwargs = {};
-    let stamps = document.getElementById("tokenFee").value;
+    let stamps = document.getElementById("tokenFee").innerHTML;
     let payload = {
         payload: {
             chain_id: CHAIN_ID,
