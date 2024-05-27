@@ -17,26 +17,26 @@ function acceptRequest() {
         }
     };
     Promise.all([signTransaction(payload, unencryptedPrivateKey)]).then((signed_tx) => {
-    broadcastTransaction(signed_tx).then((response) => {
-        let status = 'success'
-        if (response['result']['code'] == 1) {
-            status = 'error';
-        }
-        hash = response['result']['hash'];
-        prependToTransactionHistory(hash, contract, method, kwargs, status, new Date().toLocaleString());
+        broadcastTransaction(signed_tx).then((response) => {
+            let status = 'success'
+            if (response['result']['code'] == 1) {
+                status = 'error';
+            }
+            hash = response['result']['hash'];
+            prependToTransactionHistory(hash, contract, method, kwargs, status, new Date().toLocaleString());
 
-        if (response['result']['code'] == 1) {
-            sendResponse({errors: [response['result']['log']]});
+            if (response['result']['code'] == 1) {
+                sendResponse({errors: [response['result']['log']]});
+                changePage('wallet');
+            }
+            else {
+                sendResponse({status: 'sent', txid: hash});
+                changePage('wallet');
+            }
+        }).catch((error) => {
             changePage('wallet');
-        }
-        else {
-            sendResponse({status: 'sent', txid: hash});
-            changePage('wallet');
-        }
-    }).catch((error) => {
-        changePage('wallet');
+        });
     });
-});
 }
 
 function rejectRequest() {
@@ -51,3 +51,41 @@ document.getElementById('request-transaction-accept').addEventListener('click', 
 document.getElementById('request-transaction-reject').addEventListener('click', function() {
     rejectRequest();
 });
+
+async function estimateRequestStamps(){
+    let contract = document.getElementById('requestTransactionContract').innerHTML;
+    let method = document.getElementById('requestTransactionFunction').innerHTML;
+    let kwargs = JSON.parse(document.getElementById('requestTransactionParams').innerHTML);
+    let transaction = {
+        payload: {
+            chain_id: CHAIN_ID,
+            contract: contract,
+            function: method,
+            kwargs: kwargs,
+            stamps_supplied: 100000
+        },
+        metadata: {
+            signature: "",
+        }
+    };
+
+    try {
+        let signed_tx = await signTransaction(transaction, unencryptedPrivateKey);
+        let stamps = await estimateStamps(signed_tx);
+        if (stamps === null) {
+            document.getElementById('requestTransactionStampLimit').innerHTML = 0;
+            return;
+        }
+        stamps = stamps;
+        let stamp_rate = await getStampRate();
+        document.getElementById('requestTransactionStampLimitXian').innerHTML = stamps / stamp_rate;
+        document.getElementById('requestTransactionStampLimit').innerHTML = stamps;
+    } catch (error) {
+        console.error("Error estimating stamps:", error);
+        document.getElementById('requestTransactionStampLimit').innerHTML = "Error";
+    }
+}
+
+(async function() {
+    await estimateRequestStamps();
+})();
