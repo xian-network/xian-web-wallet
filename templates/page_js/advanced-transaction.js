@@ -112,19 +112,6 @@ function sendAdvTx() {
         });
 }
 
- 
- // Get current stamp rate
- getStampRate().then((rate) => {
-        if(rate === null) {
-            document.getElementById("stampRate").innerHTML = "ERR";
-            return;
-        } 
-        document.getElementById("stampRate").innerHTML = rate;
-    }).catch((error) => {
-        console.error("Error getting stamp rate:", error.message);
-        document.getElementById("stampRate").innerHTML = "ERR";
-    });
-
  document.getElementById('btn-adv-tx-send').addEventListener('click', function() {
      sendAdvTx();
  });
@@ -206,6 +193,128 @@ function sendAdvTx() {
                 error.style.display = "block";
             });
     });
+}
+
+document.getElementById('functionName').addEventListener('input', function(e) {
+    estimateSendStamps();
+});
+
+document.getElementById('contractName').addEventListener('input', function(e) {
+    estimateSendStamps();
+});
+
+document.getElementById('adv_args').childNodes.forEach(function (arg) {
+    arg.addEventListener('input', function(e) {
+        estimateSendStamps();
+    });
+});
+
+
+async function estimateSendStamps(){
+    let error = document.getElementById('sendAdvTxError');
+    let success = document.getElementById('sendAdvTxSuccess');
+    error.style.display = 'none';
+    success.style.display = 'none';
+    let function_name = document.getElementById('functionName').value;
+    let contract = document.getElementById('contractName').value;
+    let functionInfo;
+    let kwargs = {};
+    let transaction = {
+        payload: {
+            chain_id: CHAIN_ID,
+            contract: contract,
+            function: function_name,
+            kwargs: kwargs,
+            stamps_supplied: 100000
+        },
+        metadata: {
+            signature: "",
+        }
+    };
+    if (function_name === "" || contract === "") {
+        return;
+    }
+    functionInfo = await getContractFunctions(contract)
+        .then(functions => {
+            functionInfo = functions.methods.find(func => func.name === function_name);
+            functionInfo.arguments.forEach(arg => {
+                let value = document.getElementById(arg.name).value;
+                let expectedType = arg.type;
+                if (value === "") {
+                    error.innerHTML = "All fields are required!";
+                    error.style.display = "block";
+                    return;
+                }
+                if (expectedType === "int") {
+                    if (isNaN(value)) {
+                        error.innerHTML = "Invalid value for " + arg.name + "!";
+                        error.style.display = "block";
+                        return;
+                    }
+                    value = parseInt(value);
+                }
+                if (expectedType === "float") {
+                    if (isNaN(value)) {
+                        error.innerHTML = "Invalid value for " + arg.name + "!";
+                        error.style.display = "block";
+                        return;
+                    }
+                    value = parseFloat(value);
+                }
+                if (expectedType === "bool") {
+                    if (value !== "true" && value !== "false") {
+                        error.innerHTML = "Invalid value for " + arg.name + "!";
+                        error.style.display = "block";
+                        return;
+                    }
+                    value = value === "true";
+                }
+                if (expectedType === "str") {
+                    value = value.toString();
+                }
+                if (expectedType === "dict" || expectedType === "list") {
+                    try {
+                        value = JSON.parse(value);
+                    } catch (e) {
+                        error.innerHTML = "Invalid value for " + arg.name + "!";
+                        error.style.display = "block";
+                        return;
+                    }
+                }
+                if (expectedType === "Any") {
+                    try {
+                        value = JSON.parse(value);
+                    } catch (e) {
+                        value = value.toString();
+                    }
+                }
+                kwargs[arg.name] = value;
+            });
+            transaction.payload.kwargs = kwargs;
+        })
+        .catch(error_ => {
+            console.error('Error estimating stamps:', error_);
+            document.getElementById('tokenFee').innerHTML = "..";
+        });
+
+    
+
+
+    try {
+        let signed_tx = await signTransaction(transaction, unencryptedPrivateKey);
+        let stamps = await estimateStamps(signed_tx);
+        if (stamps === null) {
+            document.getElementById('tokenFee').innerHTML = 0;
+            return;
+        }
+        let stamp_rate = await getStampRate();
+        document.getElementById('tokenFeeXian').innerHTML = stamps / stamp_rate;
+        document.getElementById('tokenFee').innerHTML = stamps;
+    } catch (error) {
+        console.error("Error estimating stamps:", error);
+        document.getElementById('tokenFee').innerHTML = "Error";
+    }
+    document.getElementById('tokenFeeContainer').style.display = 'block';
 }
 
 loadAdvancedTransactionPage();

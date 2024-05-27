@@ -54,7 +54,7 @@ function sendToken() {
                         to: recipient,
                         amount: amount
                     },
-                    stamps_supplied: 100
+                    stamps_supplied: parseInt(document.getElementById('tokenFee').innerHTML)
                 },
                 metadata: {
                     signature: "",
@@ -99,3 +99,50 @@ document.getElementById('send-token-send-token').addEventListener('click', funct
 document.getElementById('send-token-cancel').addEventListener('click', function() {
     goToWallet();
 });
+document.getElementById('toAddress').addEventListener('input', function(e) {
+    estimateSendStamps();
+});
+
+document.getElementById('tokenAmount').addEventListener('input', function(e) {
+    estimateSendStamps();
+});
+
+async function estimateSendStamps(){
+    let recipient = document.getElementById('toAddress').value;
+    let amount = document.getElementById('tokenAmount').value;
+    let contract = document.getElementById('tokenName').innerHTML;
+    if (recipient === '' || amount === '') return;
+
+    let transaction = {
+        payload: {
+            chain_id: CHAIN_ID,
+            contract: contract,
+            function: "transfer",
+            kwargs: {
+                to: recipient,
+                amount: parseFloat(amount)
+            },
+            stamps_supplied: 100000
+        },
+        metadata: {
+            signature: "",
+        }
+    };
+
+    try {
+        let signed_tx = await signTransaction(transaction, unencryptedPrivateKey);
+        let stamps = await estimateStamps(signed_tx);
+        if (stamps === null) {
+            document.getElementById('tokenFee').innerHTML = 0;
+            return;
+        }
+        stamps = stamps;
+        let stamp_rate = await getStampRate();
+        document.getElementById('tokenFeeXian').innerHTML = stamps / stamp_rate;
+        document.getElementById('tokenFee').innerHTML = stamps;
+    } catch (error) {
+        console.error("Error estimating stamps:", error);
+        document.getElementById('tokenFee').innerHTML = "Error";
+    }
+    document.getElementById('tokenFeeContainer').style.display = 'block';
+}
