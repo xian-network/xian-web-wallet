@@ -198,6 +198,7 @@ function showDropdown() {
 }
 async function lintCode(code) {
     try {
+        code = encodeURIComponent(code);
         const response = await fetch(RPC + '/abci_query?path="/lint/' + btoa(code) + '"', {
             method: 'GET',
             headers: {
