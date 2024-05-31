@@ -90,7 +90,7 @@ function addNewTokenTab() {
         return;
     }
 
-    fetch('https://github.com/xian-network/xian-standard-contracts/blob/main/XSC0001%20-%20Standard%20Token/XSC0001.py').then((response) => {
+    fetch('https://raw.githubusercontent.com/xian-network/xian-standard-contracts/main/XSC0001%20-%20Standard%20Token/XSC0001.py').then((response) => {
         if (!response.ok) {
             alert('Error loading token contract!');
             return;
