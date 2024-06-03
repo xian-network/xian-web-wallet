@@ -25,6 +25,19 @@ function sendProposal() {
         successMsg.style.display = 'none';
         errorMsg.style.display = 'none';
 
+        // if value is a number, convert it to a number
+        if (!isNaN(value)) {
+            value = parseInt(value);
+        }
+        // if value is valid JSON, parse it
+        else {
+            try {
+                value = JSON.parse(value);
+            } catch (e) {
+                // do nothing
+            }
+        }
+
        
 
         let transaction = {
@@ -75,6 +88,19 @@ async function estimateProposalStamps(){
     let type = document.getElementById('proposalType').value;
     let value = document.getElementById('proposalValue').value;
     if (type === '' || value === '') return;
+
+    // if value is a number, convert it to a number
+    if (!isNaN(value)) {
+        value = parseInt(value);
+    }
+    // if value is valid JSON, parse it
+    else {
+        try {
+            value = JSON.parse(value);
+        } catch (e) {
+            // do nothing
+        }
+    }
 
     let transaction = {
         payload: {
