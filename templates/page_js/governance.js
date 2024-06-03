@@ -1,5 +1,5 @@
 function getValidatorState() {
-    getVariable("masternodes", "S", "members")
+    getVariable("masternodes", "nodes")
         .then(validator_list => {
             let built_html = "<span>You are currently ";
             if (validator_list.includes(publicKey)) {
