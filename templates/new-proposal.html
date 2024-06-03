@@ -1,0 +1,22 @@
+<h1 class="app-box-title">Create New Proposal</h1>
+<p class="app-box-description">Create a new proposal to change network parameters.</p>
+<div class="app-box-form">
+    <div class="alert alert-danger" role="alert" id="proposalError" style="display: none;"></div>
+    <div class="alert alert-success" role="alert" id="proposalSuccess" style="display: none;"></div>
+    <div class="form-group">
+        <label for="proposalType">Type</label>
+        <input type="text" class="form-control" id="proposalType" placeholder="Enter the proposal type" required>
+    </div>
+    <div class="form-group">
+        <label for="proposalValue">Value</label>
+        <input type="number" class="form-control" id="proposalValue" placeholder="Enter the proposal value" required>
+    </div>
+    <div class="form-group" id="proposalFeeContainer" style="display: none;"> <!-- TODO: make nicer .. -->
+        <label for="proposalFee">Transaction Fee: <span id="proposalFee"></span> Stamps (<span id="proposalFeeXian"></span> Xian)</label>
+    </div>
+    <div class="btn-group">
+        <button class="btn btn-primary" id="create-proposal-create">Create Proposal</button>
+        <button class="btn btn-secondary" id="create-proposal-cancel">Cancel</button>
+    </div>
+</div>
+<script src="templates/page_js/new-proposal.js"></script>

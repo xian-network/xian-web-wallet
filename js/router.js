@@ -104,6 +104,9 @@ function changePage(page, some_data = null, send_response = null) {
     case "governance":
       loadHtmlAndScripts("templates/governance.html");
       break;
+    case "new-proposal":
+      loadHtmlAndScripts("templates/new-proposal.html");
+      break;
     default:
       break;
   }

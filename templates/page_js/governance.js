@@ -1,8 +1,12 @@
+var isValidator = false;
+
 function getValidatorState() {
     getVariable("masternodes", "nodes")
         .then(validator_list => {
             let built_html = "<span>You are currently ";
             if (validator_list.includes(publicKey)) {
+                document.getElementById('new-proposal').style.display = "block";
+                isValidator = true;
                 built_html += "<span class='text-success'>a Validator</span>";
             } else {
                 built_html += "<span class='text-danger'>not a Validator</span>";
@@ -33,6 +37,50 @@ function getDAOBalance() {
         });
 }
 
+async function getProposals() {
+    let request = await fetch(RPC + '/abci_query?path="/keys/masternodes.votes"');
+    let response = await request.json();
+    let votes = JSON.parse(atob(response.result.response.value));
+    return votes;
+}
+
+async function getProposal(id) {
+    let request = await fetch(RPC + '/abci_query?path="/get/masternodes.votes:' + id + '"');
+    let response = await request.json();
+    let proposal = JSON.parse(atob(response.result.response.value));
+    return proposal;
+}
+
+async function buildProposalTable() {
+    let proposals = await getProposals();
+    // reverse the order of the proposals
+    proposals = proposals.reverse();
+    let proposal_list = document.getElementById("proposal-list");
+    let built_html = "";
+    for (let proposal of proposals) {
+        let proposal_data = await getProposal(proposal);
+        if (proposal_data.finalized) {
+            continue;
+        }
+        built_html += "<div class='governance-section-wrapper'>";
+        built_html += "<div class='governance-section'>";
+        built_html += "<h2 class='governance-sub-title'>Proposal #" + proposal + "</h2>";
+        built_html += '<p><span class="label-gov">Type of Proposal:</span> <span class="proposed-type-governance value-gov">' + proposal_data.type + '</span></p>';
+        built_html += '<p><span class="label-gov">New Value:</span> <span class="proposed-value-governance value-gov">' + proposal_data.arg + '</span></p>';
+        built_html += '<p><span class="label-gov">Votes:</span> <span class="proposed-votes-yes value-gov">' + proposal_data.yes + '</span>&nbsp;Yes /&nbsp;<span class="proposed-votes-no value-gov">' + proposal_data.no + '</span>&nbsp;No</p>'
+        built_html += "</div>";
+        if (isValidator) {
+            built_html += '<div class="governance-section-buttons-colored">';
+            built_html += '<button class="btn btn-primary" onclick="voteProposal(' + proposal + ', true)">Vote Yes</button>';
+            built_html += '<button class="btn btn-secondary" onclick="voteProposal(' + proposal + ', false)">Vote No</button>';
+            built_html += "</div>";
+        }
+        built_html += "</div>";
+    }
+    proposal_list.innerHTML = built_html;
+}
+
+
 function getRewardPercentages() {
     getVariable("rewards", "S", "value")
         .then(reward_percentages => {
@@ -55,6 +103,7 @@ function getRewardPercentages() {
 getValidatorState();
 getDAOBalance();
 getRewardPercentages();
+buildProposalTable();
 
  // Get current stamp rate
  getStampRate().then((rate) => {
@@ -67,3 +116,98 @@ getRewardPercentages();
     console.error("Error getting stamp rate:", error.message);
     document.getElementById("stamp-rate-governance").innerHTML = "ERR";
 });
+
+document.getElementById("new-proposal").addEventListener("click", () => {
+    changePage("new-proposal");
+});
+
+
+async function estimateVoteStamps(proposal_id, vote) {
+    if (vote) {
+        vote = "yes";
+    }
+    else {
+        vote = "no";
+    }
+
+    let transaction = {
+        payload: {
+            chain_id: CHAIN_ID,
+            contract: "masternodes",
+            function: "vote",
+            kwargs: {
+                proposal_id: proposal_id,
+                vote: vote
+            },
+            stamps_supplied: 100000
+        },
+        metadata: {
+            signature: "",
+        }
+    };
+
+    try {
+        let signed_tx = await signTransaction(transaction, unencryptedPrivateKey);
+        let stamps = await estimateStamps(signed_tx);
+        if (stamps === null) {
+            document.getElementById('proposalFee').innerHTML = 0;
+            return;
+        }
+        return stamps;
+    } catch (error) {
+        console.error("Error estimating stamps:", error);
+
+    }
+}
+
+async function voteProposal(proposal_id, vote) {
+    if (vote) {
+        vote = "yes";
+    }
+    else {
+        vote = "no";
+    }
+    let stamps_required = await estimateVoteStamps(proposal_id, vote);
+    Promise.all([
+        readSecureCookie('publicKey')]
+    ).then((values) => {
+     
+        
+        let transaction = {
+            payload: {
+                chain_id: CHAIN_ID,
+                contract: "masternodes",
+                function: "vote",
+                kwargs: {
+                    proposal_id: proposal_id,
+                    vote: vote
+                },
+                stamps_supplied:  stamps_required
+            },
+            metadata: {
+                signature: "",
+            }
+        };
+        Promise.all([signTransaction(transaction, unencryptedPrivateKey)]).then(signed_tx => {
+            let conf = confirm("Are you sure you want to send this transaction?");
+            if (!conf) return;
+            
+            broadcastTransaction(signed_tx).then(response => {
+                console.log(response)
+                const hash = response['result']['hash'];
+                let status = 'success';
+                if (response['result']['code'] == 1) {
+                    status = 'error';
+                }
+                
+                prependToTransactionHistory(hash, 'masternodes', 'vote', {'proposal_id':proposal_id, 'vote':vote}, status, new Date().toLocaleString());
+
+                setTimeout(() => {
+                    buildProposalTable();
+                }, 2000);
+            });
+        });
+    }).catch(error => {
+        console.error("Error reading secure cookie:", error);
+    });
+}

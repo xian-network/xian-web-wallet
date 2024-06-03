@@ -9,18 +9,14 @@
             <h2 class="governance-sub-title">Stamp Rate</h2>
             <p>1 Xian = <span id="stamp-rate-governance"><i class='fas fa-spinner fa-spin'></i></span> Stamps</p>
         </div>
-        <div class="governance-section-buttons" style="display: none;">
-            <button class="btn" id="update-stamp-rate">Propose New Stamp Rate</button>
-        </div>
+       
     </div>
     <div class="governance-section-wrapper">
         <div class="governance-section-flex">
             <h2 class="governance-sub-title">DAO Balance</h2>
             <p><span id="dao-balance-governance"><i class='fas fa-spinner fa-spin'></i></span> Xian</p>
         </div>
-        <div class="governance-section-buttons" style="display: none;">
-            <button class="btn" id="withdraw-dao">Propose Xian Transfer</button>
-        </div>
+        
     </div>
     <div class="governance-section-wrapper">
         <div class="governance-section">
@@ -30,78 +26,36 @@
             <p><span class="label-gov">Contract Developers:</span> <span class="value-gov" id="transaction-rewards-developers-governance"><i class='fas fa-spinner fa-spin'></i></span>%</p>
             <p><span class="label-gov">Burned:</span> <span class="value-gov" id="transaction-rewards-burn-governance"><i class='fas fa-spinner fa-spin'></i></span>%</p>
         </div>
-        <div class="governance-section-buttons" style="display: none;">
-            <button class="btn" id="update-transaction-rewards">Propose Distribution Change</button>
-        </div>
+        
     </div>
     <div class="governance-section-wrapper">
         <div class="governance-section">
             <h2 class="governance-sub-title">Validators</h2>
             <p><span class="label-gov">Number of Validators:</span> <span class="value-gov" id="number-of-validators-governance"><i class='fas fa-spinner fa-spin'></i></span></p>
         </div>
-        <div class="governance-section-buttons" style="display: none;" >
-            <button class="btn" id="update-validators">Propose New Validator</button>
-        </div>
+        
     </div>
     <div class="title-container-governance">
         <h2 class="token-list-title">Ongoing Votes</h2>
-    </div>
-    <div class="governance-section-wrapper" style="display: none;">
-        <div class="governance-section">
-            <h2 class="governance-sub-title">Stamp Rate</h2>
-            <p><span class="label-gov">Proposed Stamp Rate:</span> 1 Xian =&nbsp;<span class="value-gov" id="proposed-stamp-rate-governance">0</span>&nbsp;Stamps</p>
-            <p><span class="label-gov">Proposed By:</span> <span class="value-gov" id="proposed-stamp-rate-by-governance">0x0</span></p>
-            <p><span class="label-gov">Votes:</span> <span class="value-gov" id="proposed-stamp-rate-votes-y-governance">0</span>&nbsp;Yes /&nbsp;<span class="value-gov" id="proposed-stamp-rate-votes-n-governance">0</span>&nbsp;No</p>
-            <p><span class="label-gov">Vote Ends:</span> <span class="value-gov" id="proposed-stamp-rate-end-governance">2024/05/02 12:00 AM UTC</span></p>
-        </div>
-        <div class="governance-section-buttons-colored">
-            <button class="btn" id="vote-stamp-rate-yes">Yes</button>
-            <button class="btn" id="vote-stamp-rate-no">No</button>
+        <div class="governance-section-buttons" >
+            <button class="btn" id="new-proposal" style="display: none;">New Proposal</button>
         </div>
     </div>
-    <div class="governance-section-wrapper" style="display: none;">
-        <div class="governance-section">
-            <h2 class="governance-sub-title">DAO Balance</h2>
-            <p><span class="label-gov">Proposed Transfer:</span> <span class="value-gov" id="proposed-dao-transfer-governance">0</span>&nbsp;Xian</p>
-            <p><span class="label-gov">Proposed By:</span> <span class="value-gov" id="proposed-dao-transfer-by-governance">0x0</span></p>
-            <p><span class="label-gov">To:</span> <span class="value-gov" id="proposed-dao-transfer-to-governance">0x0</span></p>
-            <p><span class="label-gov">Votes:</span> <span class="value-gov" id="proposed-dao-transfer-votes-y-governance">0</span>&nbsp;Yes /&nbsp;<span class="value-gov" id="proposed-dao-transfer-votes-n-governance">0</span>&nbsp;No</p>
-            <p><span class="label-gov">Vote Ends:</span> <span class="value-gov" id="proposed-dao-transfer-end-governance">2024/05/02 12:00 AM UTC</span></p>
-        </div>
-        <div class="governance-section-buttons-colored">
-            <button class="btn" id="vote-dao-transfer-yes">Yes</button>
-            <button class="btn" id="vote-dao-transfer-no">No</button>
-        </div>
-    </div>
-    <div class="governance-section-wrapper" style="display: none;">
-        <div class="governance-section">
-            <h2 class="governance-sub-title">Transaction Rewards Distribution</h2>
-            <p><span class="label-gov">Proposed Foundation:</span> <span class="value-gov" id="proposed-transaction-rewards-foundation-governance">0</span>%</p>
-            <p><span class="label-gov">Proposed Validators:</span> <span class="value-gov" id="proposed-transaction-rewards-validators-governance">0</span>%</p>
-            <p><span class="label-gov">Proposed Contract Developers:</span> <span class="value-gov" id="proposed-transaction-rewards-developers-governance">0</span>%</p>
-            <p><span class="label-gov">Proposed Burned:</span> <span class="value-gov" id="proposed-transaction-rewards-burn-governance">0</span>%</p>
-            <p><span class="label-gov">Proposed By:</span> <span class="value-gov" id="proposed-transaction-rewards-by-governance">0x0</span></p>
-            <p><span class="label-gov">Votes:</span> <span class="value-gov" id="proposed-transaction-rewards-votes-y-governance">0</span>&nbsp;Yes /&nbsp;<span class="value-gov" id="proposed-transaction-rewards-votes-n-governance">0</span>&nbsp;No</p>
-            <p><span class="label-gov">Vote Ends:</span> <span class="value-gov" id="proposed-transaction-rewards-end-governance">2024/05/02 12:00 AM UTC</span></p>
-        </div>
-        <div class="governance-section-buttons-colored">
-            <button class="btn" id="vote-transaction-rewards-yes">Yes</button>
-            <button class="btn" id="vote-transaction-rewards-no">No</button>
+    <div id="proposal-list">
+        <div class="governance-section-wrapper">
+            <div class="governance-section">
+                <h2 class="governance-sub-title">Proposal #0</h2>
+                <p><span class="label-gov">Type of Proposal:</span> <span class="proposed-type-governance value-gov">0x0</span></p>
+                <p><span class="label-gov">New Value:</span> <span class="proposed-value-governance value-gov">0</span></p>
+                <p><span class="label-gov">Votes:</span> <span class="proposed-votes-yes value-gov">0</span>&nbsp;Yes /&nbsp;<span class="proposed-votes-no value-gov">0</span>&nbsp;No</p>
+            </div>
+            <div class="governance-section-buttons-colored">
+                <button class="btn btn-primary" id="vote-yes">Yes</button>
+                <button class="btn btn-secondary" id="vote-no">No</button>
+            </div>
         </div>
     </div>
-    <div class="governance-section-wrapper" style="display: none;">
-        <div class="governance-section">
-            <h2 class="governance-sub-title">Validators</h2>
-            <p><span class="label-gov">Proposed Validator:</span> <span class="value-gov" id="proposed-validator-governance">0x0</span></p>
-            <p><span class="label-gov">Proposed By:</span> <span class="value-gov" id="proposed-validator-by-governance">0x0</span></p>
-            <p><span class="label-gov">Votes:</span> <span class="value-gov" id="proposed-validator-votes-y-governance">0</span>&nbsp;Yes /&nbsp;<span class="value-gov" id="proposed-validator-votes-n-governance">0</span>&nbsp;No</p>
-            <p><span class="label-gov">Vote Ends:</span> <span class="value-gov" id="proposed-validator-end-governance">2024/05/02 12:00 AM UTC</span></p>
-        </div>
-        <div class="governance-section-buttons-colored">
-            <button class="btn" id="vote-validator-yes">Yes</button>
-            <button class="btn" id="vote-validator-no">No</button>
-        </div>
-    </div>
+    
     
 </div>
 <script src="templates/page_js/governance.js"></script>
