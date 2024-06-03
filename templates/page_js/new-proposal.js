@@ -47,7 +47,7 @@ function sendProposal() {
                 function: "propose_vote",
                 kwargs: {
                     type_of_vote: type,
-                    arg: JSON.parse(value) ? JSON.parse(value) : value
+                    arg: value
                 },
                 stamps_supplied: parseInt(document.getElementById('proposalFee').innerHTML)
             },
@@ -109,7 +109,7 @@ async function estimateProposalStamps(){
             function: "propose_vote",
             kwargs: {
                 type_of_vote: type,
-                arg: JSON.parse(value) ? JSON.parse(value) : value
+                arg: value
             },
             stamps_supplied: 100000
         },
