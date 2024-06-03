@@ -62,9 +62,9 @@ async function buildProposalTable() {
         if (proposal_data.finalized) {
             continue;
         }
-        // if proposal_data.type is a object, convert it to a json string
+        // if proposal_data.arg is a object, convert it to a json string
         try {
-            proposal_data.type = JSON.stringify(proposal_data.type);
+            proposal_data.arg = JSON.stringify(proposal_data.arg);
         } catch (e) {
             // do nothing
         }
