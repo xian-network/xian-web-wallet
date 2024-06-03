@@ -63,8 +63,10 @@ async function buildProposalTable() {
             continue;
         }
         // if proposal_data.type is a object, convert it to a json string
-        if (typeof proposal_data.type === 'object') {
+        try {
             proposal_data.type = JSON.stringify(proposal_data.type);
+        } catch (e) {
+            // do nothing
         }
         built_html += "<div class='governance-section-wrapper'>";
         built_html += "<div class='governance-section'>";
