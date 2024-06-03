@@ -168,10 +168,15 @@ async function getContractCode(contract) {
   }
 }
 
-async function getVariable(contract, variable, key) {
+async function getVariable(contract, variable, key = "") {
   try {
-      const response = await fetch(RPC + '/abci_query?path="/get/' + contract + '.' + variable + ':' + key + '"');
-      const data = await response.json();
+      if (key === "") {
+        let response = await fetch(RPC + '/abci_query?path="/get/' + contract + '.' + variable + '"');
+        let data = await response.json();
+      } else {
+        let response = await fetch(RPC + '/abci_query?path="/get/' + contract + '.' + variable + ':' + key + '"');
+        let data = await response.json();
+    }
       if (data.result.response.value === "AA==") {
           return null;
       }
