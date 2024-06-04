@@ -77,8 +77,8 @@ async function buildProposalTable() {
         built_html += "</div>";
         if (isValidator) {
             built_html += '<div class="governance-section-buttons-colored">';
-            built_html += '<button class="btn btn-primary" onclick="voteProposal(' + proposal + ', true)">Vote Yes</button>';
-            built_html += '<button class="btn btn-secondary" onclick="voteProposal(' + proposal + ', false)">Vote No</button>';
+            built_html += '<button class="btn btn-primary vote-yes" data-id="proposal">Vote Yes</button>';
+            built_html += '<button class="btn btn-secondary votes-no" data-id="proposal">Vote No</button>';
             built_html += "</div>";
         }
         built_html += "</div>";
@@ -217,3 +217,14 @@ async function voteProposal(proposal_id, vote) {
         console.error("Error reading secure cookie:", error);
     });
 }
+
+document.addEventListener("click", async (event) => {
+    if (event.target.classList.contains("vote-yes")) {
+        let proposal_id = event.target.dataset.id;
+        voteProposal(proposal_id, true);
+    }
+    if (event.target.classList.contains("vote-no")) {
+        let proposal_id = event.target.dataset.id;
+        voteProposal(proposal_id, false);
+    }
+});
