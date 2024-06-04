@@ -77,8 +77,8 @@ async function buildProposalTable() {
         built_html += "</div>";
         if (isValidator) {
             built_html += '<div class="governance-section-buttons-colored">';
-            built_html += '<button class="btn btn-primary vote-yes" data-id="proposal">Vote Yes</button>';
-            built_html += '<button class="btn btn-secondary votes-no" data-id="proposal">Vote No</button>';
+            built_html += '<button class="btn btn-primary vote-yes" data-id="'+proposal+'">Vote Yes</button>';
+            built_html += '<button class="btn btn-secondary votes-no" data-id="'+proposal+'">Vote No</button>';
             built_html += "</div>";
         }
         built_html += "</div>";
