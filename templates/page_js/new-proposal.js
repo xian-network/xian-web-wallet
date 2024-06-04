@@ -49,7 +49,7 @@ function sendProposal() {
                     type_of_vote: type,
                     arg: value
                 },
-                stamps_supplied: parseInt(document.getElementById('proposalFee').innerHTML)
+                stamps_supplied: parseInt(document.getElementById('proposalFee').innerHTML) + 10
             },
             metadata: {
                 signature: "",

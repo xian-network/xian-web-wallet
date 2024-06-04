@@ -188,7 +188,7 @@ async function voteProposal(proposal_id, vote) {
                     proposal_id: proposal_id,
                     vote: vote
                 },
-                stamps_supplied:  stamps_required
+                stamps_supplied:  stamps_required + 10
             },
             metadata: {
                 signature: "",
