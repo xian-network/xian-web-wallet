@@ -33,6 +33,15 @@ function createTab() {
 // Listener for messages from the content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'dAppSendTransaction' || message.type === 'getWalletInfo') {
+        if(appTabId === null) {
+            // Try finding the tab, if the reference is lost
+            chrome.tabs.query({url: chrome.runtime.getURL('index.html')}, function(tabs) {
+                if (tabs.length > 0) {
+                    appTabId = tabs[0].id;
+                }
+            });
+        }
+
         if (appTabId === null && message.type === 'getWalletInfo') { // If the extension is not open, return an empty response
             sendResponse({address: '', locked: true, chainId: ''});
             return;
@@ -41,6 +50,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             sendResponse({errors: ['Extension not open']});
             return;
         }
+
         // Forward the message to the extension window
         chrome.tabs.sendMessage(appTabId, message, sendResponse);
     }
