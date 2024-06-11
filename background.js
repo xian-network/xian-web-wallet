@@ -4,6 +4,8 @@ let appTabId = null;
 chrome.action.onClicked.addListener(function(tab) {
     const url = chrome.runtime.getURL('index.html');
 
+    findTab();
+
     // Check if the tab is still open
     if (appTabId !== null) {
         chrome.tabs.get(appTabId, function(existingTab) {
@@ -30,16 +32,19 @@ function createTab() {
     });
 }
 
+function findTab() {
+    chrome.tabs.query({url: chrome.runtime.getURL('index.html')}, function(tabs) {
+        if (tabs.length > 0) {
+            appTabId = tabs[0].id;
+        }
+    });
+}
+
 // Listener for messages from the content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'dAppSendTransaction' || message.type === 'getWalletInfo') {
         if(appTabId === null) {
-            // Try finding the tab, if the reference is lost
-            chrome.tabs.query({url: chrome.runtime.getURL('index.html')}, function(tabs) {
-                if (tabs.length > 0) {
-                    appTabId = tabs[0].id;
-                }
-            });
+            findTab(); // Try to find the tab if the reference was lost
         }
 
         if (appTabId === null && message.type === 'getWalletInfo') { // If the extension is not open, return an empty response
