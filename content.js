@@ -28,3 +28,6 @@ const getWalletInfo = () => {
         }
     });
 }
+
+// Dispatch xianReady event when the content script is loaded and ready
+document.dispatchEvent(new CustomEvent('xianReady'));
