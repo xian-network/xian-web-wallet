@@ -268,7 +268,7 @@ async function estimateStamps(signedTransaction) {
         let serializedTransaction = JSON.stringify(signedTransaction);
         let transactionUint8Array = new TextEncoder().encode(serializedTransaction);
         let signedTransactionHex = toHexString(transactionUint8Array);
-        const response = await fetch(RPC + '/abci_query?path="/estimate_stamps/' + signedTransactionHex + '"');
+        const response = await fetch(RPC + '/abci_query?path="/calculate_stamps/' + signedTransactionHex + '"');
         const data = await response.json();
         if (data.result.response.value === "AA==") {
             return null;
