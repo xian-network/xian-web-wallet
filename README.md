@@ -32,40 +32,7 @@ Security and privacy are paramount in Xian Web Wallet:
 ## dApp Integration
 **Only for Extension**
 
-Request Wallet Information
-```javascript
-// Listen for wallet info
-document.addEventListener('xianWalletInfo', function(event) {
-    console.log(event.detail); // { address: 'wallet_address', locked: true/false, chainId: 'chainId_of_wallet' }
-});
-
-// Request wallet info
-document.dispatchEvent(new CustomEvent('xianWalletGetInfo'));
-```
-
-Request Transaction
-```javascript
-// Listen for transaction response
-document.addEventListener('xianWalletTxStatus', function(event) {
-    console.log(event.detail); // { status: 'sent', txid: 'transaction_id' } or { errors: []}
-});
-
-// Request transaction
-document.dispatchEvent(new CustomEvent('xianWalletSendTx', {
-    detail:
-        {
-            contract:"currency", 
-            method:"transfer", 
-            kwargs:{
-                "to":"wallet_address",
-                "amount":1000
-            }, 
-            stampLimit:30
-        }
-    }
-));
-```
-
+Documented at [https://github.com/xian-network/dapp-utils](https://github.com/xian-network/dapp-utils)
 
 
 ## Contributions
