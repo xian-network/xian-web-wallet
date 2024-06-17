@@ -195,20 +195,32 @@ function sendAdvTx() {
     });
 }
 
-document.getElementById('functionName').addEventListener('input', function(e) {
-    estimateSendStamps();
+function debounce(func, delay) {
+    let timeout;
+    return function(...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), delay);
+    };
+}
+
+debouncedEstimateSendStamps = debounce(estimateSendStamps, 300);
+
+document.getElementById('functionName').addEventListener('input', function() {
+    debouncedEstimateSendStamps();
+
 });
 
-document.getElementById('contractName').addEventListener('input', function(e) {
-    estimateSendStamps();
+
+document.getElementById('contractName').addEventListener('input', function() {
+    debouncedEstimateSendStamps();
 });
 
 document.getElementById('adv_args').childNodes.forEach(function (arg) {
-    arg.addEventListener('input', function(e) {
-        estimateSendStamps();
+    arg.addEventListener('input', function() {
+        debouncedEstimateSendStamps();
     });
 });
-
 
 async function estimateSendStamps(){
     let error = document.getElementById('sendAdvTxError');
@@ -217,6 +229,13 @@ async function estimateSendStamps(){
     success.style.display = 'none';
     let function_name = document.getElementById('functionName').value;
     let contract = document.getElementById('contractName').value;
+    let estimation_loading = document.getElementById('estimation-loading');
+    let estimation_finished = document.getElementById('estimation-result');
+    estimation_loading.style.display = 'inline-block';
+    estimation_finished.style.display = 'none';
+    let send_btn = document.getElementById('btn-adv-tx-send');
+    send_btn.disabled = true;
+
     let functionInfo;
     let kwargs = {};
     let transaction = {
@@ -303,11 +322,15 @@ async function estimateSendStamps(){
     try {
         let signed_tx = await signTransaction(transaction, unencryptedPrivateKey);
         let stamps = await estimateStamps(signed_tx);
+        
+        let stamp_rate = await getStampRate();
+        estimation_loading.style.display = 'none';
+        estimation_finished.style.display = 'inline-block';
+        send_btn.disabled = false;
         if (stamps === null) {
             document.getElementById('tokenFee').innerHTML = 0;
             return;
         }
-        let stamp_rate = await getStampRate();
         document.getElementById('tokenFeeXian').innerHTML = stamps / stamp_rate;
         document.getElementById('tokenFee').innerHTML = stamps;
     } catch (error) {
