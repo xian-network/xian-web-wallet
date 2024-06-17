@@ -99,18 +99,32 @@ document.getElementById('send-token-send-token').addEventListener('click', funct
 document.getElementById('send-token-cancel').addEventListener('click', function() {
     goToWallet();
 });
-document.getElementById('toAddress').addEventListener('input', function(e) {
-    estimateSendStamps();
-});
 
-document.getElementById('tokenAmount').addEventListener('input', function(e) {
-    estimateSendStamps();
-});
+function debounce(func, delay) {
+    let timeout;
+    return function(...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), delay);
+    };
+}
+
+debouncedEstimateSendStamps_ = debounce(estimateSendStamps, 500);
+document.getElementById('toAddress').addEventListener('input', debouncedEstimateSendStamps_);
+
+document.getElementById('tokenAmount').addEventListener('input', debouncedEstimateSendStamps_);
+
 
 async function estimateSendStamps(){
     let recipient = document.getElementById('toAddress').value;
     let amount = document.getElementById('tokenAmount').value;
     let contract = document.getElementById('tokenName').innerHTML;
+    let send_btn = document.getElementById('send-token-send-token');
+    let estimation_loading = document.getElementById('estimation-loading');
+    let estimation_finished = document.getElementById('estimation-result');
+    estimation_loading.style.display = 'inline-block';
+    estimation_finished.style.display = 'none';
+    send_btn.disabled = true;
     if (recipient === '' || amount === '') return;
 
     let transaction = {
@@ -132,12 +146,15 @@ async function estimateSendStamps(){
     try {
         let signed_tx = await signTransaction(transaction, unencryptedPrivateKey);
         let stamps = await estimateStamps(signed_tx);
+        let stamp_rate = await getStampRate();
+        send_btn.disabled = false;
+        estimation_loading.style.display = 'none';
+        estimation_finished.style.display = 'inline-block';
         if (stamps === null) {
             document.getElementById('tokenFee').innerHTML = 0;
             return;
         }
         stamps = stamps;
-        let stamp_rate = await getStampRate();
         document.getElementById('tokenFeeXian').innerHTML = stamps / stamp_rate;
         document.getElementById('tokenFee').innerHTML = stamps;
     } catch (error) {
