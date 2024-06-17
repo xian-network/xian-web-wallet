@@ -12,7 +12,10 @@
         <input type="number" class="form-control" id="tokenAmount" placeholder="Enter the token amount" required>
     </div>
     <div class="form-group" id="tokenFeeContainer" style="display: none;"> <!-- TODO: make nicer .. -->
-        <label for="tokenFee">Transaction Fee: <span id="tokenFee"></span> Stamps (<span id="tokenFeeXian"></span> Xian)</label>
+        <label for="tokenFee">Transaction Fee: 
+            <span id="estimation-loading">Calculating..</span>
+            <span id="estimation-result"><span id="tokenFee"></span> Stamps (<span id="tokenFeeXian"></span> Xian)</span>
+        </label>
     </div>
     <div class="btn-group">
         <button class="btn btn-primary" id="send-token-send-token">Send Token</button>
