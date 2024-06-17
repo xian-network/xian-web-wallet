@@ -72,12 +72,13 @@ async function estimateRequestStamps(){
     try {
         let signed_tx = await signTransaction(transaction, unencryptedPrivateKey);
         let stamps = await estimateStamps(signed_tx);
+        
+        let stamp_rate = await getStampRate();
         if (stamps === null) {
             document.getElementById('requestTransactionStampLimit').innerHTML = 0;
             return;
         }
         stamps = stamps;
-        let stamp_rate = await getStampRate();
         document.getElementById('requestTransactionStampLimitXian').innerHTML = stamps / stamp_rate;
         document.getElementById('requestTransactionStampLimit').innerHTML = stamps;
     } catch (error) {
@@ -87,5 +88,13 @@ async function estimateRequestStamps(){
 }
 
 (async function() {
+    let acceptBtn = document.getElementById('request-transaction-accept');
+    let stamp_line = document.getElementById('stamp_line');
+    let stamp_line_finished = document.getElementById('stamp_line_finished');
+    stamp_line.style.display = 'block';
+    acceptBtn.disabled = true;
     await estimateRequestStamps();
+    stamp_line.style.display = 'none';
+    stamp_line_finished.style.display = 'block';
+    acceptBtn.disabled = false;
 })();
