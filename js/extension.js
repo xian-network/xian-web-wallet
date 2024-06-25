@@ -14,6 +14,15 @@ if (runningAsExtension()) {
             // Focus on the extension window
             window.focus();
         }
+        if (message.type === 'dAppSignMessage') {
+            if (locked) {
+                sendResponse({errors: ['Wallet is locked']});
+                return;
+            }
+            changePage('request-signature', message, sendResponse);
+            // Focus on the extension window
+            window.focus();
+        }
 
         return true;
     });

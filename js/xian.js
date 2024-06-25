@@ -281,3 +281,9 @@ async function estimateStamps(signedTransaction) {
         return null;
     }
 }
+
+function signMessage(message, privateKey) {
+    let messageUint8Array = new TextEncoder().encode(message);
+    let signature = nacl.sign.detached(messageUint8Array, privateKey);
+    return toHexString(signature);
+}

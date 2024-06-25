@@ -26,6 +26,10 @@ function changePage(page, some_data = null, send_response = null) {
             some_data["data"]["stampLimit"];
             sendResponse = send_response;
         }
+        else if(page === "request-signature"){
+          document.getElementById("requestSignatureMessage").innerHTML = some_data["data"]["message"];
+          sendResponse = send_response;
+        }
         else if (page === "password-input" || page === "create-wallet" || page === "import-wallet" || page === "get-started") {
           document.getElementsByClassName("side-nav")[0].style.display = "none";
           if (window.innerWidth > 768) {
@@ -106,6 +110,9 @@ function changePage(page, some_data = null, send_response = null) {
       break;
     case "new-proposal":
       loadHtmlAndScripts("templates/new-proposal.html");
+      break;
+    case "request-signature":
+      loadHtmlAndScripts("templates/request-signature.html");
       break;
     default:
       break;
