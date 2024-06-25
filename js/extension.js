@@ -1,7 +1,15 @@
 if (runningAsExtension()) {
+    let isJSON = (str) => {
+        try {
+            JSON.parse(str);
+        } catch (e) {
+            return false;
+        }
+        return true;
+    };
+
     // Listen for messages from the background script
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        console.log(message);
         if (message.type === 'getWalletInfo') {
             sendResponse({address: publicKey, locked: locked, chainId: CHAIN_ID});
         }
@@ -15,6 +23,12 @@ if (runningAsExtension()) {
             window.focus();
         }
         if (message.type === 'dAppSignMessage') {
+            // We expect the message to be a string that cannot be parsed as JSON
+            if (isJSON(message.data.message)) {
+                sendResponse({errors: ['Invalid message']});
+                return;
+            }
+
             if (locked) {
                 sendResponse({errors: ['Wallet is locked']});
                 return;

@@ -1,11 +1,14 @@
-function acceptRequest() {
+async function acceptRequest() {
     let message = document.getElementById('requestSignatureMessage').innerHTML;
+    
     try {
-        let signed_msg = signMessage(message, unencryptedPrivateKey);
-        sendResponse({signature: signed_msg});
+        let signedMsg = await signMessage(message, unencryptedPrivateKey);
+        sendResponse({signature: signedMsg});
         changePage('wallet');
     }
     catch (error) {
+        console.log(error);
+        sendResponse({errors: ['error']});
         changePage('wallet');
     }
     

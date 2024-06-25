@@ -42,7 +42,7 @@ function findTab() {
 
 // Listener for messages from the content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.type === 'dAppSendTransaction' || message.type === 'getWalletInfo') {
+    if (message.type === 'dAppSendTransaction' || message.type === 'getWalletInfo' || message.type === 'dAppSignMessage') {
         if(appTabId === null) {
             findTab(); // Try to find the tab if the reference was lost
         }

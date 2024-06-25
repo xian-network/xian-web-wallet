@@ -282,8 +282,16 @@ async function estimateStamps(signedTransaction) {
     }
 }
 
-function signMessage(message, privateKey) {
+async function signMessage(message, privateKey) {
+    publicKey = await readSecureCookie("publicKey");
+    let combinedKey = new Uint8Array(64);
+    combinedKey.set(privateKey);
+    combinedKey.set(fromHexString(publicKey), 32);
+
+
+    // Use nacl.sign.detached to get the signature
+    
     let messageUint8Array = new TextEncoder().encode(message);
-    let signature = nacl.sign.detached(messageUint8Array, privateKey);
+    let signature = nacl.sign.detached(messageUint8Array, combinedKey);
     return toHexString(signature);
 }
