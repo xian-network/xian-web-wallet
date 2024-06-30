@@ -32,7 +32,7 @@ function acceptRequest() {
             }
             else {
                 sendResponse({status: 'sent', txid: hash});
-                toast('success', 'Transaction sent: <a href="https://explorer.xian.org/tx/"' + hash + ' target="_blank">' + hash + '</a>');
+                toast('success', 'Transaction sent: <a class="text-light" style=" text-overflow: ellipsis; width: 5rem; overflow: hidden; text-decoration: underline;margin-left: 0.25rem; " href="https://explorer.xian.org/tx/' + hash + '" target="_blank">' + hash + '</a>');
                 changePage('wallet');
             }
         }).catch((error) => {
