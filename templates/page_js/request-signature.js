@@ -4,11 +4,13 @@ async function acceptRequest() {
     try {
         let signedMsg = await signMessage(message, unencryptedPrivateKey);
         sendResponse({signature: signedMsg});
+        toast('success', 'Successfully signed message');
         changePage('wallet');
     }
     catch (error) {
         console.log(error);
         sendResponse({errors: ['error']});
+        toast('danger', 'Error signing message: ' + error);
         changePage('wallet');
     }
     
@@ -16,6 +18,7 @@ async function acceptRequest() {
 
 function rejectRequest() {
     sendResponse({errors: ['rejected']});
+    toast('warning', 'Request rejected');
     changePage('wallet');
 }
 

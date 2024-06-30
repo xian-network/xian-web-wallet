@@ -27,10 +27,12 @@ function acceptRequest() {
 
             if (response['result']['code'] == 1) {
                 sendResponse({errors: [response['result']['log']]});
+                toast('danger', 'Error sending transaction: ' + response['result']['log']);
                 changePage('wallet');
             }
             else {
                 sendResponse({status: 'sent', txid: hash});
+                toast('success', 'Transaction sent: <a href="https://explorer.xian.org/tx/"' + hash);
                 changePage('wallet');
             }
         }).catch((error) => {
@@ -41,6 +43,7 @@ function acceptRequest() {
 
 function rejectRequest() {
     sendResponse({errors: ['rejected']});
+    toast('warning', 'Request rejected');
     changePage('wallet');
 }
 
