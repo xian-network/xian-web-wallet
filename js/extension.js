@@ -1,9 +1,9 @@
 if (runningAsExtension()) {
-    let isTransaction = (str) => {
+    let isUnsafe = (str) => {
         if (str.length < 2 ){
             return true;
         }
-        if (str.length > 1000){
+        if (str.length > 10000){
             return true;
         }
         try {
@@ -39,7 +39,7 @@ if (runningAsExtension()) {
         }
         if (message.type === 'dAppSignMessage') {
             // We expect the message to be a string that cannot be parsed as JSON
-            if (isTransaction(message.data.message)) {
+            if (isUnsafe(message.data.message)) {
                 sendResponse({errors: ['Invalid message']});
                 return;
             }
