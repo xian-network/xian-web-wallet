@@ -1,11 +1,20 @@
 if (runningAsExtension()) {
-    let isJSON = (str) => {
+    let isTransaction = (str) => {
         try {
-            JSON.parse(str);
+            obj = JSON.parse(str);
+            if (obj.hasOwnProperty('payload')){
+                return true;
+            }
+            if (obj.hasOwnProperty('metadata')){
+                return true;
+            }
+            if (obj.hasOwnProperty('chain_id')){
+                return true;
+            }
         } catch (e) {
             return false;
         }
-        return true;
+        return false;
     };
 
     // Listen for messages from the background script
@@ -24,7 +33,7 @@ if (runningAsExtension()) {
         }
         if (message.type === 'dAppSignMessage') {
             // We expect the message to be a string that cannot be parsed as JSON
-            if (isJSON(message.data.message)) {
+            if (isTransaction(message.data.message)) {
                 sendResponse({errors: ['Invalid message']});
                 return;
             }
