@@ -17,6 +17,7 @@ if (runningAsExtension()) {
             if (obj.hasOwnProperty('chain_id')){
                 return true;
             }
+            return false;
         } catch (e) {
             return false;
         }
