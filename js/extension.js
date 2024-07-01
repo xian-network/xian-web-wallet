@@ -1,5 +1,11 @@
 if (runningAsExtension()) {
     let isTransaction = (str) => {
+        if (str.length < 2 ){
+            return true;
+        }
+        if (str.length > 1000){
+            return true;
+        }
         try {
             obj = JSON.parse(str);
             if (obj.hasOwnProperty('payload')){
