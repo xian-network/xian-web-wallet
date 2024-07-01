@@ -6,6 +6,7 @@ async function acceptRequest() {
         sendResponse({signature: signedMsg});
         toast('success', 'Successfully signed message');
         changePage('wallet');
+        
     }
     catch (error) {
         console.log(error);

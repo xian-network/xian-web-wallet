@@ -21,8 +21,7 @@ const xianWalletSendTx = (detail) => {
     chrome.runtime.sendMessage({type: 'dAppSendTransaction', data: detail}, (response) => {
         if(!chrome.runtime.lastError || response !== 'ok'){
             document.dispatchEvent(new CustomEvent('xianWalletTxStatus', {detail: response}));
-            // Focus on this tab again
-            window.focus();
+            handleFocus();
         }
     });
 }
@@ -39,11 +38,17 @@ const xianWalletSignMsg = (detail) => {
     chrome.runtime.sendMessage({type: 'dAppSignMessage', data: detail}, (response) => {
         if(!chrome.runtime.lastError || response !== 'ok'){
             document.dispatchEvent(new CustomEvent('xianWalletSignMsgResponse', {detail: response}));
-            // Focus on this tab again
-            window.focus();
+            handleFocus();
         }
     });
 }
+
+const handleFocus = () => {
+    window.blur();
+    setTimeout(() => {
+        window.focus();
+    }, 100);
+};
 
 // Dispatch xianReady event when the content script is loaded and ready
 document.dispatchEvent(new CustomEvent('xianReady'));

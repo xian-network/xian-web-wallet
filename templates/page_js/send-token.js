@@ -67,7 +67,7 @@ function sendToken() {
                 broadcastTransaction(signed_tx).then(response => {
                     console.log(response)
                     const hash = response['result']['hash'];
-                    let status = 'success';
+                    let status = 'pending';
                     if (response['result']['code'] == 1) {
                         status = 'error';
                     }

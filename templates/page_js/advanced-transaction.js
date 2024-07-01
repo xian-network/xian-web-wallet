@@ -86,7 +86,7 @@ function sendAdvTx() {
                 if (!conf) return;
                 broadcastTransaction(signed_tx).then(response => {
                     hash = response['result']['hash'];
-                    let status = 'success'
+                    let status = 'pending'
                     if (response['result']['code'] == 1) {
                         status = 'error';
                     }

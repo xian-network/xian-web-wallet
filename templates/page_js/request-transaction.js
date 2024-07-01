@@ -18,7 +18,7 @@ function acceptRequest() {
     };
     Promise.all([signTransaction(payload, unencryptedPrivateKey)]).then((signed_tx) => {
         broadcastTransaction(signed_tx).then((response) => {
-            let status = 'success'
+            let status = 'pending'
             if (response['result']['code'] == 1) {
                 status = 'error';
             }
