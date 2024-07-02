@@ -1,3 +1,5 @@
+
+
 function acceptRequest() {
     let contract = document.getElementById('requestTransactionContract').innerHTML;
     let method = document.getElementById('requestTransactionFunction').innerHTML;
@@ -16,6 +18,7 @@ function acceptRequest() {
             signature: "",
         }
     };
+    console.log(payload);
     Promise.all([signTransaction(payload, unencryptedPrivateKey)]).then((signed_tx) => {
         broadcastTransaction(signed_tx).then((response) => {
             let status = 'pending'
@@ -26,25 +29,26 @@ function acceptRequest() {
             prependToTransactionHistory(hash, contract, method, kwargs, status, new Date().toLocaleString());
 
             if (response['result']['code'] == 1) {
-                sendResponse({errors: [response['result']['log']]});
+                window.opener.postMessage({type: 'REQUEST_TRANSACTION', data: {errors: [response['result']['log']]},callbackKey: callbackKey}, '*');
                 toast('danger', 'Error sending transaction: ' + response['result']['log']);
-                changePage('wallet');
+                // Close the window
+                window.close();
             }
             else {
-                sendResponse({status: 'sent', txid: hash});
+                window.opener.postMessage({type: 'REQUEST_TRANSACTION', data: {status: 'sent', txid: hash},callbackKey: callbackKey}, '*');
                 toast('success', 'Transaction sent: <a class="text-light" style=" text-overflow: ellipsis; width: 5rem; overflow: hidden; text-decoration: underline;margin-left: 0.25rem; " href="https://explorer.xian.org/tx/' + hash + '" target="_blank">' + hash + '</a>');
-                changePage('wallet');
+                window.close();
             }
         }).catch((error) => {
-            changePage('wallet');
+            window.close();
         });
     });
 }
 
 function rejectRequest() {
-    sendResponse({errors: ['rejected']});
+    window.opener.postMessage({type: 'REQUEST_TRANSACTION', data: {errors:['rejected']},callbackKey: callbackKey}, '*');
     toast('warning', 'Request rejected');
-    changePage('wallet');
+    window.close();
 }
 
 document.getElementById('request-transaction-accept').addEventListener('click', function() {
@@ -91,6 +95,7 @@ async function estimateRequestStamps(){
 }
 
 (async function() {
+    await getChainID();
     let acceptBtn = document.getElementById('request-transaction-accept');
     let stamp_line = document.getElementById('stamp_line');
     let stamp_line_finished = document.getElementById('stamp_line_finished');

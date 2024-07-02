@@ -3,24 +3,23 @@ async function acceptRequest() {
     
     try {
         let signedMsg = await signMessage(message, unencryptedPrivateKey);
-        sendResponse({signature: signedMsg});
+        window.opener.postMessage({type: 'REQUEST_SIGNATURE', data: {signature: signedMsg}, callbackKey: callbackKey}, '*');
         toast('success', 'Successfully signed message');
-        changePage('wallet');
+        window.close();
         
     }
     catch (error) {
         console.log(error);
-        sendResponse({errors: ['error']});
         toast('danger', 'Error signing message: ' + error);
-        changePage('wallet');
+        window.close();
     }
     
 }
 
 function rejectRequest() {
-    sendResponse({errors: ['rejected']});
+    window.opener.postMessage({type: 'REQUEST_SIGNATURE', data: {signature: null}, callbackKey: callbackKey}, '*');
     toast('warning', 'Request rejected');
-    changePage('wallet');
+    window.close();
 }
 
 document.getElementById('request-signature-accept').addEventListener('click', function() {

@@ -5,6 +5,92 @@ var unencryptedPrivateKey = null;
 var locked = true;
 var tx_history = JSON.parse(localStorage.getItem("tx_history")) || [];
 var sendResponse = null;
+var externalWindow = null;
+
+var callbacks = {};
+var callbackId = 0;
+
+function popup_params(width, height) {
+  var a = typeof window.screenX != 'undefined' ? window.screenX : window.screenLeft;
+  var i = typeof window.screenY != 'undefined' ? window.screenY : window.screenTop;
+  var g = typeof window.outerWidth!='undefined' ? window.outerWidth : document.documentElement.clientWidth;
+  var f = typeof window.outerHeight != 'undefined' ? window.outerHeight: (document.documentElement.clientHeight - 22);
+  var h = (a < 0) ? window.screen.width + a : a;
+  var left = parseInt(h + ((g - width) / 2), 10);
+  var top = parseInt(i + ((f-height) / 2.5), 10);
+  return 'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top + ',scrollbars=1';
+}   
+
+function createExternalWindow(page, some_data = null, send_response = null) {
+  const loadHtmlAndScripts = (htmlPath) => {
+    fetch(htmlPath)
+      .then((response) => response.text())
+      .then((htmlContent) => {
+        if (!externalWindow || externalWindow.closed) {
+          externalWindow = window.open("index-external.html", "", "width=400,height=600" + popup_params(400, 600));
+          externalWindow.onload = () => {
+            externalWindow.postMessage({
+              type: "HTML",
+              html: htmlContent
+            }, "*");
+            sendInitialState();
+            sendPageSpecificMessage(page, some_data);
+          };
+        } else {
+          externalWindow.postMessage({
+            type: "HTML",
+            html: htmlContent
+          }, "*");
+          sendInitialState();
+          sendPageSpecificMessage(page, some_data);
+        }
+      });
+  };
+
+  const sendInitialState = () => {
+    externalWindow.postMessage({
+      type: "INITIAL_STATE",
+      state: { publicKey, unencryptedPrivateKey, locked, tx_history }
+    }, "*");
+  };
+
+  const sendPageSpecificMessage = (page, some_data) => {
+    const callbackKey = 'callback_' + (callbackId++);
+    callbacks[callbackKey] = send_response;
+    externalWindow.postMessage({
+      type: page === "request-transaction" ? "REQUEST_TRANSACTION" : "REQUEST_SIGNATURE",
+      data: JSON.parse(JSON.stringify(some_data)),
+      callbackKey: callbackKey
+    }, "*");
+  };
+
+  switch (page) {
+    case "request-transaction":
+      loadHtmlAndScripts("templates/request-transaction.html");
+      break;
+    case "request-signature":
+      loadHtmlAndScripts("templates/request-signature.html");
+      break;
+    default:
+      break;
+  }
+}
+
+window.addEventListener("message", (event) => {
+ 
+  if (event.data.type === "REQUEST_TRANSACTION") {
+    const some_data = event.data.data;
+    const callbackKey = event.data.callbackKey;
+    callbacks[callbackKey](event.data.data);
+    tx_history = JSON.parse(localStorage.getItem("tx_history")) || [];
+  }
+  if (event.data.type === "REQUEST_SIGNATURE") {
+    const some_data = event.data.data;
+    const callbackKey = event.data.callbackKey;
+    callbacks[callbackKey](event.data.data);
+    toast('success', 'Successfully signed message');
+  }
+});
 
 function changePage(page, some_data = null, send_response = null) {
   app_page = page;
@@ -144,6 +230,9 @@ function insertHTMLAndExecuteScripts(container, htmlContent) {
 
 
 document.addEventListener("DOMContentLoaded", (event) => {
+  if (document.getElementById("onlineStatus") == null) {
+    return;
+  }
   let online_status_element = document.getElementById("onlineStatus");
 
   ping().then(online_status => {

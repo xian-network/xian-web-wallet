@@ -34,9 +34,8 @@ if (runningAsExtension()) {
                 sendResponse({errors: ['Wallet is locked']});
                 return;
             }
-            changePage('request-transaction', message, sendResponse);
-            // Focus on the extension window
-            window.focus();
+            createExternalWindow('request-transaction', message, sendResponse);
+            
         }
         if (message.type === 'dAppSignMessage') {
             // We expect the message to be a string that cannot be parsed as JSON
@@ -49,9 +48,8 @@ if (runningAsExtension()) {
                 sendResponse({errors: ['Wallet is locked']});
                 return;
             }
-            changePage('request-signature', message, sendResponse);
-            // Focus on the extension window
-            window.focus();
+            createExternalWindow('request-signature', message, sendResponse);
+            
         }
 
         return true;

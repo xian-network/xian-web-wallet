@@ -16,26 +16,36 @@ window.fetch = function(url, options) {
     return fetchWithTimeout(url, options);
 };
 
+if (document.getElementById('side-change-page-settings')) {
+    document.getElementById('side-change-page-settings').addEventListener('click', function() {
+        changePage('settings');
+    });
+}
 
-document.getElementById('side-change-page-settings').addEventListener('click', function() {
-    changePage('settings');
-});
+if (document.getElementById('side-change-page-ide')) {
+    document.getElementById('side-change-page-ide').addEventListener('click', function() {
+        changePage('ide');
+    });
+}
 
-document.getElementById('side-change-page-ide').addEventListener('click', function() {
-    changePage('ide');
-});
-
+if (document.getElementById('side-change-page-wallet')) {
 document.getElementById('side-change-page-wallet').addEventListener('click', function() {
     changePage('wallet');
 });
+}
 
+if(document.getElementById('side-lock-wallet')) {
 document.getElementById('side-lock-wallet').addEventListener('click', function() {
     lockWallet();
 });
+}
 
+if(document.getElementById('side-change-page-governance')) {
 document.getElementById('side-change-page-govenance').addEventListener('click', function() {
     changePage('governance');
 });
+
+}
 
 function lockWallet() {
     let confirm_lock = confirm("Are you sure you want to lock the wallet?");
