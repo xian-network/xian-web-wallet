@@ -1,6 +1,6 @@
 var app_page = "get-started";
 var app_box = document.getElementById("app-box");
-var publicKey = null;
+var publicKey = "";
 var unencryptedPrivateKey = null;
 var locked = true;
 var tx_history = JSON.parse(localStorage.getItem("tx_history")) || [];
