@@ -1,7 +1,7 @@
 <div class="title-container">
     <h1 class="app-box-title">IDE</h1>
 </div>
-<p class="app-box-description">This is the most basic form of the Xian IDE. You can use it to write and deploy smart contracts on the Xian Network. Find standardized smart contract templates <a href="https://github.com/xian-network/xian-standard-contracts" target="_blank">here</a> and docs <a href="https://github.com/xian-network/smart-contracts-docs" target="_blank">here</a>. Deployed Smart Contracts can be directly interacted with by using <a href="#" class="advanced-tx-link" id="ide-send-adv-tx">Advanced Transactions</a>.
+<p class="app-box-description">This is the most basic form of the Xian IDE. You can use it to write and deploy smart contracts on the Xian Network. Find standardized smart contract templates <a href="https://github.com/xian-network/xian-standard-contracts" target="_blank">here</a> and docs <a href="https://docs.xian.org" target="_blank">here</a>. Deployed Smart Contracts can be directly interacted with by using <a href="#" class="advanced-tx-link" id="ide-send-adv-tx">Advanced Transactions</a>.
 <div class="app-box-form" style="flex-grow: 1;display: flex;flex-direction: column;">
     <div class="alert alert-danger" role="alert" id="submitContractError" style="display: none;"></div>
     <div class="alert alert-success" role="alert" id="submitContractSuccess" style="display: none;"></div>
@@ -11,20 +11,20 @@
 
     </div>
     <div id="submission-form">
-        <div class="form-group">
+        <div class="form-group" style="display: none;" id="submitContractNameWrapper">
             <label for="submitContractName">Contract Name</label>
             <input type="text" class="form-control" id="submitContractName" placeholder="Unique, beginning with 'con_'" required>
         </div>
-        <div class="form-group">
+        <div class="form-group" style="display: none;" id="submitContractconstructorKwargsWrapper">
             <label for="submitContractconstructorKwargs">Constructor Kwargs (If any, not required)</label>
             <input type="text" class="form-control" id="submitContractconstructorKwargs" placeholder="Enter the constructor kwargs in JSON format">
         </div>
-        <div class="form-group">
+        <div class="form-group" style="display: none;" id="submitContractstampLimitWrapper">
             <label for="submitContractstampLimit">Stamp/GAS Limit (1 Xian = <span id="stampRate"><i class='fas fa-spinner fa-spin'></i></span> Stamps)</label>
             <input type="number" class="form-control" id="submitContractstampLimit" placeholder="Enter the stamp limit" required value="800">
         </div>
         <div id="wallet-actions" class="btn-group">
-            <button class="btn btn-primary" id="btn-ide-submit-contract">Deploy Contract</button>
+            <button class="btn btn-primary" id="btn-ide-submit-contract">Start Deployment</button>
             <button class="btn btn-secondary" id="btn-ide-go-to-wallet" style="display:none">Back</button>
         </div>
     </div>
@@ -43,22 +43,22 @@
     .dark-mode .app-box-form .CodeMirror{
         background-color: #121212; /* Dark background */
         color: #e4e6eb; /* Bright text */
-        border:1px solid #343a40;
+        border:1px solid #8a8b8e;
         
     }
     .dark-mode .CodeMirror-hscrollbar{
-        scrollbar-color: #343a40 #121212;
+        scrollbar-color: #8a8b8e #121212;
     }
     .dark-mode .app-box-form .CodeMirror-selected {
-        background-color: #343a40; /* Dark background */
+        background-color: #8a8b8e; /* Dark background */
     }
 
     .dark-mode .app-box-form .CodeMirror-cursor {
         border-color: #e4e6eb; /* Bright text */
     }
     .dark-mode .app-box-form .CodeMirror-gutters {
-        background-color: #1e1e1e;
-    border-right: 1px solid #343a40;
+        background-color: #202020;
+    border-right: 1px solid #8a8b8e;
     }
     .dark-mode .app-box-form .CodeMirror-linenumber {
         color: #e4e6eb;
@@ -79,13 +79,13 @@
         border-bottom: 0px!important;
     }
     .dark-mode .tabs-editor{
-        background-color: #1e1e1e;
-        border: 1px solid #343a40;
+        background-color: #202020;
+        border: 1px solid #8a8b8e;
         color: #e4e6eb;
     }
     .dark-mode .add-tab-button{
-        background-color: #1e1e1e;
-        border: 1px solid #343a40;
+        background-color: #202020;
+        border: 1px solid #8a8b8e;
         color: #e4e6eb;
     }
     .tab-editor{
@@ -100,15 +100,15 @@
     gap: 5px;
     }
     .dark-mode .tab-editor{
-        background-color: #1e1e1e;
-        border: 1px solid #343a40;
+        background-color: #494a50;
+        border: 1px solid #8a8b8e;
         color: #e4e6eb;
     }
     .tab-editor.active{
         background-color: #fff;
     }
     .dark-mode .tab-editor.active{
-        background-color: #343a40;
+        background-color: #8a8b8e;
     }
     .add-tab-button{
         padding: 5px;
@@ -134,8 +134,8 @@
     gap: 10px;
     }
     .dark-mode .function-box{
-        background-color: #1e1e1e;
-        border: 1px solid #343a40;
+        background-color: #494a50;
+        border: 1px solid #8a8b8e;
         color: #e4e6eb;
     }
     #function-boxes{

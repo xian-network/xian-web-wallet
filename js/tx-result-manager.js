@@ -22,7 +22,7 @@ async function updateTxHistory() {
                 }
                 if (data["result"]["tx_result"]["code"] === 0) {
                     tx["status"] = "success";
-                    toast("success", `Transaction <a class="text-light" style=" text-overflow: ellipsis; width: 5rem; overflow: hidden; text-decoration: underline;margin-left: 0.25rem; " href="https://explorer.xian.org/tx/` + tx["hash"] + `" target="_blank">` + tx["hash"] + `</a> was successful!`);
+                    toast("success", `Transaction <a class="text-light" style=" text-overflow: ellipsis; width: 5rem; overflow: hidden; text-decoration: underline;margin-left: 0.25rem; " href="https://explorer.xian.org/tx/` + tx["hash"] + `" target="_blank">` + tx["hash"] + `</a> success!`);
                 } else {
                     tx["status"] = "error";
                     toast("danger", `Transaction <a class="text-light" style=" text-overflow: ellipsis; width: 5rem; overflow: hidden; text-decoration: underline;margin-left: 0.25rem; " href="https://explorer.xian.org/tx/` + tx["hash"] + `" target="_blank">` + tx["hash"] + `</a> failed`);
@@ -35,6 +35,9 @@ async function updateTxHistory() {
     }
     if (historyUpdated) {
         localStorage.setItem("tx_history", JSON.stringify(tx_history));
+        if (app_page == "wallet"){
+            changePage("wallet");
+        }
     }
 }
 

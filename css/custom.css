@@ -5,18 +5,20 @@ html{
 body {
     min-height: 100%;
     margin: 0;
-    background-color: #f4f4f4;
-    font-family: 'Inter', sans-serif;
-    color: #121212;
+    background-color: #fff;
+    font-family: 'Roboto Mono', sans-serif;
+    color: #202020;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-smoothing: antialiased;
     font-weight: 500;
 }
 a{
-    color: #007bff;
+    color: #06e6cb;
     text-decoration: none;
 }
+
+.btn{color: #202020;}
 
 .top-0 {
     top: 0;
@@ -65,7 +67,7 @@ a{
     align-items: center;
 }
 .governance-section-buttons button {
-    background-color: #f4f4f4;
+    background-color: #ffffff;
 }
 
 .governance-section-flex{
@@ -85,7 +87,7 @@ a{
 }
 
 a:hover{
-    color: #007bff;
+    color: #06e6cb;
     text-decoration: underline;
 }
 .governance-sub-title{
@@ -98,7 +100,7 @@ a:hover{
     left: 0;
     font-size: 1.25rem;
     margin-bottom: 20px;
-    color:#007bff;
+    color:#06e6cb;
     cursor: pointer;
 }
 .explorer-url{
@@ -114,23 +116,23 @@ a:hover{
     z-index: 1050; /* Ensures the toggler stays above most elements */
     border: 1px solid #ced4da;
     background: #fff;
-    color: #121212;
+    color: #202020;
 }
 .dark-mode .dark-mode-toggler {
-    border: 1px solid #343a40;
-    background: #1e1e1e;
-    color: #e4e6eb;
+    border: 1px solid #8a8b8e;
+    background: #202020;
+    color: #ffffff;
 }
 
 /* Dark mode specific styles */
 .dark-mode {
-    background-color: #121212; /* Dark background */
-    color: #e4e6eb; /* Bright text */
+    background-color: #202020; /* Dark background */
+    color: #ffffff; /* Bright text */
 }
 
 .dark-mode .app-box {
-    background-color: #1e1e1e; /* Darker background */
-    border: 1px solid #343a40; /* Darker border */
+    background-color: #202020; /* Darker background */
+    border: 1px solid #8a8b8e; /* Darker border */
 }
 
 
@@ -251,8 +253,8 @@ a:hover{
 }
 
 .dark-mode .side-nav {
-    border: 1px solid #343a40;
-    background-color: #1e1e1e;
+    border: 1px solid #8a8b8e;
+    background-color: #202020;
 }
 
 .app-box {
@@ -340,7 +342,7 @@ a:hover{
 .app-name{
     color: unset;
     display: flex;
-    gap: 10px;
+    gap: 1rem;
     align-items: center;
 }
 
@@ -360,7 +362,16 @@ a:hover{
     height: 10px;
     border-radius: 50%;
     margin-right: 5px;
-    background-color: #28a745;
+    background-color: #28bdaa;
+}
+.toast.bg-success{
+    color: #155724 !important;
+}
+.toast a{
+    color: #06e6cb !important;
+}
+.toast.bg-danger{
+    color: #721c24!important;
 }
 .offline-circle {
     width: 10px;
@@ -385,23 +396,23 @@ a:hover{
     border-bottom: 1px solid #ced4da;
 }
 .dark-mode .navbar {
-    background-color: #1e1e1e;
-    border-bottom: 1px solid #343a40;
+    background-color: #202020;
+    border-bottom: 1px solid #8a8b8e;
 }
 
 .dark-mode .token-list {
 }
 .dark-mode .token-item {
-    border: 1px solid #343a40;
+    border: 1px solid #8a8b8e;
 }
 .dark-mode input, .dark-mode select, .dark-mode textarea {
-    background-color: #121212;
-    color: #e4e6eb;
-    border: 1px solid #343a40;
+    background-color: #202020;
+    color: #ffffff;
+    border: 1px solid #8a8b8e;
 }
 .dark-mode input:focus, .dark-mode select:focus, .dark-mode textarea:focus {
-    background-color: #121212;
-    color: #e4e6eb;
+    background-color: #202020;
+    color: #ffffff;
 }
 .stamp-rate{margin-top: 10px;}
 .bottom-0 {
@@ -419,7 +430,7 @@ a:hover{
     font-size: 1.25rem;
     margin-bottom: 20px;
     cursor: pointer;
-    color: #007bff;
+    color: #06e6cb;
 }
 
 .cogwheel-icon:hover, .ide-icon:hover {
@@ -444,7 +455,7 @@ a:hover{
     border: 1px solid #ced4da;
 }
 .dark-mode .activity-item {
-    border: 1px solid #343a40;
+    border: 1px solid #8a8b8e;
 }
 
 .activity-details, .activity-actions {
@@ -475,7 +486,7 @@ a:hover{
 /* Optional: Enhance visibility for clickable actions */
 .activity-actions a:hover {
     text-decoration: underline;
-    color: #007bff;
+    color: #06e6cb;
 }
 
 .wallet-tabs {
@@ -487,7 +498,7 @@ a:hover{
 
 .wallet-tabs a {
     text-decoration: none;
-    color: #007bff; /* Primary color for consistency */
+    color: #06e6cb; /* Primary color for consistency */
     padding: 10px 20px;
     border: 1px solid transparent; /* Ensures the layout doesn't shift when border is added on hover or focus */
     border-radius: 5px 5px 0 0; /* Rounded corners at the top */
@@ -515,7 +526,7 @@ a:hover{
     text-overflow: ellipsis;
     white-space: nowrap;
     cursor: pointer;
-    color: #007bff;
+    color: #06e6cb;
     display: block;
 }
 
@@ -528,7 +539,7 @@ a:hover{
     text-overflow: ellipsis;
     white-space: nowrap;
     cursor: pointer;
-    color: #007bff;
+    color: #06e6cb;
     display: block;
 }
 #yourAddressReceive:hover {
@@ -591,11 +602,11 @@ a:hover{
 }
 
 .token-actions button {
-    background-color: #f4f4f4;
+    background-color: #ffffff;
 }
 
 .token-actions button:hover {
-    background-color: #e4e6eb;
+    background-color: #ffffff;
 }
 
 .github-link {
@@ -604,7 +615,7 @@ a:hover{
 }
 
 .github-link a {
-    color: #121212; /* Dark color for light mode */
+    color: #202020; /* Dark color for light mode */
     font-weight: bold;
     text-decoration: none;
     display: inline-flex;
@@ -617,7 +628,7 @@ a:hover{
 }
 
 .dark-mode .github-link a {
-    color: #e4e6eb; /* Light color for dark mode */
+    color: #ffffff; /* Light color for dark mode */
 }
 
 .app-box-description {
@@ -629,8 +640,8 @@ a:hover{
     border: 1px solid #ced4da;
 }
 .dark-mode .dropdown-content{
-    background-color: #1e1e1e;
-    border: 1px solid #343a40;
+    background-color: #202020;
+    border: 1px solid #8a8b8e;
 }
 .governance-section-buttons{
     display: flex;

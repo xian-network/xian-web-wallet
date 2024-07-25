@@ -34,6 +34,7 @@ if (runningAsExtension()) {
                 sendResponse({errors: ['Wallet is locked']});
                 return;
             }
+            message.data.chainId = CHAIN_ID;
             createExternalWindow('request-transaction', message, sendResponse);
             
         }

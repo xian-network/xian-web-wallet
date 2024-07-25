@@ -83,6 +83,9 @@ window.addEventListener("message", (event) => {
     const callbackKey = event.data.callbackKey;
     callbacks[callbackKey](event.data.data);
     tx_history = JSON.parse(localStorage.getItem("tx_history")) || [];
+    if (app_page == "wallet"){
+      changePage("wallet");
+  }
   }
   if (event.data.type === "REQUEST_SIGNATURE") {
     const some_data = event.data.data;

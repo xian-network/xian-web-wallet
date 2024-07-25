@@ -17,6 +17,7 @@ window.addEventListener("message", (event) => {
       document.getElementById("requestTransactionFunction").innerHTML = some_data["data"]["method"];
       document.getElementById("requestTransactionParams").innerHTML = JSON.stringify(some_data["data"]["kwargs"]);
       document.getElementById("requestTransactionStampLimit").innerHTML = some_data["data"]["stampLimit"];
+      document.getElementById("requestTransactionChainId").innerHTML = some_data["data"]["chainId"];
     }
     if (event.data.type === "REQUEST_SIGNATURE") {
       const some_data = event.data.data;

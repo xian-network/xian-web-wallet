@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xian Wallet</title>
     <meta name="description" content="Manage your Xian wallet. No browser extension required. No server-side processing. Open-Source.">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
-
 
     <link rel="icon" type="image/png" href="assets/logo.png">
 
@@ -14,6 +12,9 @@
     <link rel="stylesheet" href="css/custom.css?v=312">
     <link rel="stylesheet" href="css/lint.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="css/codemirror.css">
     <script src="js/dark-mode.js?v=1"></script>
@@ -23,7 +24,7 @@
         <div class="container-fluid">
             <div class="navbar-brand" href="index.html">
                 
-                <div class="app-name"><img src="assets/logo.png" alt="Xian Connect Logo" class="app-logo"><h2>Xian Wallet</h2></div>
+                <div class="app-name"><img src="assets/xian-white.svg" alt="Xian Connect Logo" class="app-logo"><h2>Xian Wallet</h2></div>
                 <div class="online-status" id="onlineStatus">Node Status <div class='grey-circle' title='Node Status is Unknown'></div></div>
             </div>
         </div>
@@ -69,7 +70,7 @@ display: flex;max-width: 100%; width: 100%;flex-direction: column;;
         </div>
     </div>
 
-    <button class="btn dark-mode-toggler" id="darkModeToggler" title="Toggle Dark Mode">
+    <button class="btn dark-mode-toggler d-none" id="darkModeToggler" title="Toggle Dark Mode">
         <i class="fas fa-moon"></i> <!-- Default icon -->
     </button>   
 

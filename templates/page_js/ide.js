@@ -574,7 +574,15 @@ getStampRate().then((rate) => {
 });
 
 document.getElementById('btn-ide-submit-contract').addEventListener('click', function () {
-    submitContract();
+    if( document.getElementById('submitContractNameWrapper').style.display === 'none' ) {
+        document.getElementById('submitContractNameWrapper').style.display = 'block';
+        document.getElementById('submitContractstampLimitWrapper').style.display = 'block';
+        document.getElementById('submitContractconstructorKwargsWrapper').style.display = 'block';
+        document.getElementById('btn-ide-submit-contract').innerHTML = 'Deploy Contract';
+    }
+    else {
+        submitContract();
+    }
 });
 document.getElementById('btn-ide-go-to-wallet').addEventListener('click', function () {
     goToWallet();
@@ -638,6 +646,17 @@ function refreshTabList() {
 
     document.getElementById('tabs-editor').appendChild(addTabButton);
 }
+
+// Clicking anywhere outside the dropdown should close it
+document.addEventListener('click', function (event) {
+    // Check if the click event was triggered by the add-tab button or any of its children
+    if (!event.target.matches('.add-tab-button') && !event.target.closest('.add-tab-button')) {
+        let dropdown = document.querySelector('.dropdown-content');
+        if (dropdown) {
+            dropdown.remove();
+        }
+    }
+});
 
 
 // Save code on change
