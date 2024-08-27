@@ -181,6 +181,9 @@ async function getVariable(contract, variable, key = "") {
       if (data.result.response.value === "AA==") {
           return null;
       }
+      if (data.result.response.value === null) {
+            return null;
+        }
       return atob(data.result.response.value);
   } catch (error) {
       console.error("Error fetching variable:", error);
