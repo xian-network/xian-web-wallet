@@ -101,7 +101,14 @@ async function estimateRequestStamps(){
     let stamp_line_finished = document.getElementById('stamp_line_finished');
     stamp_line.style.display = 'block';
     acceptBtn.disabled = true;
-    await estimateRequestStamps();
+    if (document.getElementById('requestTransactionStampLimit').innerHTML === 'undefined') {
+        await estimateRequestStamps();
+    }
+    else {
+        let stamp_rate = await getStampRate();
+        let stamps = parseInt(document.getElementById('requestTransactionStampLimit').innerHTML);
+        document.getElementById('requestTransactionStampLimitXian').innerHTML = stamps / stamp_rate;
+    }
     stamp_line.style.display = 'none';
     stamp_line_finished.style.display = 'block';
     acceptBtn.disabled = false;
