@@ -241,6 +241,7 @@ var whitelistedPatterns = [
     'hashlib',
     'datetime',
     'crypto',
+    'decimal',
     'Any'
 ];
 function parseLintOutput(output) {
