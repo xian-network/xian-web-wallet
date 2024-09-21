@@ -89,21 +89,21 @@ async function buildProposalTable() {
 
 function getRewardPercentages() {
     getVariable("rewards", "S", "value")
-        .then(reward_percentages => {
-            reward_percentages = JSON.parse(reward_percentages);
-            
-            document.getElementById("transaction-rewards-validators-governance").innerHTML = parseFloat(reward_percentages[0]["__fixed__"] *100 ? reward_percentages[0]["__fixed__"] : reward_percentages[0] * 100);
-            document.getElementById("transaction-rewards-burn-governance").innerHTML = parseFloat(reward_percentages[1]["__fixed__"] * 100 ? reward_percentages[1]["__fixed__"] * 100 : reward_percentages[1] * 100);
-            document.getElementById("transaction-rewards-foundation-governance").innerHTML = parseFloat(reward_percentages[2]["__fixed__"] * 100 ? reward_percentages[2]["__fixed__"] * 100 : reward_percentages[2] * 100);
-            document.getElementById("transaction-rewards-developers-governance").innerHTML = parseFloat(reward_percentages[3]["__fixed__"] * 100 ? reward_percentages[3]["__fixed__"] * 100 : reward_percentages[3] * 100);
-        })
-        .catch(error => {
-            console.error("Error getting reward percentages:", error);
-            document.getElementById("transaction-rewards-validators-governance").innerHTML = "ERR";
-            document.getElementById("transaction-rewards-burn-governance").innerHTML = "ERR";
-            document.getElementById("transaction-rewards-foundation-governance").innerHTML = "ERR";
-            document.getElementById("transaction-rewards-developers-governance").innerHTML = "ERR";
-        });
+    .then(reward_percentages => {
+        reward_percentages = JSON.parse(reward_percentages);
+       
+        document.getElementById("transaction-rewards-validators-governance").innerHTML = parseFloat(reward_percentages[0]["__fixed__"] *100);
+        document.getElementById("transaction-rewards-burn-governance").innerHTML = parseFloat(reward_percentages[1]["__fixed__"] * 100);
+        document.getElementById("transaction-rewards-foundation-governance").innerHTML = parseFloat(reward_percentages[2]["__fixed__"] * 100);
+        document.getElementById("transaction-rewards-developers-governance").innerHTML = parseFloat(reward_percentages[3]["__fixed__"] * 100);
+    })
+    .catch(error => {
+        console.error("Error getting reward percentages:", error);
+        document.getElementById("transaction-rewards-validators-governance").innerHTML = "ERR";
+        document.getElementById("transaction-rewards-burn-governance").innerHTML = "ERR";
+        document.getElementById("transaction-rewards-foundation-governance").innerHTML = "ERR";
+        document.getElementById("transaction-rewards-developers-governance").innerHTML = "ERR";
+    });
 }
 
 
