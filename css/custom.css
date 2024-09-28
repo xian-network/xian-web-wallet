@@ -647,3 +647,26 @@ a:hover{
     display: flex;
     justify-content: flex-end;
 }
+@media screen and (max-width: 420px) {
+    .btn-group
+    {
+        width: 100%!important;
+    }
+    #wallet-tokens>.title-container{
+        justify-content: space-between;
+    }
+    #wallet-adv-btns{
+        flex-wrap: wrap;
+    GAP: 1rem;
+
+    }
+    .token-actions>.btn{
+        padding: .375rem .3rem;
+    }
+    .online-status{
+        font-size: 0;
+    }
+    .label-gov{
+        min-width: unset;
+    }
+}
