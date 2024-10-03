@@ -11,30 +11,44 @@ function fromHexString(hexString) {
 }
 
 function encryptPrivateKey(privateKey, password) {
-    // Convert password to a hash and ensure it's the correct size for a key
-    let hash = nacl.hash(fromHexString(password));
-    let key = hash.slice(0, 32); // Assuming nacl.hash returns a Uint8Array, adjust to 32 bytes for the key
+    // Use the password as it is (case-sensitive)
+    let passwordBytes = new TextEncoder().encode(password); // Convert the password to bytes
+    let hash = nacl.hash(passwordBytes); // Hash the password to derive the key
+    let key = hash.slice(0, 32); // Adjust to 32 bytes for the key
     let nonce = nacl.randomBytes(24);
     let encryptedPrivateKey = nacl.secretbox(privateKey, nonce, key);
     return toHexString(nonce) + toHexString(encryptedPrivateKey);
 }
 
+
 function decryptPrivateKey(encryptedPrivateKey, password, publicKey) {
-    let hash = nacl.hash(fromHexString(password));
-    let key = hash.slice(0, 32); // Key for secretbox must be 32 bytes
+    // First, try case-sensitive decryption
+    let passwordBytes = new TextEncoder().encode(password);
+    let hash = nacl.hash(passwordBytes);
+    let key = hash.slice(0, 32);
     let nonce = fromHexString(encryptedPrivateKey.slice(0, 48));
     let message = fromHexString(encryptedPrivateKey.slice(48));
     let decrypted = nacl.secretbox.open(message, nonce, key);
     
+    // If case-sensitive decryption fails, fall back to the old case-insensitive method
+    if (!decrypted) {
+        let oldHash = nacl.hash(fromHexString(password)); // Old case-insensitive method
+        let oldKey = oldHash.slice(0, 32);
+        decrypted = nacl.secretbox.open(message, nonce, oldKey);
+    }
+
+    // Proceed if decryption was successful
     if (decrypted) {
         decrypted = fromHexString(toHexString(decrypted).slice(0, 64)); // Ensure the private key is the correct size
-        let keyPair = nacl.sign.keyPair.fromSeed(decrypted)
+        let keyPair = nacl.sign.keyPair.fromSeed(decrypted);
         if (toHexString(keyPair.publicKey) === publicKey) {
             return decrypted; // Correct password and private key size
         }
     }
+
     return null; // Incorrect password or private key size
 }
+
 
 function createKeyPair(password) {
     let keyPair = nacl.sign.keyPair()
