@@ -3,14 +3,34 @@
 <div class="app-box-form">
     <div class="alert alert-danger" role="alert" id="settingsError" style="display: none;"></div>
     <div class="alert alert-success" role="alert" id="settingsSuccess" style="display: none;"></div>
+    
+    <!-- Unified form group for managing RPC URLs -->
     <div class="form-group">
-        <label for="rpc_input">RPC</label>
-        <input type="text" class="form-control" id="rpc_input" placeholder="Enter the RPC URL" required>
+        <label for="rpc_manager">RPC</label>
+        
+        <!-- Dropdown to select existing RPC URLs -->
+        <div class="input-group mb-2">
+            <select class="form-control" id="rpc_select">
+                <option value="https://node.xian.org">RPC 1 - Mainnet</option>
+                <option value="https://testnet.xian.org">RPC 2 - Testnet</option>
+            </select>
+            <!-- Button to remove selected RPC -->
+            <div class="input-group-append">
+                <button class="btn btn-danger" id="remove_rpc_button">Remove</button>
+            </div>
+        </div>
+
+        <!-- Input to add a new RPC URL -->
+        <div class="input-group">
+            <input type="text" class="form-control" id="add_rpc_input" placeholder="Enter new RPC URL">
+            <!-- Button to add the new RPC URL -->
+            <div class="input-group-append">
+                <button class="btn btn-secondary" id="add_rpc_button">Add</button>
+            </div>
+        </div>
     </div>
     
-    <div class="form-group">
-        <button class="btn btn-primary" id="settings-save-settings">Save</button>
-    </div>
+    
     <div class="form-group">
         <label for="private_key_export">Private Key</label>
         <p>You can export your private key to back it up. If you lose your private key, you will lose access to your wallet and funds.</p>

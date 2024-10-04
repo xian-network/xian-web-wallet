@@ -1,3 +1,5 @@
+var customRPCs = localStorage.getItem('customRPCs') ? JSON.parse(localStorage.getItem('customRPCs')) : [];
+
 function removeWallet(){
     let confirm_delete = confirm("Are you sure you want to remove the wallet?");
     if (!confirm_delete) {
@@ -19,7 +21,7 @@ function saveSettings() {
     settingsSuccess.style.display = 'none';
     settingsError.style.display = 'none';
 
-    let rpc = document.getElementById('rpc_input').value;
+    let rpc = document.getElementById('rpc_select').value;
     if (rpc === "") {
         settingsError.style.display = 'block';
         settingsError.innerHTML = 'All fields are required!';
@@ -64,7 +66,7 @@ function saveSettings() {
         }
         CHAIN_ID = chain_id;
         settingsSuccess.style.display = 'block';
-        settingsSuccess.innerHTML = 'Settings saved successfully!';
+        settingsSuccess.innerHTML = 'RPC changed successfully!';
     });
 }
 
@@ -104,12 +106,92 @@ document.getElementById('remove_wallet_export').addEventListener('click', functi
     removeWallet();
 });
 
-document.getElementById('settings-save-settings').addEventListener('click', function() {
+document.getElementById('rpc_select').addEventListener('change', function() {
     saveSettings();
 });
 
+document.getElementById('add_rpc_button').addEventListener('click', function() {
+    addCustomRPC();
+});
+
+document.getElementById('remove_rpc_button').addEventListener('click', function() {
+    removeCustomRPC();
+});
+
+function addCustomRPC() {
+    settingsSuccess.style.display = 'none';
+    settingsError.style.display = 'none';
+    let customrpc_input = document.getElementById('add_rpc_input');
+    let rpc = customrpc_input.value;
+    if (rpc === "") {
+        return;
+    }
+
+    // rpc has to start with https and not end with a slash
+    if (!rpc.startsWith('http')) {
+        settingsError.style.display = 'block';
+        settingsError.innerHTML = 'RPC must start with http or https';
+        return;
+    }
+
+    if (rpc.endsWith('/')) {
+        settingsError.style.display = 'block';
+        settingsError.innerHTML = 'RPC must not end with a slash';
+        return;
+    }
+
+    customRPCs.push(rpc);
+    localStorage.setItem('customRPCs', JSON.stringify(customRPCs));
+    customrpc_input.value = '';
+    document.getElementById('rpc_select').value = rpc;
+    RPC = rpc;
+    loadSettingsPage();
+    saveSettings();
+    
+}
+
+function removeCustomRPC() {
+    settingsSuccess.style.display = 'none';
+    settingsError.style.display = 'none';
+    let rpc_select = document.getElementById('rpc_select');
+    let rpc = rpc_select.value;
+    let found = false;
+    customRPCs.forEach((customRPC, index) => {
+        if (customRPC === rpc) {
+            customRPCs.splice(index, 1);
+            rpc_select.remove(rpc_select.selectedIndex);
+            found = true;
+        }
+    });
+    if (!found) {
+        settingsError.style.display = 'block';
+        settingsError.innerHTML = 'Standard RPCs cannot be removed!';
+        return;
+    }
+
+    localStorage.setItem('customRPCs', JSON.stringify(customRPCs));
+    RPC = document.getElementById('rpc_select').children[0].value;
+    document.getElementById('rpc_select').value = RPC;
+    loadSettingsPage();
+    saveSettings();
+    
+}
+
 function loadSettingsPage() {
-    document.getElementById('rpc_input').value = RPC;
+    // Load the custom RPCs from local storage and add them to the select element
+    if (customRPCs.length > 0) {
+        let rpc_select = document.getElementById('rpc_select');
+        customRPCs.forEach(rpc => {
+            let option = document.createElement('option');
+            option.text = rpc;
+            option.value = rpc;
+            rpc_select.add(option);
+        });
+    }
+
+    // Get the rpc from local storage and find the select element with the value and set it to selected
+    document.querySelector('#rpc_select').value = RPC;
+    
 }
 
 loadSettingsPage();
