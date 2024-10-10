@@ -159,7 +159,7 @@ function removeToken(contract) {
             .then(balance => {
                 let formattedBalance = "0";
                 if (balance !== null) {
-                    formattedBalance = parseFloat(balance).toFixed(8);
+                    formattedBalance = BigNumber(balance).toFixed(8);
                 }
                 document.getElementById(contract + 'Balance').innerHTML = formattedBalance;
             })
