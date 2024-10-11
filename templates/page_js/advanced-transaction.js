@@ -40,7 +40,7 @@ function sendAdvTx() {
                         error.style.display = "block";
                         return;
                     }
-                    value = parseInt(value); // {"__big_int__": BigNumber(value).toFixed(0)};
+                    value = parseInt(value);
                 }
                 if (expectedType === "float") {
                     if (isNaN(value)) {
@@ -48,7 +48,7 @@ function sendAdvTx() {
                         error.style.display = "block";
                         return;
                     }
-                    value = {"__fixed__": BigNumber(value).toFixed()};
+                    value = parseFloat(value);
                 }
                 if (expectedType === "bool") {
                     if (value !== "true" && value !== "false") {
@@ -270,7 +270,7 @@ async function estimateSendStamps(){
                         error.style.display = "block";
                         return;
                     }
-                    value = parseInt(value); // {"__big_int__": BigNumber(value).toFixed(0)};
+                    value = parseInt(value);
                 }
                 if (expectedType === "float") {
                     if (isNaN(value)) {
@@ -278,7 +278,7 @@ async function estimateSendStamps(){
                         error.style.display = "block";
                         return;
                     }
-                    value = {"__fixed__": BigNumber(value).toFixed()};
+                    value = parseFloat(value);
                 }
                 if (expectedType === "bool") {
                     if (value !== "true" && value !== "false") {
