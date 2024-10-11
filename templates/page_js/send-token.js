@@ -24,7 +24,7 @@ function sendToken() {
         }
 
         // Turn the amount into a float 
-        amount = BigNumber(amount);
+        amount = parseFloat(amount);
 
         if (amount <= 0) {
             errorMsg.innerHTML = 'Invalid amount!';
@@ -33,7 +33,7 @@ function sendToken() {
         }
 
         getVariable(contract, "balances", values[0]).then(balance => {
-            if (amount > BigNumber(balance)) {
+            if (amount > parseFloat(balance)) {
                 errorMsg.innerHTML = 'Insufficient balance!';
                 errorMsg.style.display = 'block';
                 return;
@@ -52,7 +52,7 @@ function sendToken() {
                     function: "transfer",
                     kwargs: {
                         to: recipient,
-                        amount: {"__fixed__": amount.toFixed()}
+                        amount: amount
                     },
                     stamps_supplied: parseInt(document.getElementById('tokenFee').innerHTML)
                 },
@@ -134,7 +134,7 @@ async function estimateSendStamps(){
             function: "transfer",
             kwargs: {
                 to: recipient,
-                amount: {"__fixed__": BigNumber(amount).toFixed()}
+                amount: parseFloat(amount)
             },
             stamps_supplied: 100000
         },
