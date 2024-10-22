@@ -215,6 +215,10 @@ async function ping() {
   }
 }
 
+async function sanitizeHTML(html) {
+    return html.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 async function getTokenInfo(contract) {
   let tokenInfo = { contract: contract };
 
@@ -232,7 +236,7 @@ async function getTokenInfo(contract) {
               tokenInfo["name"] = null;
           } else {
               let tokenName = atob(nameData.result.response.value);
-              tokenInfo["name"] = tokenName;
+              tokenInfo["name"] = await sanitizeHTML(tokenName);
           }
       }
 
@@ -243,7 +247,7 @@ async function getTokenInfo(contract) {
               tokenInfo["symbol"] = null;
           } else {
               let tokenSymbol = atob(symbolData.result.response.value);
-              tokenInfo["symbol"] = tokenSymbol;
+              tokenInfo["symbol"] = await sanitizeHTML(tokenSymbol);
           }
       }
 
