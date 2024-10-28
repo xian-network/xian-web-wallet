@@ -1,9 +1,15 @@
 let appTabId = null;
 
+// Retrieve the stored `appTabId` when the service worker starts
+chrome.storage.local.get("appTabId", (result) => {
+    if (result.appTabId) {
+        appTabId = result.appTabId;
+    }
+});
+
 // Listener for the extension icon click
 chrome.action.onClicked.addListener(function(tab) {
     const url = chrome.runtime.getURL('index.html');
-
     findTab();
 
     // Check if the tab is still open
@@ -27,8 +33,9 @@ chrome.action.onClicked.addListener(function(tab) {
 function createTab() {
     const url = chrome.runtime.getURL('index.html');
     chrome.tabs.create({url: url}, function(newTab) {
-        // Update the global variable with the new tab ID
+        // Update the global variable and save the new tab ID to chrome storage
         appTabId = newTab.id;
+        chrome.storage.local.set({ appTabId: newTab.id });
     });
 }
 
@@ -36,6 +43,8 @@ function findTab() {
     chrome.tabs.query({url: chrome.runtime.getURL('index.html')}, function(tabs) {
         if (tabs.length > 0) {
             appTabId = tabs[0].id;
+            // Store the found tab ID so it persists
+            chrome.storage.local.set({ appTabId: appTabId });
         }
     });
 }
@@ -43,7 +52,7 @@ function findTab() {
 // Listener for messages from the content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'dAppSendTransaction' || message.type === 'getWalletInfo' || message.type === 'dAppSignMessage') {
-        if(appTabId === null) {
+        if (appTabId === null) {
             findTab(); // Try to find the tab if the reference was lost
         }
 
@@ -63,6 +72,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
     if (tabId === appTabId) {
         appTabId = null;
+        // Remove the tab ID from storage as well
+        chrome.storage.local.remove("appTabId");
     }
 });
 
@@ -71,5 +82,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     if (tabId === appTabId && changeInfo.status === 'complete') {
         // Update appTabId if needed, such as reloading the tab
         appTabId = tabId;
+        // Store the updated tab ID
+        chrome.storage.local.set({ appTabId: tabId });
     }
 });
