@@ -146,6 +146,7 @@ async function estimateSendStamps(){
     try {
         let signed_tx = await signTransaction(transaction, unencryptedPrivateKey);
         let stamps = await estimateStamps(signed_tx);
+        stamps = stamps["stamps"];
         let stamp_rate = await getStampRate();
         send_btn.disabled = false;
         estimation_loading.style.display = 'none';

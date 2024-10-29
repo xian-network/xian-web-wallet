@@ -1,5 +1,9 @@
 <h1 class="app-box-title">Transaction Request</h1>
 <p class="app-box-description">You have received a transaction request from a website.</p>
+<div id="failure-alert" class="alert alert-danger d-none">
+    <strong>This transaction will most likely fail!</strong>
+    <p>The outcome of this transaction is: <span id="failure-reason"></span></p>
+</div>
 <div class="app-box-form">
     <div class="form-group">
         <label for="requestTransactionContract">Contract</label>

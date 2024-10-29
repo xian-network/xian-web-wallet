@@ -121,6 +121,7 @@ async function estimateProposalStamps(){
     try {
         let signed_tx = await signTransaction(transaction, unencryptedPrivateKey);
         let stamps = await estimateStamps(signed_tx);
+        stamps = stamps["stamps"];
         if (stamps === null) {
             document.getElementById('proposalFee').innerHTML = 0;
             return;

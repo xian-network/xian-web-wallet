@@ -296,10 +296,11 @@ async function estimateStamps(signedTransaction) {
         }
         let tx_result = JSON.parse(atob(data.result.response.value));
         let stamps = parseInt(tx_result["stamps_used"]);
-        return stamps;
+        let result = { stamps: stamps, tx_result: tx_result["result"], success: tx_result["status"] === 0 };
+        return result;
     } catch (error) {
         console.error("Error fetching stamp estimation:", error);
-        return null;
+        return { stamps: null, tx_result: null, success: false };
     }
 }
 
