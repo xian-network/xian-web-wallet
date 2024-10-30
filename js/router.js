@@ -203,6 +203,9 @@ function changePage(page, some_data = null, send_response = null) {
     case "request-signature":
       loadHtmlAndScripts("templates/request-signature.html");
       break;
+    case "ecosystem-news":
+      loadHtmlAndScripts("templates/ecosystem-news.html");
+      break;
     default:
       break;
   }

@@ -46,6 +46,11 @@ document.getElementById('side-change-page-govenance').addEventListener('click', 
 });
 
 }
+if(document.getElementById('side-change-page-ecosystem-news')) {
+document.getElementById('side-change-page-ecosystem-news').addEventListener('click', function() {
+    changePage('ecosystem-news');
+});
+}
 
 function lockWallet() {
     let confirm_lock = confirm("Are you sure you want to lock the wallet?");

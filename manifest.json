@@ -1,6 +1,6 @@
 {
     "name": "Xian Wallet",
-    "version": "1.91",
+    "version": "1.92",
     "description": "A cutting-edge self-custodial web3 wallet for the Xian Network",
     "manifest_version": 3,
     "action": {
