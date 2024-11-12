@@ -4,85 +4,91 @@ let appTabId = null;
 chrome.storage.local.get("appTabId", (result) => {
     if (result.appTabId) {
         appTabId = result.appTabId;
+        verifyTab(appTabId); // Ensure the tab is still valid on startup
     }
 });
 
 // Listener for the extension icon click
-chrome.action.onClicked.addListener(function(tab) {
-    const url = chrome.runtime.getURL('index.html');
-    findTab();
+chrome.action.onClicked.addListener(() => {
+    openOrFocusAppTab();
+});
 
-    // Check if the tab is still open
+// Function to open a new tab or focus on an existing one
+function openOrFocusAppTab() {
+    const url = chrome.runtime.getURL('index.html');
     if (appTabId !== null) {
-        chrome.tabs.get(appTabId, function(existingTab) {
+        chrome.tabs.get(appTabId, (existingTab) => {
             if (chrome.runtime.lastError || !existingTab) {
-                // If the tab is no longer open or an error occurred, create a new tab
-                createTab();
+                createTab(); // Create a new tab if the existing one is missing or closed
             } else {
-                // Focus on the existing tab
-                chrome.tabs.update(appTabId, {active: true});
+                chrome.tabs.update(appTabId, { active: true }); // Focus on the existing tab
             }
         });
     } else {
-        // If no tab ID is stored, create a new tab
-        createTab();
+        findTab(); // Try finding the tab first before creating a new one
     }
-});
+}
 
-// Function to create a new tab
-function createTab() {
+// Function to find the existing app tab by URL
+function findTab() {
     const url = chrome.runtime.getURL('index.html');
-    chrome.tabs.create({url: url}, function(newTab) {
-        // Update the global variable and save the new tab ID to chrome storage
-        appTabId = newTab.id;
-        chrome.storage.local.set({ appTabId: newTab.id });
+    chrome.tabs.query({ url }, (tabs) => {
+        if (tabs.length > 0) {
+            appTabId = tabs[0].id;
+            chrome.storage.local.set({ appTabId });
+            chrome.tabs.update(appTabId, { active: true });
+        } else {
+            createTab(); // If no existing tab, create a new one
+        }
     });
 }
 
-function findTab() {
-    chrome.tabs.query({url: chrome.runtime.getURL('index.html')}, function(tabs) {
-        if (tabs.length > 0) {
-            appTabId = tabs[0].id;
-            // Store the found tab ID so it persists
-            chrome.storage.local.set({ appTabId: appTabId });
+// Function to create a new app tab
+function createTab() {
+    const url = chrome.runtime.getURL('index.html');
+    chrome.tabs.create({ url }, (newTab) => {
+        appTabId = newTab.id;
+        chrome.storage.local.set({ appTabId });
+    });
+}
+
+// Verify if a stored tab ID is still valid and open
+function verifyTab(tabId) {
+    chrome.tabs.get(tabId, (tab) => {
+        if (chrome.runtime.lastError || !tab) {
+            appTabId = null;
+            chrome.storage.local.remove("appTabId");
         }
     });
 }
 
 // Listener for messages from the content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.type === 'dAppSendTransaction' || message.type === 'getWalletInfo' || message.type === 'dAppSignMessage') {
-        if (appTabId === null) {
-            findTab(); // Try to find the tab if the reference was lost
-        }
+    if (["dAppSendTransaction", "getWalletInfo", "dAppSignMessage"].includes(message.type)) {
+        if (appTabId === null) findTab();
 
-        if (appTabId === null && message.type === 'getWalletInfo') { // If the extension is not open, return an empty response
-            sendResponse({address: '', locked: true, chainId: ''});
+        if (appTabId === null && message.type === "getWalletInfo") {
+            sendResponse({ address: "", locked: true, chainId: "" });
             return;
         }
 
-        // Forward the message to the extension window
         chrome.tabs.sendMessage(appTabId, message, sendResponse);
     }
-    // Make sure to return true to indicate that you will send a response asynchronously
-    return true;
+    return true; // Indicate that we will send a response asynchronously
 });
 
 // Listener for when a tab is removed
-chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
+chrome.tabs.onRemoved.addListener((tabId) => {
     if (tabId === appTabId) {
         appTabId = null;
-        // Remove the tab ID from storage as well
         chrome.storage.local.remove("appTabId");
     }
 });
 
 // Listener for when a tab is updated
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    if (tabId === appTabId && changeInfo.status === 'complete') {
-        // Update appTabId if needed, such as reloading the tab
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+    if (tabId === appTabId && changeInfo.status === "complete") {
         appTabId = tabId;
-        // Store the updated tab ID
-        chrome.storage.local.set({ appTabId: tabId });
+        chrome.storage.local.set({ appTabId });
     }
 });
