@@ -10,20 +10,23 @@ let redditApiUrl = 'https://www.reddit.com/r/xiannetwork.json';
             for (let i = 0; i < data.data.children.length; i++) {
                 const post = posts[i].data;
                 if (post.author === 'lorythril') {
-                const postElement = createPostElement(post);
-                newsContainerElement.appendChild(postElement);
+                    if (post.removed_by_category !== null) {
+                        continue;
+                    }
+                    const postElement = createPostElement(post);
+                    newsContainerElement.appendChild(postElement);
                 }
             }
         });
 }
 function processText(text) {
-    // Markdown like [text](url) to <a href="url" target="_blank">text</a>
+    // Convert Markdown-style links [text](url) to HTML anchor tags
     text = text.replace(/\[(.*?)\]\((https?:\/\/[^\s]+)\)/g, '<a href="$2" target="_blank">$1</a>');
     
-    // Plain URLs to <a href="URL" target="_blank">URL</a>, only if not inside an existing anchor tag
-    text = text.replace(/(?<!["'])(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
-    
-    // Preserve line breaks
+    // Convert plain URLs to HTML anchor tags if they are not already inside an anchor tag
+    text = text.replace(/(^|\s)(https?:\/\/[^\s]+)/g, '$1<a href="$2" target="_blank">$2</a>');
+
+    // Preserve line breaks by replacing newlines with <br>
     text = text.replace(/\n/g, '<br>');
 
     return text;
