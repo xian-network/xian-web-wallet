@@ -199,7 +199,6 @@ a:hover{
     .token-item {
         display: flex;
         flex-direction: row!important;
-        justify-content: space-between!important;
     }
     #local-activity{
         height: 1px;
@@ -303,6 +302,10 @@ a:hover{
         flex-direction: column;
         max-width: 100%;
     }
+    
+.token-item div {
+    margin: 5px 0;
+}
 }
 @media (min-width: 768px) {
     button {
@@ -310,6 +313,12 @@ a:hover{
     }
     .form-control {
         max-width:30rem;
+    }
+    .token-item{
+        gap: 2rem;
+    }
+    .remove-btn{
+        padding: 10px;
     }
 }
 
@@ -572,6 +581,7 @@ a:hover{
     margin-bottom: 10px;
     border: 1px solid #dee2e6;
     border-radius: 5px;
+    
 }
 
 .token-list-title {
@@ -581,28 +591,34 @@ a:hover{
 }
 
 
-.token-item div {
-    margin: 5px 0;
-}
 
 .token-name span, .token-symbol span, .token-balance span {
     font-weight: bold;
+}
+
+.token-balance{
+    display: flex;
+    align-items: center;
 }
 
 .token-details {
     display: flex;
     flex-direction: column;
     margin-top: 0px !important;
+    width: 10rem;
 }
 
 .token-actions {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 10px;
+    flex-grow: 1;
 }
 
 .token-actions button {
     background-color: #ffffff;
+    width: unset;
 }
 
 .token-actions button:hover {

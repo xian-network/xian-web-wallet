@@ -29,17 +29,18 @@ function loadWalletPage() {
                 .then(tokenInfos => {
                     tokenInfos.forEach(tokenInfo => {
                         if (tokenInfo) {
-                            tokenList.innerHTML += `<div class="token-item" data-contract="${tokenInfo.contract}">
+                            tokenList.innerHTML += `
+                            <div class="token-item" data-contract="${tokenInfo.contract}">
                                 <div class="token-details">
                                     <div class="token-title-container">
-                                        ${tokenInfo.contract === "currency" ? "" : `<i class="fas fa-minus-circle cogwheel-icon" data-contract="${tokenInfo.contract}" title="Remove Token"></i>`}
-                                        <div class="token-name"><span>${tokenInfo.name}</span> (<span class="token-symbol">${tokenInfo.symbol}</span>)</div>
-                                        </div>
-                                    <div class="token-balance" id="${tokenInfo.contract}Balance">0</div>
+                                        <div class="token-name"><span class="token-symbol">${tokenInfo.symbol}</span><br><span style="font-weight:400">${tokenInfo.name}</span></div>
+                                    </div>
                                 </div>
+                                <div class="token-balance"><span id="${tokenInfo.contract}Balance">0</span>&nbsp;<span>${tokenInfo.symbol}</span></div>
                                 <div class="token-actions">
                                     <button class="btn send-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="fas fa-paper-plane"></i> Send</button>
                                     <button class="btn receive-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="fas fa-download"></i> Receive</button>
+                                    ${tokenInfo.contract === "currency" ? "" : `<button class="btn remove-btn" data-contract="${tokenInfo.contract}" title="Remove Token"><i class="fas fa-minus-circle" title="Remove Token"></i></button>`}
                                 </div>
                             </div>`;
                             refreshBalance(tokenInfo.contract);
@@ -95,7 +96,7 @@ function setupTokenEventListeners() {
             receiveTokenScreen(contract);
         });
         if (contract !== "currency") {
-            item.querySelector('.fas.fa-minus-circle').addEventListener('click', function() {
+            item.querySelector('.remove-btn').addEventListener('click', function() {
                 removeToken(contract);
             });
         }
