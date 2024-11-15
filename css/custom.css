@@ -670,3 +670,16 @@ a:hover{
         min-width: unset;
     }
 }
+
+
+
+.active-side-nav:before {
+    content: "";
+    display: block;
+    position: absolute;
+    height: 1.5rem;
+    width: .1875rem;
+    background: #06e6cb;
+    z-index: 10;
+    margin-left: -10px;
+}
