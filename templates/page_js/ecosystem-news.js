@@ -6,6 +6,7 @@ let redditApiUrl = 'https://www.reddit.com/r/xiannetwork.json';
     fetch(redditApiUrl)
         .then(response => response.json())
         .then(data => {
+            newsContainerElement.innerHTML = '';  // Clear the news container before adding new posts
             const posts = data.data.children;
             for (let i = 0; i < data.data.children.length; i++) {
                 const post = posts[i].data;

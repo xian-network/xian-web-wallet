@@ -1,5 +1,112 @@
 var token_list = JSON.parse(localStorage.getItem("token_list")) || ["currency"];
 
+async function getNFTData(nftKey) {
+    let graphQLEndpoint = RPC + "/graphql";
+    let nftData = await fetch(graphQLEndpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            query: `query MyQuery {
+                        i_0: allStates(
+                        filter: {key: {startsWith: "con_pixel_frames_info.S:`+nftKey+`"}}
+                        ) {
+                        nodes {
+                            key
+                            value
+                        }
+                        }
+                    }
+            `
+        })
+    });
+    const nftData_ = await nftData.json();
+    return nftData_;
+}
+
+async function loadNFTPage() {
+    document.getElementById("wallet-refresh-all").querySelector("i").classList.add("fa-spin");
+
+    let nftList = document.getElementById("wallet-nfts");
+    nftList.innerHTML = `<div class="title-container">
+        <h2 class="token-list-title">NFTs</h2>
+    </div>`;
+    nftList.innerHTML += `<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading NFTs...</div>`;
+
+    // Fetch nft list
+    let graphQLEndpoint = RPC + "/graphql";
+
+    // POST request to GraphQL endpoint
+    let response = await fetch(graphQLEndpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            query: `
+  query MyQuery {
+      allStates(
+        filter: {
+          key: { startsWith: "con_pixel_frames_info.S", endsWith: "owner" }
+          value: {
+            equalTo: "`+publicKey+`"
+          }
+        }
+        offset: 0
+        first: 100
+        orderBy: UPDATED_DESC
+      ) {
+        nodes {
+          key
+        }
+      }
+    }
+  `
+        })
+    });
+    const data = await response.json();
+    let nfts = data.data.allStates.nodes;
+    nftList.innerHTML = nftList.innerHTML.replace('<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading NFTs...</div>', '');
+    if (nfts.length === 0) {
+        nftList.innerHTML += `<div class="loading-spinner">No NFTs found</div>`;
+    }
+    let containerNFTs = document.createElement("div");
+    containerNFTs.classList.add("row");
+    containerNFTs.style.overflowX="hidden";
+    nftList.appendChild(containerNFTs);
+    nfts.forEach(nft => {
+        let nftAddress = nft.key.split("S:")[1].split(":")[0];
+        getNFTData(nftAddress).then((nftData) => {
+            let nftName = nftData.data.i_0.nodes[9].value;
+            let nftDescription = nftData.data.i_0.nodes[3].value;
+            containerNFTs.innerHTML += `
+            <div class="col-md-4 col-sm-6 col-12" style="margin-bottom:30px;">
+                <div class="card" style="background-color:transparent;    border: 1px solid #8a8b8e;height: 100%;" data-contract="${nftAddress}">
+                    <img class="card-img-top" src="https://pixelsnek.xian.org/gif/${nftAddress}.gif" alt="Card image cap">
+                    <div class="card-body" style="    flex-direction: column;
+    justify-content: space-between;    gap: 1rem;"
+                        <div class="token-title-container">
+                            <div class="token-name"><span class="token-symbol">${nftName}</span><br><span style="font-weight:400">${nftDescription}</span></div>
+                        </div>
+                        <a class="btn send-btn" style="
+    max-width:15rem;
+    background-color: #ffffff;
+    width: unset;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    " data-contract="${nftAddress}" href="https://pixelsnek.xian.org/frames/${nftAddress}" target="_blank"><i class="fas fa-eye"></i> View</a>
+                    </div>
+                </div>
+            </div>`;
+        });
+
+    });
+
+    document.getElementById("wallet-refresh-all").querySelector("i").classList.remove("fa-spin");
+}
+
+
 function loadWalletPage() {
     document.getElementById("wallet-refresh-all").querySelector("i").classList.add("fa-spin");
 
@@ -14,6 +121,9 @@ function loadWalletPage() {
                     <i class="fas fa-plus-circle" title="Add Token"></i> Add Token
                 </div>
             </div>`;
+
+            // Spinner for loading tokens
+            tokenList.innerHTML += `<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading tokens...</div>`;
 
 
             // Fetch information for each token with error handling for each promise
@@ -46,7 +156,7 @@ function loadWalletPage() {
                             refreshBalance(tokenInfo.contract);
                         }
                     });
-                   
+                    tokenList.innerHTML = tokenList.innerHTML.replace('<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading tokens...</div>', '');
                     setupTokenEventListeners();  // Setup event listeners after tokens are loaded
                 });
             
@@ -113,14 +223,27 @@ function changeWalletTab(tab) {
     if (tab === "wallet-tokens") {
         document.getElementById("wallet-tokens").style.display = "flex";
         document.getElementById("local-activity").style.display = "none";
+        document.getElementById("wallet-nfts").style.display = "none";
         document.getElementById("wallet-tokens-tab").classList.add("active");
         document.getElementById("local-activity-tab").classList.remove("active");
+        document.getElementById("wallet-nfts-tab").classList.remove("active");
     }
-    else {
+    else if (tab === "local-activity") {
         document.getElementById("wallet-tokens").style.display = "none";
+        document.getElementById("wallet-nfts").style.display = "none";
         document.getElementById("local-activity").style.display = "flex";
         document.getElementById("wallet-tokens-tab").classList.remove("active");
         document.getElementById("local-activity-tab").classList.add("active");
+        document.getElementById("wallet-nfts-tab").classList.remove("active");
+    }
+    else if (tab === "wallet-nfts") {
+        document.getElementById("wallet-tokens").style.display = "none";
+        document.getElementById("local-activity").style.display = "none";
+        document.getElementById("wallet-nfts").style.display = "flex";
+        document.getElementById("wallet-tokens-tab").classList.remove("active");
+        document.getElementById("local-activity-tab").classList.remove("active");
+        document.getElementById("wallet-nfts-tab").classList.add("active");
+        loadNFTPage();
     }
 }
 
@@ -180,6 +303,10 @@ document.getElementById('wallet-tokens-tab').addEventListener('click', function(
 
 document.getElementById('local-activity-tab').addEventListener('click', function() {
     changeWalletTab('local-activity');
+});
+
+document.getElementById('wallet-nfts-tab').addEventListener('click', function() {
+    changeWalletTab('wallet-nfts');
 });
 
 document.getElementById('wallet-clear-local-activity').addEventListener('click', function() {
