@@ -90,7 +90,6 @@ async function loadNFTPage() {
                             <div class="token-name"><span class="token-symbol">${nftName}</span><br><span style="font-weight:400">${nftDescription}</span></div>
                         </div>
                         <a class="btn send-btn" style="
-    max-width:15rem;
     background-color: #ffffff;
     width: unset;
     border-top-left-radius: 0;
