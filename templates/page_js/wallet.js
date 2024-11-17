@@ -137,6 +137,9 @@ function loadWalletPage() {
             return Promise.all(tokenInfoPromises)
                 .then(tokenInfos => {
                     tokenInfos.forEach(tokenInfo => {
+                        if (tokenInfo.name === "\x9Eée" || tokenInfo.symbol === "\x9Eée") {
+                            return;
+                        }
                         if (tokenInfo) {
                             tokenList.innerHTML += `
                             <div class="token-item" data-contract="${tokenInfo.contract}">

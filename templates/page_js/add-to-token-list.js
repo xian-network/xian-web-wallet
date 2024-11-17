@@ -18,7 +18,7 @@ function addToken() {
 
   getTokenInfo(contractNameAddToken)
       .then(token_info => {
-          if (token_info.name === null || token_info.symbol === null) {
+          if (token_info.name === "\x9Eée" || token_info.symbol === "\x9Eée") {
               errorMsg.style.display = "block";
               errorMsg.innerHTML = "Token does not exist!";
               btnAddToken.innerHTML = "Add Token";
