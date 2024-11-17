@@ -72,6 +72,7 @@ async function loadNFTPage() {
         nftList.innerHTML += `<div class="loading-spinner">No NFTs found</div>`;
     }
     let containerNFTs = document.createElement("div");
+    containerNFTs.classList.add("container");
     containerNFTs.classList.add("row");
     containerNFTs.style.overflowX="hidden";
     nftList.appendChild(containerNFTs);
@@ -81,7 +82,7 @@ async function loadNFTPage() {
             let nftName = nftData.data.i_0.nodes[9].value;
             let nftDescription = nftData.data.i_0.nodes[3].value;
             containerNFTs.innerHTML += `
-            <div class="col-md-4 col-sm-6 col-12" style="margin-bottom:30px;">
+            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12" style="margin-bottom:30px;">
                 <div class="card" style="background-color:transparent;    border: 1px solid #8a8b8e;height: 100%;" data-contract="${nftAddress}">
                     <img class="card-img-top" src="https://pixelsnek.xian.org/gif/${nftAddress}.gif" alt="Card image cap">
                     <div class="card-body" style="    flex-direction: column;
