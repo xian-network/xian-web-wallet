@@ -120,7 +120,7 @@ function loadContractFromExplorer() {
     }
 
     getContractCode(contract).then((contractCode) => {
-        if (contractCode === null) {
+        if (contractCode === null || contractCode === '' || contractCode === "\x9Eée") {
             alert('Contract not found!');
             return;
         }
