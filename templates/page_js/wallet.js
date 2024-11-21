@@ -145,7 +145,7 @@ function loadWalletPage() {
                             <div class="token-item" data-contract="${tokenInfo.contract}">
                                 <div class="token-details">
                                         <div class="token-title-container">
-                                        <img class="token-icon" src="${tokenInfo.symbol === "Xian" ? "assets/xian-white.svg" : tokenInfo.token_logo_url}" alt="${tokenInfo.symbol} Icon" onerror="this.src=placeholder.getData({text: '${tokenInfo.symbol}', bgcolor: '#333', color: '#fff', fsize: '64px', ffamily: 'Roboto Mono',size: '64x64'})">
+                                        <img class="token-icon" src="${tokenInfo.symbol === "Xian" ? "assets/xian-white.svg" : tokenInfo.token_logo_url}" alt="${tokenInfo.symbol}">
 
                                         <div class="token-name"><span class="token-symbol">${tokenInfo.symbol}</span><br><span style="font-weight:400">${tokenInfo.name}</span></div>
                                     </div>
@@ -202,6 +202,12 @@ function loadWalletPage() {
 }
 
 function setupTokenEventListeners() {
+    document.querySelectorAll('.token-icon').forEach(icon => {
+        icon.addEventListener('error', function() {
+            this.src = placeholder.getData({text: icon.alt.charAt(0).toUpperCase(),bgcolor: '#333', color: '#fff', ffamily: 'Roboto Mono',size: '64x64'})
+        });
+    });
+
     document.querySelectorAll('.token-item').forEach(item => {
         const contract = item.getAttribute('data-contract');
         item.querySelector('.send-btn').addEventListener('click', function() {
