@@ -172,6 +172,11 @@ a:hover{
     padding: 20px;
 }
 
+.token-icon {
+    width: 32px; /* Adjust based on your icon's size */
+    height: auto;
+}
+
 .wrap-app{
     display: flex; max-width: 100%;width: 100%;align-self: stretch;
 }
@@ -283,6 +288,7 @@ a:hover{
     align-items: center; /* Align items vertically */
     position: relative; /* Needed to position the cogwheel icon */
     margin-top: 0px !important;
+    gap: 1rem;
 }
 
 .token-title-container > .cogwheel-icon{

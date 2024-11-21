@@ -251,6 +251,17 @@ async function getTokenInfo(contract) {
           }
       }
 
+      const imgResponse = await fetch(RPC + '/abci_query?path="/get/' + contract + '.metadata:token_logo_url"');
+      if (imgResponse.status === 200) {
+          const imgData = await imgResponse.json();
+          if (imgData.result.response.value === "AA==") {
+              tokenInfo["token_logo_url"] = null;
+          } else {
+              let tokenImg = atob(imgData.result.response.value);
+              tokenInfo["token_logo_url"] = await sanitizeHTML(tokenImg);
+          }
+      }
+
       return tokenInfo;
   } catch (error) {
       console.error("Error retrieving token info:", error);
