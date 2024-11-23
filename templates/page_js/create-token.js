@@ -7,7 +7,7 @@ metadata = Hash()
 
 @construct
 def seed():
-    balances[ctx.caller] = TOTAL_SUPPLY
+    balances[ctx.caller] = 12345321
 
     metadata['token_name'] = "TOKEN_NAME"
     metadata['token_symbol'] = "TOKEN_SYMBOL"
@@ -76,32 +76,13 @@ document.getElementById("btn-create-token-cancel").addEventListener("click", fun
 });
 
 document.getElementById("NameCreateToken").addEventListener("input", function() {
-    tokenContract = tokenContract.replace("TOKEN_NAME", document.getElementById("NameCreateToken").value);
-    document.getElementById("ContractNameCreateToken").value = "con_" + document.getElementById("NameCreateToken").value.replace(" ", "_").toLowerCase();
+    
+    document.getElementById("ContractNameCreateToken").value = "con_" + document.getElementById("NameCreateToken").value.replaceAll(" ", "_").toLowerCase();
 });
 
-document.getElementById("SymbolCreateToken").addEventListener("input", function() {
-    tokenContract = tokenContract.replace("TOKEN_SYMBOL", document.getElementById("SymbolCreateToken").value);
-});
 
-document.getElementById("SupplyCreateToken").addEventListener("input", function() {
-    tokenContract = tokenContract.replace("TOTAL_SUPPLY", document.getElementById("SupplyCreateToken").value);
-});
 
-document.getElementById("LogoCreateToken").addEventListener("input", function() {
-    tokenContract = tokenContract.replace("TOKEN_LOGO_URL", document.getElementById("LogoCreateToken").value);
-});
-
-document.getElementById("WebsiteCreateToken").addEventListener("input", function() {
-    tokenContract = tokenContract.replace("TOKEN_WEBSITE", document.getElementById("WebsiteCreateToken").value);
-});
-
-document.getElementById("WebsiteCreateToken").addEventListener("input", debounce(estimateSendStamps, 500));
-document.getElementById("SupplyCreateToken").addEventListener("input", debounce(estimateSendStamps, 500));
-document.getElementById("SymbolCreateToken").addEventListener("input", debounce(estimateSendStamps, 500));
 document.getElementById("NameCreateToken").addEventListener("input", debounce(estimateSendStamps, 500));
-document.getElementById("LogoCreateToken").addEventListener("input", debounce(estimateSendStamps, 500));
-document.getElementById("ContractNameCreateToken").addEventListener("input", debounce(estimateSendStamps, 500));
 
 async function estimateSendStamps(){
     let estimation_loading = document.getElementById('estimation-loading');
@@ -150,6 +131,12 @@ async function estimateSendStamps(){
 }
 
 document.getElementById("btn-create-token-create").addEventListener("click", async function() {
+    tokenContract = tokenContract.replace("TOKEN_NAME", document.getElementById("NameCreateToken").value);
+    tokenContract = tokenContract.replace("TOKEN_SYMBOL", document.getElementById("SymbolCreateToken").value);
+    tokenContract = tokenContract.replace("12345321", document.getElementById("SupplyCreateToken").value);
+    tokenContract = tokenContract.replace("TOKEN_LOGO_URL", document.getElementById("LogoCreateToken").value);
+    tokenContract = tokenContract.replace("TOKEN_WEBSITE", document.getElementById("WebsiteCreateToken").value);
+    await estimateSendStamps();
     let createTokenError = document.getElementById("createTokenError");
     let createTokenSuccess = document.getElementById("createTokenSuccess");
     let createTokenBtn = document.getElementById("btn-create-token-create");
