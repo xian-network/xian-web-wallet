@@ -115,6 +115,10 @@ function loadWalletPage() {
             document.getElementById("walletAddress").innerHTML = publicKey;
             let tokenList = document.getElementById("wallet-tokens");
             tokenList.innerHTML = `<div class="title-container">
+
+                <div class="create-token-link" style="font-size:1rem">
+                    <i class="fas fa-coins" title="Create Token"></i> Create Token
+                </div>
                 <h2 class="token-list-title">Tokens</h2>
                 <div class="cogwheel-icon add-token-link" style="font-size:1rem">
                     <i class="fas fa-plus-circle" title="Add Token"></i> Add Token
@@ -226,6 +230,11 @@ function setupTokenEventListeners() {
     document.querySelector('.add-token-link').addEventListener('click', function() {
         changePage('add-to-token-list');
     });
+
+    document.querySelector('.create-token-link').addEventListener('click', function() {
+        changePage('create-token');
+    });
+    
 }
 
 

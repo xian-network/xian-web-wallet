@@ -1,0 +1,43 @@
+<h1 class="app-box-title">Create Token</h1>
+<p class="app-box-description">Create a fungible token on the blockchain.</p>
+<div class="app-box-form">
+    <div class="alert alert-danger" role="alert" id="createTokenError" style="display: none;"></div>
+    <div class="alert alert-success" role="alert" id="createTokenSuccess" style="display: none;"></div>
+    <div class="form-group">
+        <label for="NameCreateToken">Token Name (*)</label>
+        <input type="text" class="form-control" id="NameCreateToken" placeholder="Enter the token name" required>
+    </div>
+    <div class="form-group">
+        <label for="SymbolCreateToken">Token Symbol (*)</label>
+        <input type="text" class="form-control" id="SymbolCreateToken" placeholder="Enter the token symbol" required>
+    </div>
+    <div class="form-group">
+        <label for="SupplyCreateToken">Token Supply (*)</label>
+        <input type="number" class="form-control" id="SupplyCreateToken" placeholder="Enter the token supply" required>
+    </div>
+    <div class="form-group">
+        <label for="LogoCreateToken">Token Logo URL</label>
+        <input type="text" class="form-control" id="LogoCreateToken" placeholder="Enter the token logo URL">
+    </div>
+    <div class="form-group">
+        <label for="WebsiteCreateToken">Token Website URL</label>
+        <input type="text" class="form-control" id="WebsiteCreateToken" placeholder="Enter the token website URL">
+    </div>
+    <div class="form-group">
+        <label for="ContractNameCreateToken">Token Contract Name (*)</label>
+        <input type="text" class="form-control" id="ContractNameCreateToken" placeholder="con_tokenname" required>
+    </div>
+    <div class="form-group">
+    <small id="emailHelp" class="form-text text-muted">(*) Required fields</small>
+    </div>
+    <div class="form-group" id="tokenFeeContainer" style="display: none;">
+        <label for="transactionFee">Transaction Fee: 
+             <span id="estimation-loading">Calculating..</span>
+            <span id="estimation-result" style="display:none"><span id="tokenFee"></span> Stamps (<span id="tokenFeeXian"></span> Xian)</label></span>
+    </div>
+    <div class="btn-group">
+        <button class="btn btn-primary" id="btn-create-token-create">Create Token</button>
+        <button class="btn btn-secondary" id="btn-create-token-cancel">Cancel</button>
+    </div>
+</div>
+<script src="templates/page_js/create-token.js"></script>

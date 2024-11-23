@@ -249,6 +249,9 @@ function changePage(page, some_data = null, send_response = null) {
     case "ecosystem-news":
       loadHtmlAndScripts("templates/ecosystem-news.html");
       break;
+    case "create-token":
+      loadHtmlAndScripts("templates/create-token.html");
+      break;
     default:
       break;
   }

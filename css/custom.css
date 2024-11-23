@@ -596,7 +596,14 @@ a:hover{
     text-align: center;
 }
 
-
+.create-token-link{
+    position: absolute;
+    left: 0;
+    font-size: 1.25rem;
+    margin-bottom: 20px;
+    cursor: pointer;
+    color: #06e6cb;
+}
 
 .token-name span, .token-symbol span, .token-balance span {
     font-weight: bold;
@@ -670,6 +677,10 @@ a:hover{
     justify-content: flex-end;
 }
 @media screen and (max-width: 420px) {
+    .create-token-link{
+        display: none;
+    }
+    
     .btn-group
     {
         width: 100%!important;
