@@ -720,3 +720,27 @@ a:hover{
     z-index: 10;
     margin-left: -10px;
 }
+
+.wallet-info-card{
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    border: 1px solid #8a8b8e;
+    overflow: auto;
+    width: 100%;
+    max-width: fit-content;
+}
+
+.wallet-info-title{
+    position: absolute;
+    margin-top: -32.5px;
+    background: #202020;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.wallet-info-address{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}

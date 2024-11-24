@@ -3,8 +3,14 @@
 </div>
 <p class="app-box-description">This is your Xian Wallet. You can use it to send and receive tokens on the Xian Network.</p>
 <div class="app-box-form" style="display: flex;flex-direction: column;height:100%">
-    <div id="wallet-info">
-        <span class="app-box-form-title"><b>Wallet Address:</b> <span id="walletAddress"></span></span>
+    <div id="wallet-info" class="wallet-info-card">
+        <div class="wallet-info-title">
+            <b>Wallet Address:</b> 
+        </div>
+        <div class="wallet-info-address">
+            <span id="walletAddress"></span>
+            <a href="#" id="wallet-copy-address" title="Copy Address"><i class="far fa-copy"></i></a>
+        </div>
     </div>
     <div class="wallet-tabs">
         <a href="#" id="wallet-tokens-tab" id="wallet-change-tab-wallet-tokens" class="active">Tokens</a>

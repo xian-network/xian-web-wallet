@@ -340,6 +340,12 @@ document.getElementById('walletAddress').addEventListener('click', function() {
     copyToClipboard('walletAddress');
 });
 
+
+document.getElementById('wallet-copy-address').addEventListener('click', function() {
+    copyToClipboard('walletAddress');
+});
+
+
 document.getElementById('wallet-send-adv-tx').addEventListener('click', function() {
     changePage('send-advanced-transaction');
 });
