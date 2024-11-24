@@ -680,10 +680,7 @@ a:hover{
 }
 .token-name{overflow: hidden;
     text-overflow: ellipsis;}
-@media screen and (max-width: 420px) {
-    .create-token-link{
-        display: none;
-    }
+@media screen and (max-width: 450px) {
     
     .btn-group
     {
@@ -691,6 +688,7 @@ a:hover{
     }
     #wallet-tokens>.title-container{
         justify-content: space-between;
+        flex-direction: column;
     }
     #wallet-adv-btns{
         flex-wrap: wrap;
@@ -705,6 +703,10 @@ a:hover{
     }
     .label-gov{
         min-width: unset;
+    }
+    .create-token-link{
+        align-self: start;
+        position: relative;
     }
 }
 
