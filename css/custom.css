@@ -312,6 +312,7 @@ a:hover{
 .token-item div {
     margin: 5px 0;
 }
+.token-details{width: unset!important;}
 }
 @media (min-width: 768px) {
     button {
@@ -326,6 +327,7 @@ a:hover{
     .remove-btn{
         padding: 10px;
     }
+    
 }
 
 .kwarg-group{
