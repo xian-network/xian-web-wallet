@@ -150,8 +150,7 @@ function loadWalletPage() {
                                 <div class="token-details">
                                         <div class="token-title-container">
                                         <img class="token-icon" src="${tokenInfo.symbol === "Xian" ? "assets/xian-white.svg" : tokenInfo.token_logo_url}" alt="${tokenInfo.symbol}">
-
-                                        <div class="token-name"><span class="token-symbol">${tokenInfo.symbol}</span><br><span style="font-weight:400">${tokenInfo.name}</span></div>
+                                        <div class="token-name"><span class="token-symbol">${tokenInfo.symbol}</span><br><a style="font-weight:400" target="_blank" href="https://explorer.xian.org/contracts/${tokenInfo.contract}">${tokenInfo.name}</a></div>
                                     </div>
                                 </div>
                                 <div class="token-balance"><span id="${tokenInfo.contract}Balance">0</span>&nbsp;<span>${tokenInfo.symbol}</span></div>

@@ -676,6 +676,8 @@ a:hover{
     display: flex;
     justify-content: flex-end;
 }
+.token-name{overflow: hidden;
+    text-overflow: ellipsis;}
 @media screen and (max-width: 420px) {
     .create-token-link{
         display: none;
