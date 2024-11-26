@@ -24,4 +24,10 @@ window.addEventListener("message", (event) => {
       callbackKey = event.data.callbackKey;
       document.getElementById("requestSignatureMessage").innerHTML = some_data["data"]["message"];
     }
+    if (event.data.type === "REQUEST_VERIFICATION") {
+      const some_data = event.data.data;
+      callbackKey = event.data.callbackKey;
+      document.getElementById("requestVerificationMessage").innerHTML = some_data["data"]["message"];
+      document.getElementById("requestVerificationSignature").innerHTML = some_data["data"]["signature"];
+    }
   });
