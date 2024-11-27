@@ -91,11 +91,28 @@ function getRewardPercentages() {
     getVariable("rewards", "S", "value")
     .then(reward_percentages => {
         reward_percentages = JSON.parse(reward_percentages);
-       
-        document.getElementById("transaction-rewards-validators-governance").innerHTML = parseFloat(reward_percentages[0]["__fixed__"] *100);
-        document.getElementById("transaction-rewards-burn-governance").innerHTML = parseFloat(reward_percentages[1]["__fixed__"] * 100);
-        document.getElementById("transaction-rewards-foundation-governance").innerHTML = parseFloat(reward_percentages[2]["__fixed__"] * 100);
-        document.getElementById("transaction-rewards-developers-governance").innerHTML = parseFloat(reward_percentages[3]["__fixed__"] * 100);
+        // if __fixed__ is present, it means the value is a fixed point number
+        if (reward_percentages[0].hasOwnProperty("__fixed__")) {
+            document.getElementById("transaction-rewards-validators-governance").innerHTML = parseFloat(reward_percentages[0]["__fixed__"] * 100);
+        } else {
+            document.getElementById("transaction-rewards-validators-governance").innerHTML = parseFloat(reward_percentages[0] * 100);
+        }
+        if (reward_percentages[1].hasOwnProperty("__fixed__")) {
+            document.getElementById("transaction-rewards-burn-governance").innerHTML = parseFloat(reward_percentages[1]["__fixed__"] * 100);
+        } else {
+            document.getElementById("transaction-rewards-burn-governance").innerHTML = parseFloat(reward_percentages[1] * 100);
+        }
+        if (reward_percentages[2].hasOwnProperty("__fixed__")) {
+            document.getElementById("transaction-rewards-foundation-governance").innerHTML = parseFloat(reward_percentages[2]["__fixed__"] * 100);
+        }
+        else {
+            document.getElementById("transaction-rewards-foundation-governance").innerHTML = parseFloat(reward_percentages[2] * 100);
+        }
+        if (reward_percentages[3].hasOwnProperty("__fixed__")) {
+            document.getElementById("transaction-rewards-developers-governance").innerHTML = parseFloat(reward_percentages[3]["__fixed__"] * 100);
+        } else {
+            document.getElementById("transaction-rewards-developers-governance").innerHTML = parseFloat(reward_percentages[3] * 100);
+        }
     })
     .catch(error => {
         console.error("Error getting reward percentages:", error);

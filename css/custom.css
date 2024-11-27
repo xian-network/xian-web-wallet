@@ -378,7 +378,6 @@ a:hover{
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    margin-right: 5px;
     background-color: #28bdaa;
 }
 .toast.bg-success{
@@ -390,18 +389,19 @@ a:hover{
 .toast.bg-danger{
     color: #721c24!important;
 }
+.mt-1px{
+    margin-top: 1px;
+}
 .offline-circle {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    margin-right: 5px;
     background-color: #dc3545;
 }
 .grey-circle {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    margin-right: 5px;
     background-color: #6c757d;
 }
 .navbar {

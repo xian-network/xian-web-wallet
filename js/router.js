@@ -290,13 +290,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
   ping().then(online_status => {
         
         if (!online_status) {
-            online_status_element.innerHTML = "Node Status <div class='offline-circle' title='Node is Offline'></div>"
+            online_status_element.innerHTML = "<div class='mt-1px'><div class='offline-circle' title='Node is Offline'></div></div> <div>" + RPC.replace("https://", "").replace("http://", "") + "</div>";
         }
         else {
-            online_status_element.innerHTML = "Node Status <div class='online-circle' title='Node is Online'></div>"
+            online_status_element.innerHTML = "<div class='mt-1px'><div class='online-circle' title='Node is Online'></div></div> <div>" + RPC.replace("https://", "").replace("http://", "") + "</div>";
         }
-    }).catch(error => {
-        online_status_element.innerHTML = "Node Status <div class='offline-circle' title='Node is Offline'></div>"
+        }).catch(error => {
+        online_status_element.innerHTML = "<div class='mt-1px'><div class='offline-circle' title='Node is Offline'></div></div> <div>" + RPC.replace("https://", "").replace("http://", "") + "</div>";
     });
 
     getChainID().then(chain_id => {

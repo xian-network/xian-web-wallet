@@ -49,13 +49,13 @@ function saveSettings() {
     ping().then(online_status => {
         
         if (!online_status) {
-            online_status_element.innerHTML = "Node Status <div class='offline-circle' title='Node is Offline'></div>"
+            online_status_element.innerHTML = "<div class='mt-1px'><div class='offline-circle' title='Node is Offline'></div></div> <div>" + RPC.replace("https://", "").replace("http://", "") + "</div>";
         }
         else {
-            online_status_element.innerHTML = "Node Status <div class='online-circle' title='Node is Online'></div>"
+            online_status_element.innerHTML = "<div class='mt-1px'><div class='online-circle' title='Node is Online'></div></div> <div>" + RPC.replace("https://", "").replace("http://", "") + "</div>";
         }
     }).catch(error => {
-        online_status_element.innerHTML = "Node Status <div class='offline-circle' title='Node is Offline'></div>"
+        online_status_element.innerHTML = "<div class='mt-1px'><div class='offline-circle' title='Node is Offline'></div></div> <div>" + RPC.replace("https://", "").replace("http://", "") + "</div>";
     });
 
     getChainID().then(chain_id => {
@@ -177,6 +177,23 @@ function removeCustomRPC() {
     
 }
 
+function readTextFile(file) {
+
+    var rawFile = new XMLHttpRequest();
+    var allText = null;
+
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function () {
+        if(rawFile.readyState === 4) {
+            if(rawFile.status === 200 || rawFile.status == 0) {
+                allText = rawFile.responseText;
+            }
+        }
+    }
+    rawFile.send(null);
+    return allText;
+}
+
 function loadSettingsPage() {
     // Load the custom RPCs from local storage and add them to the select element
     if (customRPCs.length > 0) {
@@ -191,6 +208,10 @@ function loadSettingsPage() {
 
     // Get the rpc from local storage and find the select element with the value and set it to selected
     document.querySelector('#rpc_select').value = RPC;
+
+    // Get the wallet version from the manifest file (two directories up) and set it in the settings page
+    let manifest = JSON.parse(readTextFile('../../manifest.json'));
+    document.getElementById('version').innerHTML = manifest.version;
     
 }
 
