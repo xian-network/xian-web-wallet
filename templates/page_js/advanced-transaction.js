@@ -97,7 +97,7 @@ function sendAdvTx() {
                         error.style.display = 'block';
                         return;
                     } else {
-                        success.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/" + hash + "' target='_blank'>" + hash + "</a>"
+                        success.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a class='explorer-url' href='"+EXPLORER+"/tx/" + hash + "' target='_blank'>" + hash + "</a>"
                         success.style.display = 'block';
                     }
                 }).catch(error_ => {

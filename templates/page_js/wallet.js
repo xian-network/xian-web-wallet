@@ -150,7 +150,7 @@ function loadWalletPage() {
                                 <div class="token-details">
                                         <div class="token-title-container">
                                         <img class="token-icon" src="${tokenInfo.symbol === "Xian" ? "assets/xian-white.svg" : tokenInfo.token_logo_url}" alt="${tokenInfo.symbol}">
-                                        <div class="token-name"><span class="token-symbol">${tokenInfo.symbol}</span><br><a style="font-weight:400" target="_blank" href="https://explorer.xian.org/contracts/${tokenInfo.contract}">${tokenInfo.name}</a></div>
+                                        <div class="token-name"><span class="token-symbol">${tokenInfo.symbol}</span><br><a style="font-weight:400" target="_blank" href="`+EXPLORER+`/contracts/${tokenInfo.contract}">${tokenInfo.name}</a></div>
                                     </div>
                                 </div>
                                 <div class="token-balance"><span id="${tokenInfo.contract}Balance">0</span>&nbsp;<span>${tokenInfo.symbol}</span></div>
@@ -186,7 +186,7 @@ function loadWalletPage() {
                         <div class="activity-timestamp">`+tx["timestamp"]+`</div>
                     </div>
                     <div class="activity-actions">
-                        <a href="https://explorer.xian.org/tx/`+tx["hash"]+`" target="_blank"><i class="fas fa-eye"></i> View</a>
+                        <a href="`+EXPLORER+`/tx/`+tx["hash"]+`" target="_blank"><i class="fas fa-eye"></i> View</a>
                     </div>
                 </div>`;
             });

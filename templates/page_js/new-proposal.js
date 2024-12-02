@@ -75,7 +75,7 @@ function sendProposal() {
                     return;
                 }
 
-                successMsg.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a class='explorer-url' href='https://explorer.xian.org/tx/"+hash+"' target='_blank'>"+hash+"</a>";
+                successMsg.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a class='explorer-url' href='"+EXPLORER+"/tx/"+hash+"' target='_blank'>"+hash+"</a>";
                 successMsg.style.display = 'block';
             });
         });

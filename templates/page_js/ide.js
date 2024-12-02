@@ -444,7 +444,7 @@ function buildFunctionBoxes() {
                         } else {
                             success.innerHTML =
                                 "Transaction sent successfully! Explorer: " +
-                                "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
+                                "<a class='explorer-url' href='"+EXPLORER+"/tx/" +
                                 hash +
                                 "' target='_blank'>" +
                                 hash +
@@ -546,7 +546,7 @@ function submitContract() {
             } else {
                 contractSuccess.innerHTML =
                     "Transaction sent successfully! Explorer: " +
-                    "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
+                    "<a class='explorer-url' href='"+EXPLORER+"/tx/" +
                     hash +
                     "' target='_blank'>" +
                     hash +

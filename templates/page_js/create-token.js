@@ -187,7 +187,7 @@ document.getElementById("btn-create-token-create").addEventListener("click", asy
             } else {
                 createTokenSuccess.innerHTML =
                     "Token created successfully! Explorer: " +
-                    "<a class='explorer-url' href='https://explorer.xian.org/tx/" +
+                    "<a class='explorer-url' href='"+EXPLORER+"/tx/" +
                     hash +
                     "' target='_blank'>" +
                     hash +

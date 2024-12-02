@@ -21,7 +21,7 @@ function saveSettings() {
     settingsSuccess.style.display = 'none';
     settingsError.style.display = 'none';
 
-    let rpc = document.getElementById('rpc_select').value;
+    let rpc = document.getElementById('rpc_select').value.split(',')[0];
     if (rpc === "") {
         settingsError.style.display = 'block';
         settingsError.innerHTML = 'All fields are required!';
@@ -41,7 +41,8 @@ function saveSettings() {
         return;
     }
 
-
+    let explorer = document.getElementById('rpc_select').value.split(',')[1];
+    localStorage.setItem("explorer", explorer);
     localStorage.setItem("rpc", rpc);
     RPC = rpc;
     let online_status_element = document.getElementById("onlineStatus");
@@ -122,8 +123,17 @@ function addCustomRPC() {
     settingsSuccess.style.display = 'none';
     settingsError.style.display = 'none';
     let customrpc_input = document.getElementById('add_rpc_input');
+    let explorer_input = document.getElementById('add_explorer_input');
     let rpc = customrpc_input.value;
+    let explorer = explorer_input.value;
     if (rpc === "") {
+        settingsError.style.display = 'block';
+        settingsError.innerHTML = 'RPC field is required!';
+        return;
+    }
+    if (explorer === "") {
+        settingsError.style.display = 'block';
+        settingsError.innerHTML = 'Explorer field is required!';
         return;
     }
 
@@ -140,11 +150,25 @@ function addCustomRPC() {
         return;
     }
 
-    customRPCs.push(rpc);
+    if (!explorer.startsWith('http')) {
+        settingsError.style.display = 'block';
+        settingsError.innerHTML = 'Explorer must start with http or https';
+        return;
+    }
+
+    if (explorer.endsWith('/')) {
+        settingsError.style.display = 'block';
+        settingsError.innerHTML = 'Explorer must not end with a slash';
+        return;
+    }
+
+    customRPCs.push([rpc, explorer]);
     localStorage.setItem('customRPCs', JSON.stringify(customRPCs));
     customrpc_input.value = '';
+    explorer_input.value = '';
     document.getElementById('rpc_select').value = rpc;
     RPC = rpc;
+    EXPLORER = explorer;
     loadSettingsPage();
     saveSettings();
     
@@ -157,7 +181,7 @@ function removeCustomRPC() {
     let rpc = rpc_select.value;
     let found = false;
     customRPCs.forEach((customRPC, index) => {
-        if (customRPC === rpc) {
+        if (customRPC[0] === rpc) {
             customRPCs.splice(index, 1);
             rpc_select.remove(rpc_select.selectedIndex);
             found = true;
@@ -171,6 +195,7 @@ function removeCustomRPC() {
 
     localStorage.setItem('customRPCs', JSON.stringify(customRPCs));
     RPC = document.getElementById('rpc_select').children[0].value;
+    EXPLORER = customRPCs[0][1];
     document.getElementById('rpc_select').value = RPC;
     loadSettingsPage();
     saveSettings();
@@ -200,14 +225,14 @@ function loadSettingsPage() {
         let rpc_select = document.getElementById('rpc_select');
         customRPCs.forEach(rpc => {
             let option = document.createElement('option');
-            option.text = rpc;
-            option.value = rpc;
+            option.text = rpc[0];
+            option.value = rpc[0] + ',' + rpc[1];
             rpc_select.add(option);
         });
     }
 
     // Get the rpc from local storage and find the select element with the value and set it to selected
-    document.querySelector('#rpc_select').value = RPC;
+    document.querySelector('#rpc_select').value = RPC + ',' + EXPLORER;
 
     // Get the wallet version from the manifest file (two directories up) and set it in the settings page
     let manifest = JSON.parse(readTextFile('../../manifest.json'));

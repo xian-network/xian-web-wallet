@@ -36,7 +36,7 @@ function acceptRequest() {
             }
             else {
                 window.opener.postMessage({type: 'REQUEST_TRANSACTION', data: {status: 'sent', txid: hash},callbackKey: callbackKey}, '*');
-                toast('success', 'Transaction sent: <a class="text-light" style=" text-overflow: ellipsis; width: 5rem; overflow: hidden; text-decoration: underline;margin-left: 0.25rem; " href="https://explorer.xian.org/tx/' + hash + '" target="_blank">' + hash + '</a>');
+                toast('success', 'Transaction sent: <a class="text-light" style=" text-overflow: ellipsis; width: 5rem; overflow: hidden; text-decoration: underline;margin-left: 0.25rem; " href="'+EXPLORER+'/tx/' + hash + '" target="_blank">' + hash + '</a>');
                 window.close();
             }
         }).catch((error) => {

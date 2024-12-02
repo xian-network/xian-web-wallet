@@ -1,4 +1,5 @@
 var RPC = localStorage.getItem("rpc") || "https://node.xian.org";
+var EXPLORER = localStorage.getItem("explorer") || "https://explorer.xian.org";
 var CHAIN_ID = null;
 function toHexString(byteArray) {
     return Array.from(byteArray, function(byte) {

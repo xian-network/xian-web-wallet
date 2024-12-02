@@ -11,8 +11,8 @@
         <!-- Dropdown to select existing RPC URLs -->
         <div class="input-group mb-2">
             <select class="form-control" id="rpc_select">
-                <option value="https://node.xian.org">RPC 1 - Mainnet</option>
-                <option value="https://testnet.xian.org">RPC 2 - Testnet</option>
+                <option value="https://node.xian.org,https://explorer.xian.org">RPC 1 - Mainnet</option>
+                <option value="https://testnet.xian.org,https://testnet-explorer.xian.org">RPC 2 - Testnet</option>
             </select>
             <!-- Button to remove selected RPC -->
             <div class="input-group-append">
@@ -21,12 +21,15 @@
         </div>
 
         <!-- Input to add a new RPC URL -->
-        <div class="input-group">
+        <div class="input-group mb-2">
             <input type="text" class="form-control" id="add_rpc_input" placeholder="Enter new RPC URL">
             <!-- Button to add the new RPC URL -->
             <div class="input-group-append">
                 <button class="btn btn-secondary" id="add_rpc_button"><i class="fas fa-plus"></i></button>
             </div>
+        </div>
+        <div class="input-group">
+            <input type="text" class="form-control" id="add_explorer_input" placeholder="Enter new Explorer URL">
         </div>
     </div>
     
