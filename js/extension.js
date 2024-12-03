@@ -52,6 +52,25 @@ if (runningAsExtension()) {
             createExternalWindow('request-signature', message, sendResponse);
             
         }
+        if (message.type === 'dAppVerifySignature') {
+            // We expect the message to be a string that cannot be parsed as JSON
+            if (isUnsafe(message.data.message)) {
+                sendResponse({errors: ['Invalid message']});
+                return;
+            }
+            
+            if (isUnsafe(message.data.signature)) {
+                sendResponse({errors: ['Invalid message']});
+                return;
+            }
+
+            if (locked) {
+                sendResponse({errors: ['Wallet is locked']});
+                return;
+            }
+            createExternalWindow('request-verification', message, sendResponse);
+            
+        }
 
         return true;
     });

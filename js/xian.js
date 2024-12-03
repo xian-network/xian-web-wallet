@@ -329,3 +329,14 @@ async function signMessage(message, privateKey) {
     let signature = nacl.sign.detached(messageUint8Array, combinedKey);
     return toHexString(signature);
 }
+
+async function verifySignature(message, signature) {
+    publicKey = await readSecureCookie("publicKey");
+    const publicKeyUint8Array = fromHexString(publicKey);
+    const signatureUint8Array = fromHexString(signature);
+
+    // Use nacl.sign.detached.verify to verify
+    
+    const messageUint8Array = new TextEncoder().encode(message);
+    return nacl.sign.detached.verify(messageUint8Array, signatureUint8Array, publicKeyUint8Array);
+}

@@ -57,8 +57,14 @@ function createExternalWindow(page, some_data = null, send_response = null) {
   const sendPageSpecificMessage = (page, some_data) => {
     const callbackKey = 'callback_' + (callbackId++);
     callbacks[callbackKey] = send_response;
+    const requests = {
+      "request-transaction" : "REQUEST_TRANSACTION",
+      "request-signature" : "REQUEST_SIGNATURE",
+      "request-verification": "REQUEST_VERIFICATION"
+    }
+    
     externalWindow.postMessage({
-      type: page === "request-transaction" ? "REQUEST_TRANSACTION" : "REQUEST_SIGNATURE",
+      type: requests[page],
       data: JSON.parse(JSON.stringify(some_data)),
       callbackKey: callbackKey
     }, "*");
@@ -70,6 +76,9 @@ function createExternalWindow(page, some_data = null, send_response = null) {
       break;
     case "request-signature":
       loadHtmlAndScripts("templates/request-signature.html");
+      break;
+    case "request-verification":
+      loadHtmlAndScripts("templates/request-verification.html");
       break;
     default:
       break;
@@ -88,10 +97,20 @@ window.addEventListener("message", (event) => {
   }
   }
   if (event.data.type === "REQUEST_SIGNATURE") {
-    const some_data = event.data.data;
     const callbackKey = event.data.callbackKey;
-    callbacks[callbackKey](event.data.data);
-    toast('success', 'Successfully signed message');
+    if(callbacks[callbackKey]){
+      callbacks[callbackKey](event.data.data);
+      toast('success', 'Successfully verified signature');
+    }
+  }
+  if (event.data.type === "REQUEST_VERIFICATION") {
+    const callbackKey = event.data.callbackKey;
+    console.log({callbackKey});
+    if(callbacks[callbackKey]){
+      callbacks[callbackKey](event.data.data);
+      toast('success', 'Successfully verified signature');
+    }
+      
   }
 });
 
@@ -160,6 +179,11 @@ function changePage(page, some_data = null, send_response = null) {
         }
         else if(page === "request-signature"){
           document.getElementById("requestSignatureMessage").innerHTML = some_data["data"]["message"];
+          sendResponse = send_response;
+        }
+        else if(page === "request-verification"){
+          document.getElementById("requestVerificationMessage").innerHTML = some_data["data"]["message"];
+          document.getElementById("requestVerificationSignature").innerHTML = some_data["data"]["signature"];
           sendResponse = send_response;
         }
         else if (page === "password-input" || page === "create-wallet" || page === "import-wallet" || page === "get-started") {
@@ -245,6 +269,9 @@ function changePage(page, some_data = null, send_response = null) {
       break;
     case "request-signature":
       loadHtmlAndScripts("templates/request-signature.html");
+      break;
+    case "request-verification":
+      loadHtmlAndScripts("templates/request-verification.html");
       break;
     case "ecosystem-news":
       loadHtmlAndScripts("templates/ecosystem-news.html");
