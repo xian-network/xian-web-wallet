@@ -179,9 +179,10 @@ function removeCustomRPC() {
     settingsSuccess.style.display = 'none';
     settingsError.style.display = 'none';
     let rpc_select = document.getElementById('rpc_select');
-    let rpc = rpc_select.value;
+    let rpc = rpc_select.value.split(',')[0];
     let found = false;
     customRPCs.forEach((customRPC, index) => {
+        console.log(customRPC[0]);
         if (customRPC[0] === rpc) {
             customRPCs.splice(index, 1);
             rpc_select.remove(rpc_select.selectedIndex);
@@ -195,9 +196,9 @@ function removeCustomRPC() {
     }
 
     localStorage.setItem('customRPCs', JSON.stringify(customRPCs));
-    RPC = document.getElementById('rpc_select').children[0].value;
-    EXPLORER = customRPCs[0][1];
-    document.getElementById('rpc_select').value = RPC;
+    RPC = document.getElementById('rpc_select').children[0].value.split(',')[0];
+    EXPLORER = document.getElementById('rpc_select').children[0].value.split(',')[1];
+    document.getElementById('rpc_select').value = RPC + ',' + EXPLORER;
     loadSettingsPage();
     saveSettings();
     
