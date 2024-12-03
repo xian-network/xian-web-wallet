@@ -45,6 +45,7 @@ function saveSettings() {
     localStorage.setItem("explorer", explorer);
     localStorage.setItem("rpc", rpc);
     RPC = rpc;
+    EXPLORER = explorer;
     let online_status_element = document.getElementById("onlineStatus");
 
     ping().then(online_status => {
