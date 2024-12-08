@@ -296,7 +296,7 @@ async function estimateSendStamps(message_receiver, message_input) {
             document.getElementById('tokenFee').innerHTML = 0;
             return;
         }
-        stamps = stamps;
+        stamps = stamps + 20;
         document.getElementById('tokenFeeXian').innerHTML = stamps / stamp_rate;
         document.getElementById('tokenFee').innerHTML = stamps;
     } catch (error) {
