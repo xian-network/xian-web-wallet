@@ -768,7 +768,7 @@ a:hover{
     justify-content: space-between;
     align-items: center;
 }
-.messenger-inbox-header h3{
+.messenger-inbox-header h5{
     margin-bottom: 0;
 }
 
@@ -853,7 +853,7 @@ a:hover{
     border-bottom: 1px solid #8a8b8e;
 }
 
-.messenger-chat-header h3{
+.messenger-chat-header h5{
     text-overflow: ellipsis;
     overflow: hidden;
     width: 100%;
