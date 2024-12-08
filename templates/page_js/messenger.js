@@ -243,7 +243,7 @@ function switchChat(address_chat) {
         }
 
         message_content.classList.add('messenger-chat-item-content');
-        message_text.innerText = message.message;
+        message_text.innerText = sanitizeHTML(message.message);
         message_timestamp.innerText = new Date(message.timestamp).toLocaleString();
         if (message.sender === publicKey) {
             message_timestamp.innerText += ' (You)';
