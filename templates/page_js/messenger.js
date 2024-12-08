@@ -496,6 +496,9 @@ function renderInbox(groupedMessages) {
     const inbox_body = document.querySelector('.messenger-inbox-body');
     inbox_body.innerHTML = ''; // Clear existing inbox items
 
+    // Reverse the order of messages to show the most recent first
+    groupedMessages.reverse();
+
     groupedMessages.forEach(group => {
         // Create the inbox item container
         const inbox_item = document.createElement('div');
