@@ -507,7 +507,14 @@ function renderInbox(groupedMessages) {
 
         // Add the last message preview
         const inbox_item_last_message = document.createElement('p');
-        inbox_item_last_message.innerText = group.lastMessage || "No messages yet";
+        if (group.lastMessage) {
+            sanitizeHTML(group.lastMessage).then((sanitized) => {
+                inbox_item_last_message.innerHTML = sanitized;
+            });
+        }
+        else {
+            inbox_item_last_message.innerText = 'No messages';
+        }
         inbox_item_content.appendChild(inbox_item_last_message);
 
         // Append content to the inbox item
