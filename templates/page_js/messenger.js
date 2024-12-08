@@ -465,8 +465,6 @@ async function getAllMessagesUsingGraphQL() {
                             timestamp: new Date().toISOString() // Fallback timestamp
                         });
                     }
-                    const lastMessage = messages[otherAddress].thread[messages[otherAddress].thread.length - 1];
-                    messages[otherAddress].lastMessage = lastMessage.message;
                 })
             );
         }
@@ -477,6 +475,11 @@ async function getAllMessagesUsingGraphQL() {
         const groupedMessages = Object.values(messages);
         groupedMessages.forEach(group => {
             group.thread.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        });
+
+        // Set last message for each thread
+        groupedMessages.forEach(group => {
+            group.lastMessage = group.thread[group.thread.length - 1]?.message || null;
         });
 
         renderInbox(groupedMessages);
