@@ -251,7 +251,7 @@ function switchChat(address_chat) {
             message_timestamp.innerText += ' (You - Locally Stored Message)';
         }
         if (message.sender !== publicKey) {
-            message_timestamp.innerText += ' (Partner)';
+            message_timestamp.innerText += ' (Partner - Encrypted Message)';
         }
 
         // Append message content to the item
