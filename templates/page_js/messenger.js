@@ -102,23 +102,25 @@ function convertEd25519ToCurve25519PublicKey(ed25519PublicKey) {
 function saveMessageLocally(publicKey, recipient, message) {
     const allMessages = JSON.parse(localStorage.getItem('sentMessages')) || {};
 
-    // Ensure storage for the current public key
-    if (!allMessages[publicKey]) {
-        allMessages[publicKey] = {};
+    // Ensure storage for the current RPC and publicKey
+    if (!allMessages[RPC]) {
+        allMessages[RPC] = {};
+    }
+    if (!allMessages[RPC][publicKey]) {
+        allMessages[RPC][publicKey] = {};
     }
 
     // Ensure storage for the recipient
-    if (!allMessages[publicKey][recipient]) {
-        allMessages[publicKey][recipient] = [];
+    if (!allMessages[RPC][publicKey][recipient]) {
+        allMessages[RPC][publicKey][recipient] = [];
     }
 
     // Save the message
-    allMessages[publicKey][recipient].push(message);
+    allMessages[RPC][publicKey][recipient].push(message);
 
     // Update local storage
     localStorage.setItem('sentMessages', JSON.stringify(allMessages));
 }
-
 function encrypt_nacl_box(cleartext_msg, receiver_public_key_hex) {
     // Convert the receiver's Ed25519 public key to Curve25519
     const receiverEd25519PublicKey = fromHexString(receiver_public_key_hex);
@@ -374,7 +376,7 @@ function sendMessage() {
 
 function loadLocalMessages(publicKey) {
     const allMessages = JSON.parse(localStorage.getItem('sentMessages')) || {};
-    return allMessages[publicKey] || {};
+    return allMessages[RPC]?.[publicKey] || {};
 }
 
 async function getAllMessagesUsingGraphQL() {
