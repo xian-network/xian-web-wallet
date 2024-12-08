@@ -271,7 +271,7 @@ async function estimateSendStamps(message_receiver, message_input) {
     let transaction = {
         payload: {
             chain_id: CHAIN_ID,
-            contract: "con_msg",
+            contract: "con_msg_main",
             function: "save_msg",
             kwargs: {
                 msg: encrypt_nacl_box(message_input, message_receiver),
@@ -296,7 +296,7 @@ async function estimateSendStamps(message_receiver, message_input) {
             document.getElementById('tokenFee').innerHTML = 0;
             return;
         }
-        stamps = stamps + 20;
+        stamps = stamps;
         document.getElementById('tokenFeeXian').innerHTML = stamps / stamp_rate;
         document.getElementById('tokenFee').innerHTML = stamps;
     } catch (error) {
@@ -327,7 +327,7 @@ function sendMessage() {
     let transaction = {
         payload: {
             chain_id: CHAIN_ID,
-            contract: "con_msg",
+            contract: "con_msg_main",
             function: "save_msg",
             kwargs: {
                 msg: "",
@@ -393,11 +393,11 @@ async function getAllMessagesUsingGraphQL() {
         }
 
         // Fetch messages from the blockchain
-        const counter = await getVariable('con_msg', 'counter');
+        const counter = await getVariable('con_msg_main', 'counter');
         const messagePromises = [];
         for (let i = 1; i <= counter; i++) {
             messagePromises.push(
-                getVariable('con_msg', 'messages:' + i).then((message) => {
+                getVariable('con_msg_main', 'messages:' + i).then((message) => {
                     message = JSON.parse(message);
                     if (message.sender !== publicKey && message.receiver !== publicKey) {
                         return; // Ignore messages not involving the user
