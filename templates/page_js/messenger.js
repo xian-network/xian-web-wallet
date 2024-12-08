@@ -331,9 +331,6 @@ function sendMessage() {
         timestamp: timestamp
     };
 
-    // Save the plaintext message locally
-    saveMessageLocally(publicKey, message_receiver, plaintextMessage);
-
     let transaction = {
         payload: {
             chain_id: CHAIN_ID,
@@ -362,6 +359,8 @@ function sendMessage() {
             if (response.result.code === 0) {
                 toast("success", "Message sent successfully");
                 document.getElementById('message_input').value = ''; // Clear the input field
+                // Save the plaintext message locally
+                saveMessageLocally(publicKey, message_receiver, plaintextMessage);
                 // Reload the chat to reflect the new message
                 getAllMessagesUsingGraphQL().then(() => {
                     switchChat(message_receiver); // Focus on the current chat
@@ -442,7 +441,7 @@ async function getAllMessagesUsingGraphQL() {
                                 });
                                 messages[otherAddress].lastMessage = localMessage.message;
                             } else {
-                                console.warn("Received message not found in local storage:", message);
+                                console.warn("Sent message not found in local storage:", message);
                             }
                         } else {
                             // Received messages, decrypt them
