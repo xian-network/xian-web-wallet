@@ -262,9 +262,12 @@ function switchChat(address_chat) {
         // Append the message item to the chat body
         message_container.appendChild(message_item);
     });
+    setTimeout(() => {
+        let message_scroll = document.querySelector('.messenger-chat-body');
+        message_scroll.scrollTop = message_scroll.scrollHeight;
+    
+    }, 100);
 
-    // Scroll to the bottom of the chat
-    message_container.scrollTop = message_container.scrollHeight;
 }
 
 

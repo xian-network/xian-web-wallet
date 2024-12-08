@@ -748,6 +748,9 @@ a:hover{
 
 .messenger-inbox {
     width: 30%;
+    flex-direction: column;
+    display: flex
+;
     max-width: 300px;
     border-top: 1px solid #8a8b8e;
     border-left: 1px solid #8a8b8e;
@@ -773,10 +776,14 @@ a:hover{
 }
 
 .messenger-inbox-body {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding-top: 10px;
+    display: flex
+    ;
+        flex-direction: column;
+        gap: 10px;
+        padding-top: 10px;
+        flex: 1;
+        height: 0;
+        overflow-y: auto;
 }
 .messenger-inbox-item-active {
     background-color: #494a50;
@@ -825,14 +832,6 @@ a:hover{
     text-overflow: ellipsis;
 }
 
-.messenger-chat {
-    flex: 1;
-    height: 100%;
-    display: flex;
-    overflow: hidden;
-    flex-direction: column;
-    
-}
 
 .messenger-chat-wrapper {
     border: 1px solid #8a8b8e;
@@ -859,13 +858,24 @@ a:hover{
     width: 100%;
 }
 
-.messenger-chat-body {
+.messenger-chat {
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Ensures the chat area takes the full height of its parent */
+    overflow: hidden; /* Prevent any growth beyond the container */
     flex: 1;
-    padding: 10px;
-    overflow-y: auto;
+}
+
+.messenger-chat-body {
+    flex-grow: 1; /* Allow it to take available space within its container */
+    overflow-y: auto; /* Adds a scrollbar if content exceeds the height */
+    max-height: 100%; /* Prevents it from growing beyond its parent's height */
+    padding: 10px; /* Maintain consistent spacing inside */
     display: flex;
     flex-direction: column;
     gap: 10px;
+    overflow-y: auto;
+    height: 0;
 }
 
 .messenger-chat-item-me {
