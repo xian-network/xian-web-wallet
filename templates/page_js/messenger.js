@@ -248,7 +248,7 @@ function switchChat(address_chat) {
         });
         message_timestamp.innerText = new Date(message.timestamp).toLocaleString();
         if (message.sender === publicKey) {
-            message_timestamp.innerText += ' (You)';
+            message_timestamp.innerText += ' (You - Locally Stored Message)';
         }
         if (message.sender !== publicKey) {
             message_timestamp.innerText += ' (Partner)';
