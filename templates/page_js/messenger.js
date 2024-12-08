@@ -432,12 +432,7 @@ async function getAllMessagesUsingGraphQL() {
                                 });
                                 messages[otherAddress].lastMessage = localMessage.message;
                             } else {
-                                messages[otherAddress].thread.push({
-                                    sender: message.sender,
-                                    recipient: message.receiver,
-                                    message: "[Local Message Not Found]",
-                                    timestamp: timestamp
-                                });
+                                console.warn("Received message not found in local storage:", message);
                             }
                         } else {
                             // Received messages, decrypt them
