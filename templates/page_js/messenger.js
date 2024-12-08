@@ -351,7 +351,11 @@ function sendMessage() {
         .then((response) => {
             if (response.result.code === 0) {
                 toast("success", "Message sent successfully");
-                document.getElementById('message_input').value = '';
+                document.getElementById('message_input').value = ''; // Clear the input field
+                // Reload the chat to reflect the new message
+                getAllMessagesUsingGraphQL().then(() => {
+                    switchChat(message_receiver); // Focus on the current chat
+                });
             } else {
                 toast("danger", "Error sending message");
             }
@@ -361,6 +365,7 @@ function sendMessage() {
             toast("danger", "An unexpected error occurred");
         });
 }
+
 function loadLocalMessages(publicKey) {
     const allMessages = JSON.parse(localStorage.getItem('sentMessages')) || {};
     return allMessages[publicKey] || {};
@@ -409,7 +414,7 @@ async function getAllMessagesUsingGraphQL() {
 
                     try {
                         const [year, month, day, hour, minute, second] = message.timestamp["__time__"];
-                        const timestamp = new Date(year, month - 1, day, hour, minute, second).toISOString();
+                        const timestamp = new Date(Date.UTC(year, month - 1, day, hour, minute, second)).toISOString();
 
                         if (message.sender === publicKey) {
                             // Check if the local copy exists
