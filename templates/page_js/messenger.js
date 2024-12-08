@@ -455,7 +455,6 @@ async function getAllMessagesUsingGraphQL() {
                                 message: decryptedMessage,
                                 timestamp: timestamp
                             });
-                            messages[otherAddress].lastMessage = decryptedMessage;
                         }
                     } catch (error) {
                         console.error("Decryption failed for message:", message, error);
@@ -466,6 +465,8 @@ async function getAllMessagesUsingGraphQL() {
                             timestamp: new Date().toISOString() // Fallback timestamp
                         });
                     }
+                    const lastMessage = messages[otherAddress].thread[messages[otherAddress].thread.length - 1];
+                    messages[otherAddress].lastMessage = lastMessage.message;
                 })
             );
         }
