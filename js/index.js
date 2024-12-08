@@ -51,6 +51,12 @@ document.getElementById('side-change-page-ecosystem-news').addEventListener('cli
     changePage('ecosystem-news');
 });
 }
+if(document.getElementById('side-change-page-messenger')) {
+    document.getElementById('side-change-page-messenger').addEventListener('click', function() {
+        changePage('messenger');
+    });
+    }
+    
 
 function lockWallet() {
     let confirm_lock = confirm("Are you sure you want to lock the wallet?");
@@ -62,3 +68,11 @@ function lockWallet() {
     locked = true;
     changePage('password-input');
 }
+
+(async () => {
+    // Wait for sodium to initialize
+    await sodium.ready;
+
+    // Now you can safely use sodium functions
+    console.log("Sodium is ready!");
+})();

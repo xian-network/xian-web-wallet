@@ -745,3 +745,227 @@ a:hover{
     flex-direction: row;
     gap: 10px;
 }
+
+.messenger-inbox {
+    width: 30%;
+    max-width: 300px;
+    border-top: 1px solid #8a8b8e;
+    border-left: 1px solid #8a8b8e;
+    border-bottom: 1px solid #8a8b8e;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    padding: 10px;
+    overflow-y: auto;
+    height: 100%;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.messenger-inbox-header {
+    font-size: 1.25rem;
+    font-weight: bold;
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.messenger-inbox-header h3{
+    margin-bottom: 0;
+}
+
+.messenger-inbox-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 10px;
+}
+.messenger-inbox-item-active {
+    background-color: #494a50;
+}
+
+.messenger-inbox-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #8a8b8e;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+.messenger-inbox-item-content{
+    width: 100%;
+}
+.messenger-inbox-item:hover {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.messenger-inbox-item-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.messenger-inbox-item-content h3 {
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.messenger-inbox-item-content p {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.messenger-chat {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    overflow: hidden;
+    flex-direction: column;
+    
+}
+
+.messenger-chat-wrapper {
+    border: 1px solid #8a8b8e;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding: 10px;
+    display: flex
+;
+    flex: 1;
+    overflow: hidden;
+}
+
+.messenger-chat-header {
+    font-size: 1.25rem;
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #8a8b8e;
+}
+
+.messenger-chat-header h3{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 100%;
+}
+
+.messenger-chat-body {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.messenger-chat-item-me {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 10px;
+}
+.messenger-chat-item-you {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.messenger-chat-item-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.flex-grow-1 {
+    flex-grow: 1;
+}
+
+
+.messenger-chat-item-content {
+    max-width: 70%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #8a8b8e;
+    font-size: 0.9rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+
+.messenger-chat-item-content p {
+    margin: 0;
+}
+
+.messenger-chat-footer {
+    display: flex;
+    gap: 10px;
+    border-top: 1px solid #8a8b8e;
+    padding-top: 10px;
+}
+
+.messenger-chat-footer input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #8a8b8e;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease-in-out;
+}
+
+.messenger-chat-footer input:focus {
+    border-color: #93e8e1;
+}
+
+.messenger-chat-footer button {
+    padding: 10px 20px;
+    background-color: #93e8e1;
+    color: #202020;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+.messenger-chat-footer button:focus {
+    outline: none;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .messenger-inbox {
+        width: 100%;
+        max-width: unset;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #ced4da;
+    }
+
+    .messenger-chat {
+        height: auto;
+    }
+    .column-mobile{
+        flex-direction: column;
+        gap: 20px;
+    }
+    .messenger-chat-wrapper {
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+    }
+    .messenger-inbox{
+        border-right: 1px solid #8a8b8e;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+}

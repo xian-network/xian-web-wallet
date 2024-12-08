@@ -103,6 +103,7 @@ function sideNavActive() {
       document.getElementById("side-change-page-govenance").classList.remove("active-side-nav");
       document.getElementById("side-change-page-ecosystem-news").classList.remove("active-side-nav");
       document.getElementById("side-change-page-settings").classList.remove("active-side-nav");
+      document.getElementById("side-change-page-messenger").classList.remove("active-side-nav");
     }
     else if (app_page === "ide") {
       document.getElementById("side-change-page-wallet").classList.remove("active-side-nav");
@@ -110,6 +111,7 @@ function sideNavActive() {
       document.getElementById("side-change-page-govenance").classList.remove("active-side-nav");
       document.getElementById("side-change-page-ecosystem-news").classList.remove("active-side-nav");
       document.getElementById("side-change-page-settings").classList.remove("active-side-nav");
+      document.getElementById("side-change-page-messenger").classList.remove("active-side-nav");
     }
     else if (app_page === "governance") {
       document.getElementById("side-change-page-wallet").classList.remove("active-side-nav");
@@ -117,6 +119,7 @@ function sideNavActive() {
       document.getElementById("side-change-page-govenance").classList.add("active-side-nav");
       document.getElementById("side-change-page-ecosystem-news").classList.remove("active-side-nav");
       document.getElementById("side-change-page-settings").classList.remove("active-side-nav");
+      document.getElementById("side-change-page-messenger").classList.remove("active-side-nav");
     }
     else if (app_page === "ecosystem-news") {
       document.getElementById("side-change-page-wallet").classList.remove("active-side-nav");
@@ -124,6 +127,7 @@ function sideNavActive() {
       document.getElementById("side-change-page-govenance").classList.remove("active-side-nav");
       document.getElementById("side-change-page-ecosystem-news").classList.add("active-side-nav");
       document.getElementById("side-change-page-settings").classList.remove("active-side-nav");
+      document.getElementById("side-change-page-messenger").classList.remove("active-side-nav");
     }
     else if (app_page === "settings") {
       document.getElementById("side-change-page-wallet").classList.remove("active-side-nav");
@@ -131,7 +135,17 @@ function sideNavActive() {
       document.getElementById("side-change-page-govenance").classList.remove("active-side-nav");
       document.getElementById("side-change-page-ecosystem-news").classList.remove("active-side-nav");
       document.getElementById("side-change-page-settings").classList.add("active-side-nav");
+      document.getElementById("side-change-page-messenger").classList.remove("active-side-nav");
     }
+    else if (app_page === "messenger") {
+      document.getElementById("side-change-page-wallet").classList.remove("active-side-nav");
+      document.getElementById("side-change-page-ide").classList.remove("active-side-nav");
+      document.getElementById("side-change-page-govenance").classList.remove("active-side-nav");
+      document.getElementById("side-change-page-ecosystem-news").classList.remove("active-side-nav");
+      document.getElementById("side-change-page-settings").classList.remove("active-side-nav");
+      document.getElementById("side-change-page-messenger").classList.add("active-side-nav");
+    }
+    
   } catch (error) {
     console.log(error);
   }
@@ -251,6 +265,9 @@ function changePage(page, some_data = null, send_response = null) {
       break;
     case "create-token":
       loadHtmlAndScripts("templates/create-token.html");
+      break;
+    case "messenger":
+      loadHtmlAndScripts("templates/messenger.html");
       break;
     default:
       break;
