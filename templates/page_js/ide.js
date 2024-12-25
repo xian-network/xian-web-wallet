@@ -196,34 +196,34 @@ function showDropdown() {
     dropdown.appendChild(newTokenTab);
     dropdown.appendChild(loadContract);
 }
-async function lintCode(code) {
-    try {
-        code = encodeURIComponent(code);
-        const response = await fetch(RPC + '/abci_query?path="/lint/' + btoa(code) + '"', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+// async function lintCode(code) {
+//     try {
+//         code = encodeURIComponent(code);
+//         const response = await fetch(RPC + '/abci_query?path="/lint/' + btoa(code) + '"', {
+//             method: 'GET',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             }
+//         });
         
-        if (!response.ok) {
-            console.error('Failed to lint code:', response.status);
-            return [];
-        }
+//         if (!response.ok) {
+//             console.error('Failed to lint code:', response.status);
+//             return [];
+//         }
         
-        const data = await response.json();
-        let lintinfo = data['result']['response']['value'];
-        let lintinfo_decoded = atob(lintinfo);
-        lintinfo_decoded = JSON.parse(lintinfo_decoded);
-        lintinfo_decoded = lintinfo_decoded['stdout'] + lintinfo_decoded['stderr'];
-        console.log(lintinfo_decoded);
-        return parseLintOutput(lintinfo_decoded);
+//         const data = await response.json();
+//         let lintinfo = data['result']['response']['value'];
+//         let lintinfo_decoded = atob(lintinfo);
+//         lintinfo_decoded = JSON.parse(lintinfo_decoded);
+//         lintinfo_decoded = lintinfo_decoded['stdout'] + lintinfo_decoded['stderr'];
+//         console.log(lintinfo_decoded);
+//         return parseLintOutput(lintinfo_decoded);
         
-    } catch (error) {
-        console.error('Error linting code:', error.message);
-        return [];
-    }
-}
+//     } catch (error) {
+//         console.error('Error linting code:', error.message);
+//         return [];
+//     }
+// }
 
 var whitelistedPatterns = [
     'export',
@@ -265,25 +265,25 @@ function parseLintOutput(output) {
     return errors;
 }
 
-async function pythonLinter(text, options, cm) {
-    try {
-        const errors = await lintCode(text);
-        console.log(errors);
-        let lintErrors = errors.map(error => ({
-            message: error.message,
-            severity: error.severity,
-            from: CodeMirror.Pos(error.line, error.col),
-            to: CodeMirror.Pos(error.line, error.col)
-        }));
-        return lintErrors;
-    } catch (error) {
-        console.error('Error in pythonLinter:', error.message);
-        return [];
-    }
-}
+// async function pythonLinter(text, options, cm) {
+//     try {
+//         const errors = await lintCode(text);
+//         console.log(errors);
+//         let lintErrors = errors.map(error => ({
+//             message: error.message,
+//             severity: error.severity,
+//             from: CodeMirror.Pos(error.line, error.col),
+//             to: CodeMirror.Pos(error.line, error.col)
+//         }));
+//         return lintErrors;
+//     } catch (error) {
+//         console.error('Error in pythonLinter:', error.message);
+//         return [];
+//     }
+// }
 
 
-CodeMirror.registerHelper("lint", "python", pythonLinter);
+// CodeMirror.registerHelper("lint", "python", pythonLinter);
 
 var editor = CodeMirror(document.querySelector('#editor'), {
     value: code_storage[current_tab],
