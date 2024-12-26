@@ -111,9 +111,36 @@ function debounce(func, delay) {
 
 debouncedEstimateSendStamps_ = debounce(estimateSendStamps, 500);
 document.getElementById('toAddress').addEventListener('input', debouncedEstimateSendStamps_);
-
 document.getElementById('tokenAmount').addEventListener('input', debouncedEstimateSendStamps_);
 
+async function loadPage() {
+    let tokenInfo = await getTokenInfo(document.getElementById('tokenName').innerHTML);
+    document.getElementById('realTokenName').innerHTML = tokenInfo['name'];
+
+    let tokenBalance = await getVariable(document.getElementById('tokenName').innerHTML, "balances", publicKey);
+    let formattedBalance = "0";
+    if (tokenBalance !== null) {
+        formattedBalance = parseFloat(tokenBalance).toFixed(8);
+    }
+    document.getElementById('maxTokenAmount').innerHTML = formattedBalance;
+
+    document.getElementById('maxTokenAmount').style.display = 'inline-block';
+    document.getElementById('realTokenName').style.display = 'inline-block';
+
+    document.getElementById('maxTokenAmount').addEventListener('click', function() {
+        document.getElementById('tokenAmount').value = formattedBalance;
+        estimateSendStamps().then(() => {
+            if(document.getElementById('tokenName').innerHTML == 'currency') {
+                document.getElementById('tokenAmount').value = formattedBalance - document.getElementById('tokenFeeXian').innerHTML;
+                }
+        });
+       
+    });
+}
+
+(async () => {
+    await loadPage();
+})();
 
 async function estimateSendStamps(){
     let recipient = document.getElementById('toAddress').value;
