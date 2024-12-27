@@ -242,7 +242,8 @@ var whitelistedPatterns = [
     'datetime',
     'crypto',
     'decimal',
-    'Any'
+    'Any',
+    'LogEvent'
 ];
 function parseLintOutput(output) {
     let errors = [];
