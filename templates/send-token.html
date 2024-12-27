@@ -1,4 +1,4 @@
-<h1 class="app-box-title">Send<span id="tokenName" style="display:none"></span></h1><!-- TODO: make nicer .. -->
+<h1 class="app-box-title"><span>Send<span id="tokenName" style="display:none"></span> <span id="realTokenName" style="display:none"></span></span></h1>
 <p class="app-box-description">Send tokens to another wallet address.</p>
 <div class="app-box-form">
     <div class="alert alert-danger" role="alert" id="sendTokenError" style="display: none;"></div>
@@ -8,8 +8,8 @@
         <input type="text" class="form-control" id="toAddress" placeholder="Enter the wallet address" required>
     </div>
     <div class="form-group">
-        <label for="tokenAmount">Token Amount</label>
-        <input type="number" class="form-control" id="tokenAmount" placeholder="Enter the token amount" required>
+        <label for="tokenAmount">Token Amount (max. <span id="maxTokenAmount" style="display:none;cursor:pointer;"></span>)</label>
+        <input type="text" class="form-control" id="tokenAmount" placeholder="Enter the token amount" required>
     </div>
     <div class="form-group" id="tokenFeeContainer" style="display: none;"> <!-- TODO: make nicer .. -->
         <label for="tokenFee">Transaction Fee: 
