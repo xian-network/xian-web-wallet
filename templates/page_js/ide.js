@@ -241,7 +241,7 @@ async function pythonLinter(text, options, cm) {
             from: CodeMirror.Pos(error.get("line")),
             to: CodeMirror.Pos(error.get("line"))
         }));
-        
+        console.log(lintErrors)
         return lintErrors;
     } catch (error) {
         console.error('Error in pythonLinter:', error.get("message"));
@@ -260,6 +260,61 @@ var editor = CodeMirror(document.querySelector('#editor'), {
     lint: true,
 });
 
+// Create a mapping between actual and displayed line numbers
+let lineNumberMapping = new Map();
+let reverseLineNumberMapping = new Map();
+
+function updateLineNumberMappings() {
+    lineNumberMapping.clear();
+    reverseLineNumberMapping.clear();
+    
+    let displayedNumber = 1;
+    for (let i = 1; i <= editor.lineCount(); i++) {
+        const prevLineContent = i > 1 ? editor.getLine(i - 2) : '';
+        
+        if (!(prevLineContent && prevLineContent.trim().endsWith('\\'))) {
+            lineNumberMapping.set(i, displayedNumber);
+            reverseLineNumberMapping.set(displayedNumber, i);
+            displayedNumber++;
+        } else {
+            lineNumberMapping.set(i, displayedNumber - 1);
+        }
+    }
+}
+
+// Override the line number formatting
+editor.setOption('lineNumberFormatter', function(line) {
+    updateLineNumberMappings();
+    const prevLineContent = line > 1 ? editor.getLine(line - 2) : '';
+    
+    // If previous line ends with backslash, don't show line number
+    if (prevLineContent && prevLineContent.trim().endsWith('\\')) {
+        return '';
+    }
+
+    return lineNumberMapping.get(line).toString();
+});
+
+// Override the default lint placement
+const originalSetGutterMarker = editor.setGutterMarker.bind(editor);
+editor.setGutterMarker = function(line, gutterID, value) {
+    updateLineNumberMappings();
+    // If this is a line number that should be empty (continuation line)
+    const prevLineContent = line > 0 ? editor.getLine(line - 1) : '';
+    if (prevLineContent && prevLineContent.trim().endsWith('\\')) {
+        // Find the next non-continuation line
+        let targetLine = line;
+        while (targetLine < editor.lineCount()) {
+            const content = editor.getLine(targetLine - 1);
+            if (!(content && content.trim().endsWith('\\'))) {
+                break;
+            }
+            targetLine++;
+        }
+        return originalSetGutterMarker(targetLine, gutterID, value);
+    }
+    return originalSetGutterMarker(line, gutterID, value);
+};
 
 editor.setSize('100%', null);
 if (current_tab.endsWith('(Read-Only)')) {
