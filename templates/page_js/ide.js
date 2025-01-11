@@ -225,46 +225,46 @@ function showDropdown() {
 //     }
 // }
 
-var whitelistedPatterns = [
-    'export',
-    'construct',
-    'Hash',
-    'Variable',
-    'ctx',
-    'now',
-    'random',
-    'ForeignHash',
-    'ForeignVariable',
-    'block_num',
-    'block_hash',
-    'importlib',
-    'hashlib',
-    'datetime',
-    'crypto',
-    'decimal',
-    'Any',
-    'LogEvent'
-];
-function parseLintOutput(output) {
-    let errors = [];
-    let lines = output.split('\n');
-    for (let line of lines) {
-        let match = line.match(/<string>:(\d+):(\d+):\s*(.+)/);
-        if (match) {
-            let message = match[3];
-            let isWhitelisted = whitelistedPatterns.some(pattern => message.includes(pattern));
-            if (!isWhitelisted) {
-                errors.push({
-                    line: parseInt(match[1]) - 1,
-                    col: parseInt(match[2]) - 1,
-                    message: message,
-                    severity: 'error'  // Default to 'error'
-                });
-            }
-        }
-    }
-    return errors;
-}
+// var whitelistedPatterns = [
+//     'export',
+//     'construct',
+//     'Hash',
+//     'Variable',
+//     'ctx',
+//     'now',
+//     'random',
+//     'ForeignHash',
+//     'ForeignVariable',
+//     'block_num',
+//     'block_hash',
+//     'importlib',
+//     'hashlib',
+//     'datetime',
+//     'crypto',
+//     'decimal',
+//     'Any',
+//     'LogEvent'
+// ];
+// function parseLintOutput(output) {
+//     let errors = [];
+//     let lines = output.split('\n');
+//     for (let line of lines) {
+//         let match = line.match(/<string>:(\d+):(\d+):\s*(.+)/);
+//         if (match) {
+//             let message = match[3];
+//             let isWhitelisted = whitelistedPatterns.some(pattern => message.includes(pattern));
+//             if (!isWhitelisted) {
+//                 errors.push({
+//                     line: parseInt(match[1]) - 1,
+//                     col: parseInt(match[2]) - 1,
+//                     message: message,
+//                     severity: 'error'  // Default to 'error'
+//                 });
+//             }
+//         }
+//     }
+//     return errors;
+// }
 
 // async function pythonLinter(text, options, cm) {
 //     try {
