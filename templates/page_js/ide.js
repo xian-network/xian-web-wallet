@@ -196,95 +196,60 @@ function showDropdown() {
     dropdown.appendChild(newTokenTab);
     dropdown.appendChild(loadContract);
 }
-// async function lintCode(code) {
-//     try {
-//         code = encodeURIComponent(code);
-//         const response = await fetch(RPC + '/abci_query?path="/lint/' + btoa(code) + '"', {
-//             method: 'GET',
-//             headers: {
-//                 'Content-Type': 'application/json'
-//             }
-//         });
-        
-//         if (!response.ok) {
-//             console.error('Failed to lint code:', response.status);
-//             return [];
-//         }
-        
-//         const data = await response.json();
-//         let lintinfo = data['result']['response']['value'];
-//         let lintinfo_decoded = atob(lintinfo);
-//         lintinfo_decoded = JSON.parse(lintinfo_decoded);
-//         lintinfo_decoded = lintinfo_decoded['stdout'] + lintinfo_decoded['stderr'];
-//         console.log(lintinfo_decoded);
-//         return parseLintOutput(lintinfo_decoded);
-        
-//     } catch (error) {
-//         console.error('Error linting code:', error.message);
-//         return [];
-//     }
-// }
 
-var whitelistedPatterns = [
-    'export',
-    'construct',
-    'Hash',
-    'Variable',
-    'ctx',
-    'now',
-    'random',
-    'ForeignHash',
-    'ForeignVariable',
-    'block_num',
-    'block_hash',
-    'importlib',
-    'hashlib',
-    'datetime',
-    'crypto',
-    'decimal',
-    'Any',
-    'LogEvent'
-];
-function parseLintOutput(output) {
-    let errors = [];
-    let lines = output.split('\n');
-    for (let line of lines) {
-        let match = line.match(/<string>:(\d+):(\d+):\s*(.+)/);
-        if (match) {
-            let message = match[3];
-            let isWhitelisted = whitelistedPatterns.some(pattern => message.includes(pattern));
-            if (!isWhitelisted) {
-                errors.push({
-                    line: parseInt(match[1]) - 1,
-                    col: parseInt(match[2]) - 1,
-                    message: message,
-                    severity: 'error'  // Default to 'error'
-                });
-            }
-        }
+// var whitelistedPatterns = [
+//     'export',
+//     'construct',
+//     'Hash',
+//     'Variable',
+//     'ctx',
+//     'now',
+//     'random',
+//     'ForeignHash',
+//     'ForeignVariable',
+//     'block_num',
+//     'block_hash',
+//     'importlib',
+//     'hashlib',
+//     'datetime',
+//     'crypto',
+//     'decimal',
+//     'Any',
+//     'LogEvent'
+// ];
+
+async function lintCode(code){   
+    try{
+        const result = await pyodide.runPythonAsync(`
+from xian_contracting_linter import lint_code
+lint_code("""${code}""")
+`);   
+        let lintinfo = result.toJs();
+        return lintinfo;    
+    } catch (error) {
+        console.error('Error linting code:', error.message);
+        return [];
     }
-    return errors;
 }
 
-// async function pythonLinter(text, options, cm) {
-//     try {
-//         const errors = await lintCode(text);
-//         console.log(errors);
-//         let lintErrors = errors.map(error => ({
-//             message: error.message,
-//             severity: error.severity,
-//             from: CodeMirror.Pos(error.line, error.col),
-//             to: CodeMirror.Pos(error.line, error.col)
-//         }));
-//         return lintErrors;
-//     } catch (error) {
-//         console.error('Error in pythonLinter:', error.message);
-//         return [];
-//     }
-// }
+async function pythonLinter(text, options, cm) {
+    try {
+        const errors = await lintCode(text);
+        let lintErrors = errors.map(error => ({
+            message: error.get("message"),
+            severity: error.get("severity"),
+            from: CodeMirror.Pos(error.get("line")),
+            to: CodeMirror.Pos(error.get("line"))
+        }));
+        console.log(lintErrors)
+        return lintErrors;
+    } catch (error) {
+        console.error('Error in pythonLinter:', error.get("message"));
+        return [];
+    }
+}
 
-
-// CodeMirror.registerHelper("lint", "python", pythonLinter);
+CodeMirror.registerHelper("lint", "python", pythonLinter);
 
 var editor = CodeMirror(document.querySelector('#editor'), {
     value: code_storage[current_tab],
@@ -295,6 +260,61 @@ var editor = CodeMirror(document.querySelector('#editor'), {
     lint: true,
 });
 
+// Create a mapping between actual and displayed line numbers
+let lineNumberMapping = new Map();
+let reverseLineNumberMapping = new Map();
+
+function updateLineNumberMappings() {
+    lineNumberMapping.clear();
+    reverseLineNumberMapping.clear();
+    
+    let displayedNumber = 1;
+    for (let i = 1; i <= editor.lineCount(); i++) {
+        const prevLineContent = i > 1 ? editor.getLine(i - 2) : '';
+        
+        if (!(prevLineContent && prevLineContent.trim().endsWith('\\'))) {
+            lineNumberMapping.set(i, displayedNumber);
+            reverseLineNumberMapping.set(displayedNumber, i);
+            displayedNumber++;
+        } else {
+            lineNumberMapping.set(i, displayedNumber - 1);
+        }
+    }
+}
+
+// Override the line number formatting
+editor.setOption('lineNumberFormatter', function(line) {
+    updateLineNumberMappings();
+    const prevLineContent = line > 1 ? editor.getLine(line - 2) : '';
+    
+    // If previous line ends with backslash, don't show line number
+    if (prevLineContent && prevLineContent.trim().endsWith('\\')) {
+        return '';
+    }
+
+    return lineNumberMapping.get(line).toString();
+});
+
+// Override the default lint placement
+const originalSetGutterMarker = editor.setGutterMarker.bind(editor);
+editor.setGutterMarker = function(line, gutterID, value) {
+    updateLineNumberMappings();
+    // If this is a line number that should be empty (continuation line)
+    const prevLineContent = line > 0 ? editor.getLine(line - 1) : '';
+    if (prevLineContent && prevLineContent.trim().endsWith('\\')) {
+        // Find the next non-continuation line
+        let targetLine = line;
+        while (targetLine < editor.lineCount()) {
+            const content = editor.getLine(targetLine - 1);
+            if (!(content && content.trim().endsWith('\\'))) {
+                break;
+            }
+            targetLine++;
+        }
+        return originalSetGutterMarker(targetLine, gutterID, value);
+    }
+    return originalSetGutterMarker(line, gutterID, value);
+};
 
 editor.setSize('100%', null);
 if (current_tab.endsWith('(Read-Only)')) {
