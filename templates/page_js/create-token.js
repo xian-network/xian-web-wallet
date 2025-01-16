@@ -13,6 +13,7 @@ def seed():
     metadata['token_symbol'] = "TOKEN_SYMBOL"
     metadata['token_logo_url'] = 'TOKEN_LOGO_URL'
     metadata['token_website'] = 'TOKEN_WEBSITE'
+    metadata['total_supply'] = 12345321
     metadata['operator'] = ctx.caller
 
 
@@ -133,7 +134,7 @@ async function estimateSendStamps(){
 document.getElementById("btn-create-token-create").addEventListener("click", async function() {
     tokenContract = tokenContract.replace("TOKEN_NAME", document.getElementById("NameCreateToken").value);
     tokenContract = tokenContract.replace("TOKEN_SYMBOL", document.getElementById("SymbolCreateToken").value);
-    tokenContract = tokenContract.replace("12345321", document.getElementById("SupplyCreateToken").value);
+    tokenContract = tokenContract.replaceAll("12345321", document.getElementById("SupplyCreateToken").value);
     tokenContract = tokenContract.replace("TOKEN_LOGO_URL", document.getElementById("LogoCreateToken").value);
     tokenContract = tokenContract.replace("TOKEN_WEBSITE", document.getElementById("WebsiteCreateToken").value);
     await estimateSendStamps();
