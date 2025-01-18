@@ -152,6 +152,7 @@ function sideNavActive() {
 }
 
 function changePage(page, some_data = null, send_response = null) {
+  sendEventGA("page_view", {engagement_time_msec: 100, page_title: page, page_location: page});
   app_page = page;
   sideNavActive();
   const loadHtmlAndScripts = (htmlPath) => {
