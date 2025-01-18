@@ -261,9 +261,12 @@ var editor = CodeMirror(document.querySelector('#editor'), {
 });
 
 // Create a mapping between actual and displayed line numbers
-let lineNumberMapping = new Map();
-let reverseLineNumberMapping = new Map();
-
+if (typeof lineNumberMapping === 'undefined') {
+    var lineNumberMapping = new Map();
+}
+if (typeof reverseLineNumberMapping === 'undefined') {
+    var reverseLineNumberMapping = new Map();
+}
 function updateLineNumberMappings() {
     lineNumberMapping.clear();
     reverseLineNumberMapping.clear();
@@ -296,7 +299,9 @@ editor.setOption('lineNumberFormatter', function(line) {
 });
 
 // Override the default lint placement
-const originalSetGutterMarker = editor.setGutterMarker.bind(editor);
+if (typeof originalLint === 'undefined') {
+var originalSetGutterMarker = editor.setGutterMarker.bind(editor);
+}
 editor.setGutterMarker = function(line, gutterID, value) {
     updateLineNumberMappings();
     // If this is a line number that should be empty (continuation line)
