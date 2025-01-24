@@ -332,22 +332,21 @@ async function signMessage(message, privateKey) {
 
 async function execute_balance_of(contract, address) {
   let payload = {
-        sender: "",
-        contract: contract,
-        function: "balance_of",
-        arguments: {
+        "sender": address,
+        "contract": contract,
+        "function": "balance_of",
+        "kwargs": {
             "address": address
         }
     };
+    console.log(payload);
     let bytes = new TextEncoder().encode(JSON.stringify(payload));
     let hex = toHexString(bytes);
     let response = await fetch(RPC + '/abci_query?path="/simulate_tx/' + hex + '"');
     let data = await response.json();
     let decoded = atob(data.result.response.value);
-    if (decoded === "AA==" || decoded === null || decoded === "") {
-        return 0;
-    }
-    if (decoded === "ée"){
+    if (decoded === "ée" || decoded === "AA==" || decoded === null || decoded === "")
+    {
         let balance = await getVariable(contract, "balances", address);
         if (balance === null) {
             return 0;
