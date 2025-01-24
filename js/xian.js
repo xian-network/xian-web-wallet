@@ -339,12 +339,12 @@ async function execute_balance_of(contract, address) {
             "address": address
         }
     };
-    console.log(payload);
     let bytes = new TextEncoder().encode(JSON.stringify(payload));
     let hex = toHexString(bytes);
     let response = await fetch(RPC + '/abci_query?path="/simulate_tx/' + hex + '"');
     let data = await response.json();
     let decoded = atob(data.result.response.value);
+    decoded = JSON.parse(decoded)["result"];
     if (decoded === "ée" || decoded === "AA==" || decoded === null || decoded === "")
     {
         let balance = await getVariable(contract, "balances", address);
