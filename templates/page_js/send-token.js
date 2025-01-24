@@ -117,7 +117,7 @@ async function loadPage() {
     let tokenInfo = await getTokenInfo(document.getElementById('tokenName').innerHTML);
     document.getElementById('realTokenName').innerHTML = tokenInfo['name'];
 
-    let tokenBalance = await getVariable(document.getElementById('tokenName').innerHTML, "balances", publicKey);
+    let tokenBalance = await execute_balance_of(document.getElementById('tokenName').innerHTML, publicKey);
     let formattedBalance = "0";
     if (tokenBalance !== null) {
         formattedBalance = parseFloat(tokenBalance).toFixed(8);

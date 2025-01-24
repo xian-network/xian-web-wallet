@@ -298,13 +298,10 @@ function removeToken(contract) {
         readSecureCookie('publicKey')
     ]).then((values) => {
         const publicKey = values[0];
-        getVariable(contract, "balances", publicKey)
+        execute_balance_of(contract,publicKey)
             .then(balance => {
-                let formattedBalance = "0";
-                if (balance !== null) {
-                    formattedBalance = parseFloat(balance).toFixed(8);
-                }
-                document.getElementById(contract + 'Balance').innerHTML = formattedBalance;
+                
+                document.getElementById(contract + 'Balance').innerHTML = balance;
             })
             .catch(error => {
                 console.error("Error fetching balance:", error);

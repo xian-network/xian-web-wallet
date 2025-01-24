@@ -329,3 +329,31 @@ async function signMessage(message, privateKey) {
     let signature = nacl.sign.detached(messageUint8Array, combinedKey);
     return toHexString(signature);
 }
+
+async function execute_balance_of(contract, address) {
+  let payload = {
+        sender: "",
+        contract: contract,
+        function: "balance_of",
+        arguments: {
+            "address": address
+        }
+    };
+    let bytes = new TextEncoder().encode(JSON.stringify(payload));
+    let hex = toHexString(bytes);
+    let response = await fetch(RPC + '/abci_query?path="/simulate_tx/' + hex + '"');
+    let data = await response.json();
+    let decoded = atob(data.result.response.value);
+    if (decoded === "AA==" || decoded === null || decoded === "") {
+        return 0;
+    }
+    if (decoded === "ée"){
+        let balance = await getVariable(contract, "balances", address);
+        if (balance === null) {
+            return 0;
+        }
+        return parseFloat(balance).toFixed(8);
+    }
+
+    return parseFloat(decoded).toFixed(8);
+}
