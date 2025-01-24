@@ -344,7 +344,6 @@ async function execute_balance_of(contract, address) {
     let response = await fetch(RPC + '/abci_query?path="/simulate_tx/' + hex + '"');
     let data = await response.json();
     let decoded = atob(data.result.response.value);
-    decoded = JSON.parse(decoded)["result"];
     if (decoded === "ée" || decoded === "AA==" || decoded === null || decoded === "")
     {
         let balance = await getVariable(contract, "balances", address);
@@ -353,6 +352,8 @@ async function execute_balance_of(contract, address) {
         }
         return parseFloat(balance).toFixed(8);
     }
+    decoded = JSON.parse(decoded)["result"];
+    
 
     return parseFloat(decoded).toFixed(8);
 }
