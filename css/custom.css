@@ -201,6 +201,12 @@ a:hover{
         gap: 10px;
         align-items: center;
     }
+    .token-actions a {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items: center;
+    }
     .token-item {
         display: flex;
         flex-direction: row!important;
@@ -636,7 +642,16 @@ a:hover{
     width: unset;
 }
 
+.token-actions a {
+    background-color: #ffffff;
+    width: unset;
+}
+
 .token-actions button:hover {
+    background-color: #ffffff;
+}
+
+.token-actions a:hover {
     background-color: #ffffff;
 }
 

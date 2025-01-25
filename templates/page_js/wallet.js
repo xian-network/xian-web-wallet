@@ -156,7 +156,7 @@ function loadWalletPage() {
                                 <div class="token-balance"><span id="${tokenInfo.contract}Balance">0</span>&nbsp;<span>${tokenInfo.symbol}</span></div>
                                 <div class="token-actions">
                                                                     ${tokenInfo.contract === "currency" ? "" : `<button class="btn remove-btn" data-contract="${tokenInfo.contract}" title="Remove Token"><i class="fas fa-minus-circle" title="Remove Token"></i></button>`}
-
+                                                                    ${tokenInfo.contract === "currency" ? "" : `<a class="btn" style="height:38px" href="https://snakexchange.org/?token0=${tokenInfo.contract}&token1=currency" target="_blank" title="Swap Token for Xian"><i class="fas fa-exchange-alt" title="Swap Token"></i></a>`}
                                     <button class="btn send-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="fas fa-paper-plane"></i> Send</button>
                                     <button class="btn receive-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="fas fa-download"></i> Receive</button>
                                 </div>
