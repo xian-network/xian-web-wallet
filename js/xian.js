@@ -357,3 +357,30 @@ async function execute_balance_of(contract, address) {
 
     return parseFloat(decoded).toFixed(8);
 }
+
+async function execute_get_main_name_to_address(name) {
+    let payload = {
+          "sender": "",
+          "contract": "con_name_service",
+          "function": "get_main_name_to_address",
+          "kwargs": {
+              "name": name
+          }
+      };
+      let bytes = new TextEncoder().encode(JSON.stringify(payload));
+      let hex = toHexString(bytes);
+      let response = await fetch(RPC + '/abci_query?path="/simulate_tx/' + hex + '"');
+      let data = await response.json();
+      let decoded = atob(data.result.response.value);
+      console.log(decoded);
+      if (decoded === "ée" || decoded === "AA==" || decoded === null || decoded === "")
+      {
+          return "None";
+      }
+      decoded = JSON.parse(decoded)
+      if (decoded["status"] === 1) {
+            return "None";
+        }
+      let result = decoded["result"].replaceAll("'", "");
+      return result;
+  }

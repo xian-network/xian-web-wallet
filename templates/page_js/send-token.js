@@ -7,6 +7,11 @@ function sendToken() {
         let amount = document.getElementById('tokenAmount').value;
         let successMsg = document.getElementById('sendTokenSuccess');
         let errorMsg = document.getElementById('sendTokenError');
+        let xnsFoundAddress = document.getElementById('xnsFoundAddress');
+        if (xnsFoundAddress.innerHTML !== '') {
+            recipient = xnsFoundAddress.innerHTML;
+        }
+
         successMsg.style.display = 'none';
         errorMsg.style.display = 'none';
 
@@ -110,6 +115,7 @@ function debounce(func, delay) {
 }
 
 debouncedEstimateSendStamps_ = debounce(estimateSendStamps, 500);
+document.getElementById('toAddress').addEventListener('input', getXNSAddress);
 document.getElementById('toAddress').addEventListener('input', debouncedEstimateSendStamps_);
 document.getElementById('tokenAmount').addEventListener('input', debouncedEstimateSendStamps_);
 
@@ -190,4 +196,24 @@ async function estimateSendStamps(){
         document.getElementById('tokenFee').innerHTML = "Error";
     }
     document.getElementById('tokenFeeContainer').style.display = 'block';
+}
+
+async function getXNSAddress(){
+    let name = document.getElementById('toAddress').value;
+    let xns_found = document.querySelector('.xns-found');
+    document.getElementById('xnsFoundAddress').innerHTML = '';
+    xns_found.style.display = 'none';
+    if (name === '') return;
+    if (name.length < 3) return;
+    if (name.length > 32) return;
+    if (!/^[a-zA-Z0-9]+$/.test(name)) {
+        return;
+    }
+    let address = await execute_get_main_name_to_address(name);
+    if (address === "None") {
+        return;
+    }
+    xns_found.style.display = 'block';
+    document.getElementById('xnsFoundAddress').innerHTML = address;
+
 }
