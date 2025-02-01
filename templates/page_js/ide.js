@@ -31,12 +31,14 @@ function changeTab(tab_name) {
     editor.setValue(code_storage[current_tab]);
     if (current_tab.endsWith('(Read-Only)')) {
         editor.setOption('readOnly', true);
+        editor.setOption('lint', false);
         document.getElementById('submission-form').style.display = 'none';
         buildFunctionBoxes();
         document.getElementById('function-boxes').style.display = 'flex';
     }
     else {
         editor.setOption('readOnly', false);
+        editor.setOption('lint', true);
         document.getElementById('submission-form').style.display = 'block';
         document.getElementById('function-boxes').style.display = 'none';
     }
