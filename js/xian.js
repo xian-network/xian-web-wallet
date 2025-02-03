@@ -361,7 +361,7 @@ async function execute_balance_of(contract, address) {
 async function execute_get_main_name_to_address(name) {
     let payload = {
           "sender": "",
-          "contract": "con_name_service",
+          "contract": "con_name_service_main",
           "function": "get_main_name_to_address",
           "kwargs": {
               "name": name
