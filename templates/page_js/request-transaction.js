@@ -59,6 +59,11 @@ document.getElementById('request-transaction-reject').addEventListener('click', 
     rejectRequest();
 });
 
+// We need to also catch the case where the user closes the window
+window.onbeforeunload = function() {
+    rejectRequest();
+};
+
 async function estimateRequestStamps(){
     let contract = document.getElementById('requestTransactionContract').innerHTML;
     let method = document.getElementById('requestTransactionFunction').innerHTML;
