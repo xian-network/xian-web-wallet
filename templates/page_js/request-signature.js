@@ -22,6 +22,12 @@ function rejectRequest() {
     window.close();
 }
 
+// We need to also catch the case where the user closes the window
+window.onbeforeunload = function() {
+    rejectRequest();
+};
+
+
 document.getElementById('request-signature-accept').addEventListener('click', function() {
     acceptRequest();
 });
