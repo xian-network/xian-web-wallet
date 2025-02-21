@@ -40,9 +40,9 @@ document.getElementById('side-lock-wallet').addEventListener('click', function()
 });
 }
 
-if(document.getElementById('side-change-page-govenance')) {
-document.getElementById('side-change-page-govenance').addEventListener('click', function() {
-    changePage('governance');
+if(document.getElementById('side-change-page-insights')) {
+document.getElementById('side-change-page-insights').addEventListener('click', function() {
+    changePage('insights');
 });
 
 }

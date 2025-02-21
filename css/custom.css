@@ -94,6 +94,7 @@ a:hover{
     font-size: 1.25rem;
     margin-bottom: 1rem;
     margin-top: 1rem;
+    text-decoration: underline;
 }
 .ide-icon{
     position: absolute;
@@ -597,7 +598,9 @@ a:hover{
     border-radius: 5px;
     
 }
-
+#validator-state{
+    margin-bottom: 1rem;
+}
 .token-list-title {
     font-size: 1.25rem;
     margin-bottom: 20px;

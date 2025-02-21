@@ -1,0 +1,51 @@
+<h1 class="app-box-title">Chain Insights</h1>
+<p class="app-box-description">Chain Insights provides a detailed view of the Xian Network. Here you can find information about the blockchain's current state.</p>
+<div class="app-box-form">
+    <div class="alert alert-danger" role="alert" id="governanceError" style="display: none;"></div>
+    <div class="alert alert-success" role="alert" id="governanceSuccess" style="display: none;"></div>
+    <span id="validator-state"></span>
+    <div class="governance-section-wrapper">
+        <div class="governance-section-flex">
+            <h2 class="governance-sub-title">Stamp Conversion Rate (Pay Fees with XIAN)</h2> 
+            <p>Stamps measure the computational effort required to process transactions, while XIAN is used to pay for these stamps.</p>
+            <p>1 Xian = <span id="stamp-rate-governance"><i class='fas fa-spinner fa-spin'></i></span> Stamps</p>
+            <p>As a point of reference, a typical XIAN transfer transaction costs 14 stamps.</p>
+        </div>
+       
+    </div>
+    
+    <div class="governance-section-wrapper">
+        <div class="governance-section">
+            <h2 class="governance-sub-title">Transaction Fee Distribution (Paid in XIAN)</h2>
+            <p><span class="label-gov">Foundation:</span> <span class="value-gov" id="transaction-rewards-foundation-governance"><i class='fas fa-spinner fa-spin'></i></span>%</p>
+            <p><span class="label-gov">Validators:</span> <span class="value-gov" id="transaction-rewards-validators-governance"><i class='fas fa-spinner fa-spin'></i></span>%</p>
+            <p><span class="label-gov">Contract Developers:</span> <span class="value-gov" id="transaction-rewards-developers-governance"><i class='fas fa-spinner fa-spin'></i></span>%</p>
+            <p><span class="label-gov">Burned:</span> <span class="value-gov" id="transaction-rewards-burn-governance"><i class='fas fa-spinner fa-spin'></i></span>%</p>
+        </div>
+        
+    </div>
+    <div class="governance-section-wrapper">
+        <div class="governance-section">
+            <h2 class="governance-sub-title">Validators</h2>
+            <p><span class="label-gov">Number of Validators:</span> <span class="value-gov" id="number-of-validators-governance"><i class='fas fa-spinner fa-spin'></i></span></p>
+        </div>
+    </div>
+    <div class="governance-section-wrapper">
+        <div class="governance-section-flex">
+            <h2 class="governance-sub-title">Validator DAO Balance</h2>
+            <p><span id="dao-balance-governance"><i class='fas fa-spinner fa-spin'></i></span> Xian</p>
+        </div>
+    </div>
+    <div class="title-container-governance d-none">
+        <h2 class="token-list-title">Ongoing Votes</h2>
+        <div class="governance-section-buttons" >
+            <button class="btn" id="new-proposal" style="display: none;">New Proposal</button>
+        </div>
+    </div>
+    <div id="proposal-list" class="d-none">
+        
+    </div>
+    
+    
+</div>
+<script src="templates/page_js/governance.js"></script>

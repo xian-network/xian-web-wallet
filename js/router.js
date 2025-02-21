@@ -100,7 +100,7 @@ function sideNavActive() {
     if (app_page === "wallet") {
       document.getElementById("side-change-page-wallet").classList.add("active-side-nav");
       document.getElementById("side-change-page-ide").classList.remove("active-side-nav");
-      document.getElementById("side-change-page-govenance").classList.remove("active-side-nav");
+      document.getElementById("side-change-page-insights").classList.remove("active-side-nav");
       document.getElementById("side-change-page-ecosystem-news").classList.remove("active-side-nav");
       document.getElementById("side-change-page-settings").classList.remove("active-side-nav");
       document.getElementById("side-change-page-messenger").classList.remove("active-side-nav");
@@ -108,15 +108,15 @@ function sideNavActive() {
     else if (app_page === "ide") {
       document.getElementById("side-change-page-wallet").classList.remove("active-side-nav");
       document.getElementById("side-change-page-ide").classList.add("active-side-nav");
-      document.getElementById("side-change-page-govenance").classList.remove("active-side-nav");
+      document.getElementById("side-change-page-insights").classList.remove("active-side-nav");
       document.getElementById("side-change-page-ecosystem-news").classList.remove("active-side-nav");
       document.getElementById("side-change-page-settings").classList.remove("active-side-nav");
       document.getElementById("side-change-page-messenger").classList.remove("active-side-nav");
     }
-    else if (app_page === "governance") {
+    else if (app_page === "insights") {
       document.getElementById("side-change-page-wallet").classList.remove("active-side-nav");
       document.getElementById("side-change-page-ide").classList.remove("active-side-nav");
-      document.getElementById("side-change-page-govenance").classList.add("active-side-nav");
+      document.getElementById("side-change-page-insights").classList.add("active-side-nav");
       document.getElementById("side-change-page-ecosystem-news").classList.remove("active-side-nav");
       document.getElementById("side-change-page-settings").classList.remove("active-side-nav");
       document.getElementById("side-change-page-messenger").classList.remove("active-side-nav");
@@ -124,7 +124,7 @@ function sideNavActive() {
     else if (app_page === "ecosystem-news") {
       document.getElementById("side-change-page-wallet").classList.remove("active-side-nav");
       document.getElementById("side-change-page-ide").classList.remove("active-side-nav");
-      document.getElementById("side-change-page-govenance").classList.remove("active-side-nav");
+      document.getElementById("side-change-page-insights").classList.remove("active-side-nav");
       document.getElementById("side-change-page-ecosystem-news").classList.add("active-side-nav");
       document.getElementById("side-change-page-settings").classList.remove("active-side-nav");
       document.getElementById("side-change-page-messenger").classList.remove("active-side-nav");
@@ -132,7 +132,7 @@ function sideNavActive() {
     else if (app_page === "settings") {
       document.getElementById("side-change-page-wallet").classList.remove("active-side-nav");
       document.getElementById("side-change-page-ide").classList.remove("active-side-nav");
-      document.getElementById("side-change-page-govenance").classList.remove("active-side-nav");
+      document.getElementById("side-change-page-insights").classList.remove("active-side-nav");
       document.getElementById("side-change-page-ecosystem-news").classList.remove("active-side-nav");
       document.getElementById("side-change-page-settings").classList.add("active-side-nav");
       document.getElementById("side-change-page-messenger").classList.remove("active-side-nav");
@@ -140,7 +140,7 @@ function sideNavActive() {
     else if (app_page === "messenger") {
       document.getElementById("side-change-page-wallet").classList.remove("active-side-nav");
       document.getElementById("side-change-page-ide").classList.remove("active-side-nav");
-      document.getElementById("side-change-page-govenance").classList.remove("active-side-nav");
+      document.getElementById("side-change-page-insights").classList.remove("active-side-nav");
       document.getElementById("side-change-page-ecosystem-news").classList.remove("active-side-nav");
       document.getElementById("side-change-page-settings").classList.remove("active-side-nav");
       document.getElementById("side-change-page-messenger").classList.add("active-side-nav");
@@ -252,8 +252,8 @@ function changePage(page, some_data = null, send_response = null) {
     case "request-transaction":
       loadHtmlAndScripts("templates/request-transaction.html");
       break;
-    case "governance":
-      loadHtmlAndScripts("templates/governance.html");
+    case "insights":
+      loadHtmlAndScripts("templates/insights.html");
       break;
     case "new-proposal":
       loadHtmlAndScripts("templates/new-proposal.html");
