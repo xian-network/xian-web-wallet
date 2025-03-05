@@ -605,6 +605,7 @@ getStampRate().then((rate) => {
 document.getElementById('btn-ide-submit-contract').addEventListener('click', function () {
     if( document.getElementById('submitContractNameWrapper').style.display === 'none' ) {
         document.getElementById('submitContractNameWrapper').style.display = 'block';
+        document.getElementById("submitContractName").value = current_tab;
         document.getElementById('submitContractstampLimitWrapper').style.display = 'block';
         document.getElementById('submitContractconstructorKwargsWrapper').style.display = 'block';
         document.getElementById('btn-ide-submit-contract').innerHTML = 'Deploy Contract';
