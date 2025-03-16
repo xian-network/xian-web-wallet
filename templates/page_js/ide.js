@@ -25,6 +25,7 @@ function removeTab(tab_name) {
     );
 
     localStorage.setItem('code_storage', JSON.stringify(code_storage));
+    if(deployment_started[tab_name]) deployment_started[tab_name] = false;
 }
 
 function changeTab(tab_name) {
