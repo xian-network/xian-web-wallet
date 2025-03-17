@@ -17,6 +17,10 @@ document.addEventListener('xianWalletSignMsg', (event) => {
     xianWalletSignMsg(event.detail)
 });
 
+document.addEventListener('xianWalletAddToken', (event) => {
+    xianWalletAddToken(event.detail)
+});
+
 const xianWalletSendTx = (detail) => { 
     chrome.runtime.sendMessage({type: 'dAppSendTransaction', data: detail}, (response) => {
         if(!chrome.runtime.lastError || response !== 'ok'){
@@ -38,6 +42,15 @@ const xianWalletSignMsg = (detail) => {
     chrome.runtime.sendMessage({type: 'dAppSignMessage', data: detail}, (response) => {
         if(!chrome.runtime.lastError || response !== 'ok'){
             document.dispatchEvent(new CustomEvent('xianWalletSignMsgResponse', {detail: response}));
+            handleFocus();
+        }
+    });
+}
+
+const xianWalletAddToken = (detail) => {
+    chrome.runtime.sendMessage({type: 'dAppAddToken', data: detail}, (response) => {
+        if(!chrome.runtime.lastError || response !== 'ok'){
+            document.dispatchEvent(new CustomEvent('xianWalletAddTokenResponse', {detail: response}));
             handleFocus();
         }
     });

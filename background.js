@@ -64,7 +64,7 @@ function verifyTab(tabId) {
 
 // Listener for messages from the content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (["dAppSendTransaction", "getWalletInfo", "dAppSignMessage"].includes(message.type)) {
+    if (["dAppSendTransaction", "getWalletInfo", "dAppSignMessage", "dAppAddToken"].includes(message.type)) {
         if (appTabId === null) findTab();
 
         if (appTabId === null && message.type === "getWalletInfo") {

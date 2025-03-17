@@ -52,6 +52,14 @@ if (runningAsExtension()) {
             createExternalWindow('request-signature', message, sendResponse);
             
         }
+        if (message.type === 'dAppAddToken') {
+            if (locked) {
+                sendResponse({errors: ['Wallet is locked']});
+                return;
+            }
+            createExternalWindow('request-token', message, sendResponse);
+            
+        }
 
         return true;
     });
