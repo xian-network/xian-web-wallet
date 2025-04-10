@@ -24,4 +24,13 @@ window.addEventListener("message", (event) => {
       callbackKey = event.data.callbackKey;
       document.getElementById("requestSignatureMessage").innerHTML = some_data["data"]["message"];
     }
+    if (event.data.type === "REQUEST_TOKEN") {
+      const some_data = event.data.data;
+      callbackKey = event.data.callbackKey;
+      document.getElementById("requestTokenMessage").innerHTML = some_data["data"]["contract"];
+      getTokenInfo(some_data["data"]["contract"]).then(token_info => {
+        document.getElementById("requestTokenName").innerHTML = token_info.name;
+        document.getElementById("requestTokenSymbol").innerHTML = token_info.symbol;
+      });
+    }
   });

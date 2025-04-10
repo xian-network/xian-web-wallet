@@ -77,6 +77,27 @@ a{
 .title-container-governance{
     margin-top:1rem;
 }
+.form-group label {
+    display: block;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.25rem;
+}
+
+.form-group p {
+    margin: 0 0 0.5rem 0;
+    line-height: 1.5;
+}
+
+.form-group a {
+    color: #06e6cb;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.form-group a:hover {
+    text-decoration: underline;
+}
 .label-gov {
     min-width: 250px; /* Adjust this value based on your longest label */
     margin-right: 10px; /* Space between the label and the value */

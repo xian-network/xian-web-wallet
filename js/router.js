@@ -57,8 +57,17 @@ function createExternalWindow(page, some_data = null, send_response = null) {
   const sendPageSpecificMessage = (page, some_data) => {
     const callbackKey = 'callback_' + (callbackId++);
     callbacks[callbackKey] = send_response;
+    let type = "";
+    if (page === "request-transaction") {
+      type = "REQUEST_TRANSACTION";
+    } else if (page === "request-signature") {
+      type = "REQUEST_SIGNATURE";
+    }
+    else if (page === "request-token") {
+      type = "REQUEST_TOKEN";
+    }
     externalWindow.postMessage({
-      type: page === "request-transaction" ? "REQUEST_TRANSACTION" : "REQUEST_SIGNATURE",
+      type: type,
       data: JSON.parse(JSON.stringify(some_data)),
       callbackKey: callbackKey
     }, "*");
@@ -71,13 +80,15 @@ function createExternalWindow(page, some_data = null, send_response = null) {
     case "request-signature":
       loadHtmlAndScripts("templates/request-signature.html");
       break;
+    case "request-token":
+      loadHtmlAndScripts("templates/request-token.html");
+      break;
     default:
       break;
   }
 }
 
 window.addEventListener("message", (event) => {
- 
   if (event.data.type === "REQUEST_TRANSACTION") {
     const some_data = event.data.data;
     const callbackKey = event.data.callbackKey;
@@ -92,6 +103,15 @@ window.addEventListener("message", (event) => {
     const callbackKey = event.data.callbackKey;
     callbacks[callbackKey](event.data.data);
     toast('success', 'Successfully signed message');
+  }
+  if (event.data.type === "REQUEST_TOKEN") {
+    const some_data = event.data.data;
+    const callbackKey = event.data.callbackKey;
+    callbacks[callbackKey](event.data.data);
+    token_list = JSON.parse(localStorage.getItem("token_list")) || ["currency"];
+    if (app_page == "wallet"){
+      changePage("settings");
+    }
   }
 });
 
@@ -175,6 +195,10 @@ function changePage(page, some_data = null, send_response = null) {
         }
         else if(page === "request-signature"){
           document.getElementById("requestSignatureMessage").innerHTML = some_data["data"]["message"];
+          sendResponse = send_response;
+        }
+        else if (page === "request-token") {
+          document.getElementById("requestTokenMessage").innerHTML = some_data;
           sendResponse = send_response;
         }
         else if (page === "password-input" || page === "create-wallet" || page === "import-wallet" || page === "get-started") {
