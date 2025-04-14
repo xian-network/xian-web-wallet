@@ -14,45 +14,27 @@ var callbacks = {};
 var callbackId = 0;
 
 function insertHTMLAndExecuteScripts(container, htmlContent) {
-    if (!container) {
-        console.error("Container element not found for insertHTMLAndExecuteScripts");
-        return;
-    }
     container.innerHTML = htmlContent;
     const scripts = container.querySelectorAll("script");
-
+  
     // Identify and remove previously loaded scripts to prevent duplicates
-    // Use a more specific selector if possible, or ensure scripts have unique IDs/attributes
-    // const oldScripts = document.querySelectorAll('script[data-script="dynamic"]');
-    // oldScripts.forEach(script => script.remove()); // Be careful with removing scripts this way
-
+    const oldScripts = document.querySelectorAll('script[data-script="dynamic"]');
+    oldScripts.forEach(script => script.remove());
+  
     scripts.forEach((originalScript) => {
-        if (originalScript.src) {
-             // Check if script with this src already exists in head to avoid duplicates
-             if (!document.head.querySelector(`script[src="${originalScript.src}"]`)) {
-                 const script = document.createElement("script");
-                 script.src = originalScript.src;
-                 // script.setAttribute('data-script', 'dynamic'); // Mark script for identification
-                 script.onload = () => {
-                     // console.log(`Script loaded: ${script.src}`); // Optional logging
-                 };
-                 script.onerror = () => {
-                      console.error(`Failed to load script: ${script.src}`);
-                 };
-                 document.head.appendChild(script);
-             } else {
-                 // console.log(`Script already loaded: ${originalScript.src}`); // Optional logging
-             }
-
-        } else {
-            // Inline scripts might be blocked by CSP in extensions.
-            // Consider extracting inline logic into separate .js files referenced by src.
-            console.warn("Inline script execution attempted and might be blocked by CSP. Content:", originalScript.textContent.substring(0, 100) + "...");
-             // If absolutely necessary and CSP allows 'unsafe-inline', you could eval, but it's risky:
-             // try { eval(originalScript.textContent); } catch (e) { console.error("Error executing inline script:", e); }
-        }
+      if (originalScript.src) {
+        const script = document.createElement("script");
+        script.src = originalScript.src;
+        script.setAttribute('data-script', 'dynamic'); // Mark script for identification
+        script.onload = () => {
+          console.log(`Script loaded: ${script.src}`);
+        };
+        document.head.appendChild(script);
+      } else {
+        console.warn("Inline script execution is blocked by CSP");
+      }
     });
-}
+  }
 
 // --- Other Helper Functions (like popup_params, getSelectedAccount etc.) ---
 function popup_params(width, height) {
