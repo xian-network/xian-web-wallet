@@ -1,4 +1,17 @@
-// Define helper functions EARLIER in the file
+// --- Global Variables (Keep these at the top) ---
+var app_page = "get-started";
+var app_box = document.getElementById("app-box");
+// ... (other global variables: encryptedSeed, accounts, etc.) ...
+var encryptedSeed = null;
+var unencryptedMnemonic = null;
+var accounts = [];
+var selectedAccountIndex = 0;
+var locked = true;
+var tx_history = JSON.parse(localStorage.getItem("tx_history")) || [];
+var sendResponse = null;
+var externalWindow = null;
+var callbacks = {};
+var callbackId = 0;
 
 function insertHTMLAndExecuteScripts(container, htmlContent) {
     if (!container) {
@@ -40,22 +53,6 @@ function insertHTMLAndExecuteScripts(container, htmlContent) {
         }
     });
 }
-
-
-// --- Global Variables (Keep these at the top) ---
-var app_page = "get-started";
-var app_box = document.getElementById("app-box");
-// ... (other global variables: encryptedSeed, accounts, etc.) ...
-var encryptedSeed = null;
-var unencryptedMnemonic = null;
-var accounts = [];
-var selectedAccountIndex = 0;
-var locked = true;
-var tx_history = JSON.parse(localStorage.getItem("tx_history")) || [];
-var sendResponse = null;
-var externalWindow = null;
-var callbacks = {};
-var callbackId = 0;
 
 // --- Other Helper Functions (like popup_params, getSelectedAccount etc.) ---
 function popup_params(width, height) {
