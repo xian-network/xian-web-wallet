@@ -1,11 +1,29 @@
-function importWallet() {
-    let password = document.getElementById('import_password').value;
-    let confirmPassword = document.getElementById('import_confirmPassword').value;
-    let privateKey = document.getElementById('import_privateKey').value;
-    let importWalletError = document.getElementById('importWalletError');
+// Assumes bip39 library is loaded globally
 
-    if (privateKey.length !== 64) {
-        importWalletError.innerHTML = 'Invalid private key!';
+async function importHdWallet() { // Renamed and made async
+    const mnemonicInput = document.getElementById('import_mnemonic').value.trim(); // Get mnemonic and trim whitespace
+    const password = document.getElementById('import_password').value;
+    const confirmPassword = document.getElementById('import_confirmPassword').value;
+    const importWalletError = document.getElementById('importWalletError');
+    const importButton = document.getElementById('btn-import-wallet-import-wallet');
+
+    importWalletError.style.display = 'none'; // Reset error
+
+    // --- Validation ---
+    // Normalize multiple spaces between words to single spaces
+    const normalizedMnemonic = mnemonicInput.replace(/\s+/g, ' ');
+    const words = normalizedMnemonic.split(' ');
+    const wordCount = words.length;
+
+    if (wordCount !== 12 && wordCount !== 24) {
+         importWalletError.innerHTML = 'Recovery phrase must be 12 or 24 words long.';
+         importWalletError.style.display = 'block';
+         return;
+    }
+
+    // Validate mnemonic using bip39 library
+    if (!bip39.validateMnemonic(normalizedMnemonic)) {
+        importWalletError.innerHTML = 'Invalid recovery phrase. Please check your words and their order.';
         importWalletError.style.display = 'block';
         return;
     }
@@ -21,80 +39,116 @@ function importWallet() {
         importWalletError.style.display = 'block';
         return;
     }
+    // --- End Validation ---
 
-    importWalletError.style.display = 'none';
+    // Disable button during import
+    importButton.disabled = true;
+    importButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing...';
 
-    let keyPair = createKeyPairFromSK(privateKey, password);
-    console.log(keyPair);
-    let public_key = keyPair.publicKey;
-    let encryptedPrivateKey = keyPair.encryptedPrivateKey;
-    let _unencryptedPrivateKey = keyPair.unencryptedPrivateKey;
-    
-    // Save the public key and the encrypted private key
-    createSecureCookie('publicKey', public_key, 9999);
-    createSecureCookie('encryptedPrivateKey', encryptedPrivateKey, 9999);
-    
-    // Save the unencrypted private key to the global variable
-    unencryptedPrivateKey = _unencryptedPrivateKey;
-    publicKey = public_key;
-    locked = false;
-    changePage('wallet');
+    try {
+        // 1. Import Master Seed (validates mnemonic, derives first key, encrypts mnemonic)
+        // Use the normalized mnemonic
+        const importedWalletData = importMasterSeedFromMnemonic(normalizedMnemonic, password); // From xian.js
+
+        if (!importedWalletData) {
+             // Should not happen if validation passed, but double-check
+             throw new Error("Mnemonic validation passed but import failed.");
+        }
+
+        // 2. Prepare initial account data
+        const initialAccount = {
+            index: 0,
+            vk: importedWalletData.publicKey, // VK of the first account (index 0)
+            name: "Account 1" // Default name for the first account
+        };
+
+        // 3. Update Global State (in router.js scope)
+        window.encryptedSeed = importedWalletData.encryptedSeed;
+        window.unencryptedMnemonic = importedWalletData.unencryptedMnemonic; // Store temporarily
+        window.accounts = [initialAccount]; // Start with just the first account
+        window.selectedAccountIndex = 0;
+        window.locked = false; // Wallet is imported and immediately unlocked
+
+        // 4. Save State to Storage
+        await saveEncryptedSeed(window.encryptedSeed);
+        await saveAccounts(window.accounts);
+        await saveSelectedAccountIndex(window.selectedAccountIndex);
+
+        // Clear sensitive fields
+        document.getElementById('import_mnemonic').value = '';
+        document.getElementById('import_password').value = '';
+        document.getElementById('import_confirmPassword').value = '';
+
+        // 5. Navigate to Wallet Page
+        toast('success', 'Wallet imported successfully!');
+        changePage('wallet');
+
+    } catch (error) {
+        console.error("Error importing HD wallet:", error);
+        importWalletError.innerHTML = 'Failed to import wallet. ' + error.message;
+        importWalletError.style.display = 'block';
+         // Re-enable button on error
+         importButton.disabled = false;
+         importButton.innerHTML = 'Import Wallet';
+    }
+     // importButton.disabled = false; // Might re-enable too early if changePage is fast
+     // importButton.innerHTML = 'Import Wallet';
 }
 
+// Back button listener
 document.getElementById('btn-import-wallet-back').addEventListener('click', function() {
     changePage('get-started');
 });
+
+// Import button listener
 document.getElementById('btn-import-wallet-import-wallet').addEventListener('click', function() {
-    importWallet();
+    importHdWallet(); // Call async function
 });
 
-function inputValidation() {
-    const privateKey = document.getElementById('import_privateKey');
+// Input validation setup (similar to create-wallet, adapted for mnemonic)
+function inputValidationImport() {
+    const mnemonicInput = document.getElementById('import_mnemonic');
     const password = document.getElementById('import_password');
     const confirmPassword = document.getElementById('import_confirmPassword');
     const importWalletError = document.getElementById('importWalletError');
 
-    password.addEventListener("input", checkPasswordLength);
-    confirmPassword.addEventListener("input", matchPasswords);
+    // Clear error on input
+    mnemonicInput.addEventListener('input', () => importWalletError.style.display = 'none');
+    password.addEventListener('input', () => importWalletError.style.display = 'none');
+    confirmPassword.addEventListener('input', () => importWalletError.style.display = 'none');
 
-    function checkPasswordLength(event){
-        const passwordValue = event.target.value;
+    // Basic validation on blur (full validation on submit)
+    password.addEventListener("blur", checkPasswordLengthImport);
+    confirmPassword.addEventListener("blur", matchPasswordsImport);
+
+    function checkPasswordLengthImport(){
+        const passwordValue = password.value;
         if (passwordValue.length > 0 && passwordValue.length < 6) {
             importWalletError.innerHTML = 'Password must be at least 6 characters long!';
             importWalletError.style.display = 'block';
         } else {
-            importWalletError.style.display = 'none';
+            // Don't hide error here, let submit handle final state
         }
     }
 
-    function matchPasswords(event){
-        const confirmPasswordValue = event.target.value;
-        if (password.value !== confirmPasswordValue || confirmPasswordValue === '') {
+    function matchPasswordsImport(){
+        const confirmPasswordValue = confirmPassword.value;
+        if (password.value !== confirmPasswordValue && confirmPasswordValue !== '') { // Only show error if confirm has content and doesn't match
             importWalletError.innerHTML = 'Passwords do not match!';
             importWalletError.style.display = 'block';
-        }else {
-            importWalletError.style.display = 'none';
-        }
-    }
-
-    function checkPrivateKeyLength(event){
-        const privateKeyValue = event.target.value;
-        if (privateKeyValue.length > 0 && privateKeyValue.length < 64) {
-            importWalletError.innerHTML = 'Private key must be 64 characters long!';
-            importWalletError.style.display = 'block';
         } else {
-            importWalletError.style.display = 'none';
+           // Don't hide error here
         }
     }
-
-    privateKey.addEventListener("input", checkPrivateKeyLength);
-
 }
-inputValidation();
 
+// Initialize validation listeners
+inputValidationImport();
+
+// Add Enter key listener to confirm password field
 document.getElementById('import_confirmPassword').addEventListener('keyup', function(event) {
-    if (event.keyCode === 13) {
+    if (event.keyCode === 13) { // Enter key
         event.preventDefault();
-        importWallet();
+        importHdWallet();
     }
 });

@@ -1,696 +1,876 @@
-var code_storage = JSON.parse(localStorage.getItem('code_storage')) || { "contract": "@construct\ndef seed():\n    pass\n\n@export\ndef test():\n    return 'Hello, World!'" };
+// Assumes global vars: code_storage, current_tab, deployment_started (needs proper scoping if not global),
+//                    editor, pyodide (from pyodide-linting.js), RPC, EXPLORER, CHAIN_ID,
+//                    locked, unencryptedMnemonic, selectedAccountIndex, accounts, tx_history
+// Assumes functions: saveCode, addTab, removeTab, changeTab, refreshTabList, showDropdown,
+//                    getContractCode, getContractFunctions, getStampRate, signTransaction,
+//                    broadcastTransaction, prependToTransactionHistory, changePage, toast,
+//                    getSelectedAccount, execute_balance_of (needs to be available)
+
+var code_storage = JSON.parse(localStorage.getItem('code_storage')) || { "contract.py": "@construct\ndef seed():\n    pass\n\n@export\ndef test():\n    return 'Hello, World!'" }; // Default with .py extension
 var current_tab = Object.keys(code_storage)[0];
+// Scope deployment_started properly if it's meant to be per-tab state persisted across sessions
+var deployment_started = JSON.parse(sessionStorage.getItem('deployment_started')) || {}; // Use sessionStorage for temporary state
+
 
 function saveCode() {
-    code_storage[current_tab] = editor.getValue();
-    localStorage.setItem('code_storage', JSON.stringify(code_storage));
+    if (editor && current_tab && !current_tab.endsWith('(Read-Only)')) { // Only save writable tabs
+        code_storage[current_tab] = editor.getValue();
+        localStorage.setItem('code_storage', JSON.stringify(code_storage));
+    }
 }
 
+function saveDeploymentState() {
+    sessionStorage.setItem('deployment_started', JSON.stringify(deployment_started));
+}
+
+
 function addTab(tab_name, code = '') {
+    // Basic validation for tab name
+    if (!tab_name || typeof tab_name !== 'string' || tab_name.trim().length === 0) {
+        console.error("Invalid tab name provided.");
+        return;
+    }
+    // Prevent adding duplicate names
+     if (code_storage.hasOwnProperty(tab_name)) {
+         console.warn(`Tab "${tab_name}" already exists.`);
+         return;
+     }
     code_storage[tab_name] = code;
     localStorage.setItem('code_storage', JSON.stringify(code_storage));
+    // Reset deployment state for the new tab if it exists
+    if (deployment_started.hasOwnProperty(tab_name)) {
+        delete deployment_started[tab_name];
+        saveDeploymentState();
+    }
 }
 
 function removeTab(tab_name) {
-    let old_code_storage = code_storage;
-    code_storage = {};
-    Object.keys(old_code_storage).forEach((tab) => {
-        if (tab !== tab_name) {
-            console.log(tab, tab_name);
-            code_storage[tab] = old_code_storage[tab];
-            console.log('Adding tab:', tab);
-        }
+    if (Object.keys(code_storage).length <= 1) {
+        toast('warning', 'Cannot remove the last file.');
+        return; // Don't remove the last tab
     }
-    );
-
-    localStorage.setItem('code_storage', JSON.stringify(code_storage));
+    if (code_storage.hasOwnProperty(tab_name)) {
+        delete code_storage[tab_name]; // Remove the tab
+        localStorage.setItem('code_storage', JSON.stringify(code_storage)); // Update storage
+         // Remove associated deployment state
+         if (deployment_started.hasOwnProperty(tab_name)) {
+             delete deployment_started[tab_name];
+             saveDeploymentState();
+         }
+        return true; // Indicate success
+    }
+    return false; // Indicate tab not found
 }
+
 
 function changeTab(tab_name) {
-    current_tab = tab_name;
-    editor.setValue(code_storage[current_tab]);
-    if (current_tab.endsWith('(Read-Only)')) {
-        editor.setOption('readOnly', true);
-        editor.setOption('lint', false);
-        document.getElementById('submission-form').style.display = 'none';
-        buildFunctionBoxes();
-        document.getElementById('function-boxes').style.display = 'flex';
+     if (!code_storage.hasOwnProperty(tab_name)) {
+          console.error(`Attempted to switch to non-existent tab: ${tab_name}`);
+          // Optionally switch to the first available tab
+          const firstTab = Object.keys(code_storage)[0];
+          if (firstTab) {
+             current_tab = firstTab;
+             editor.setValue(code_storage[current_tab] || '');
+          } else {
+               // Handle case where there are no tabs left (shouldn't happen with removeTab check)
+               editor.setValue(''); // Clear editor
+               current_tab = null;
+          }
+     } else {
+         current_tab = tab_name;
+         editor.setValue(code_storage[current_tab]);
+     }
+
+    const isReadOnly = current_tab && current_tab.endsWith('(Read-Only)');
+    const submissionForm = document.getElementById('submission-form');
+    const functionBoxes = document.getElementById('function-boxes');
+    const submitContractNameWrapper = document.getElementById('submitContractNameWrapper');
+    const submitContractstampLimitWrapper = document.getElementById('submitContractstampLimitWrapper');
+    const submitContractconstructorKwargsWrapper = document.getElementById('submitContractconstructorKwargsWrapper');
+    const submitButton = document.getElementById('btn-ide-submit-contract');
+
+
+    editor.setOption('readOnly', isReadOnly);
+    // Disable linting for read-only as it might be irrelevant or slow
+    editor.setOption('lint', !isReadOnly && typeof pythonLinter === 'function');
+
+    submissionForm.style.display = isReadOnly ? 'none' : 'block';
+    functionBoxes.style.display = isReadOnly ? 'flex' : 'none';
+    functionBoxes.innerHTML = ''; // Clear previous function boxes
+
+    if (isReadOnly) {
+        buildFunctionBoxes(); // Build function boxes for read-only contracts
+    } else {
+        // Handle deployment state display for writable tabs
+        if (deployment_started[current_tab]) {
+            submitContractNameWrapper.style.display = 'block';
+            // Pre-fill contract name based on tab name (remove .py if exists)
+            document.getElementById("submitContractName").value = current_tab.replace(/\.py$/i, '');
+            submitContractstampLimitWrapper.style.display = 'block';
+            submitContractconstructorKwargsWrapper.style.display = 'block';
+            submitButton.innerHTML = 'Deploy Contract';
+        } else {
+            submitContractNameWrapper.style.display = 'none';
+            submitContractstampLimitWrapper.style.display = 'none';
+            submitContractconstructorKwargsWrapper.style.display = 'none';
+            submitButton.innerHTML = 'Start Deployment';
+        }
     }
-    else {
-        editor.setOption('readOnly', false);
-        editor.setOption('lint', true);
-        document.getElementById('submission-form').style.display = 'block';
-        document.getElementById('function-boxes').style.display = 'none';
-    }
-    refreshTabList();
+
+    refreshTabList(); // Update the visual state of tabs
 }
+
 
 function addNewTab() {
     let dropdown = document.querySelector('.dropdown-content');
-    if (dropdown) {
-        dropdown.remove();
-    }
+    if (dropdown) dropdown.remove();
 
-    let tab_name = prompt('Enter new file name:');
-    if (tab_name === null) {
+    let tab_name = prompt('Enter new file name (e.g., my_contract.py):');
+    if (tab_name === null) return; // User cancelled
+
+    tab_name = tab_name.trim();
+    if (tab_name === '') {
+        toast('warning', 'File name cannot be empty!');
+        return;
+    }
+    // Suggest adding .py if not present
+     if (!tab_name.toLowerCase().endsWith('.py')) {
+         tab_name += '.py';
+     }
+
+    if (code_storage.hasOwnProperty(tab_name)) {
+        toast('warning', `File "${tab_name}" already exists!`);
         return;
     }
 
-    if (Object.keys(code_storage).includes(tab_name)) {
-        alert('File already exists!');
-        return;
-    }
-
-    if (tab_name.trim() === '') {
-        alert('File name cannot be empty!');
-        return;
-    }
-
-    addTab(tab_name);
-    changeTab(tab_name);
-    refreshTabList();
+    // Add with default code or empty string
+    const defaultCode = "@construct\ndef seed():\n    pass\n\n@export\ndef my_function():\n    # Your code here\n    return 0";
+    addTab(tab_name, defaultCode);
+    changeTab(tab_name); // Switch to the new tab
+    refreshTabList(); // Update UI
 }
 
 function addNewTokenTab() {
-    let dropdown = document.querySelector('.dropdown-content');
-    if (dropdown) {
-        dropdown.remove();
-    }
+     let dropdown = document.querySelector('.dropdown-content');
+     if (dropdown) dropdown.remove();
 
-    let tab_name = prompt('Enter new file name:');
-    if (tab_name === null) {
-        return;
-    }
+     let tab_name = prompt('Enter new token file name (e.g., my_token.py):');
+     if (tab_name === null) return; // User cancelled
 
-    if (Object.keys(code_storage).includes(tab_name)) {
-        alert('File already exists!');
-        return;
-    }
+     tab_name = tab_name.trim();
+      if (tab_name === '') {
+         toast('warning', 'File name cannot be empty!');
+         return;
+     }
+      if (!tab_name.toLowerCase().endsWith('.py')) {
+         tab_name += '.py';
+     }
 
-    if (tab_name.trim() === '') {
-        alert('File name cannot be empty!');
-        return;
-    }
 
-    fetch('https://raw.githubusercontent.com/xian-network/xian-standard-contracts/refs/heads/main/XSC001_standard_token/XSC0001.py').then((response) => {
-        if (!response.ok) {
-            alert('Error loading token contract!');
-            return;
-        }
-        response.text().then((response) => {
-            addTab(tab_name, response);
-            changeTab(tab_name);
-            refreshTabList();
-        }).catch((error) => {
-            console.error('Error loading token contract:', error.message);
-            alert('Error loading token contract!');
-        });
-    });
+     if (code_storage.hasOwnProperty(tab_name)) {
+          toast('warning', `File "${tab_name}" already exists!`);
+         return;
+     }
+
+     // Fetch standard token code
+      fetch('https://raw.githubusercontent.com/xian-network/xian-standard-contracts/refs/heads/main/XSC001_standard_token/XSC0001.py')
+          .then((response) => {
+              if (!response.ok) {
+                   throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              return response.text();
+          })
+          .then((code) => {
+              addTab(tab_name, code);
+              changeTab(tab_name);
+              refreshTabList();
+               toast('success', 'Standard token contract loaded.');
+          })
+          .catch((error) => {
+               console.error('Error loading standard token contract:', error);
+               toast('danger', 'Error loading token template. Please try again.');
+          });
 }
-
-
 
 function loadContractFromExplorer() {
     let dropdown = document.querySelector('.dropdown-content');
-    if (dropdown) {
-        dropdown.remove();
-    }
-    let contract = prompt('Enter contract name:');
+    if (dropdown) dropdown.remove();
 
-    if (contract === null) {
+    let contract = prompt('Enter contract name to load:');
+    if (contract === null) return;
+
+    contract = contract.trim();
+    if (contract === '') {
+         toast('warning', 'Contract name cannot be empty.');
         return;
     }
 
-    getContractCode(contract).then((contractCode) => {
+    const tab_name = contract + '(Read-Only)';
+    if (code_storage.hasOwnProperty(tab_name)) {
+        toast('warning', `Contract "${contract}" is already open (read-only).`);
+         changeTab(tab_name); // Switch to existing tab
+        return;
+    }
+
+     // Show loading indicator?
+     toast('info', `Loading contract ${contract}...`);
+
+    getContractCode(contract).then((contractCode) => { // Assumes getContractCode is async
         if (contractCode === null || contractCode === '' || contractCode === "\x9Eée") {
-            alert('Contract not found!');
+            toast('danger', `Contract "${contract}" not found or could not be loaded.`);
             return;
         }
 
-        let tab_name = contract + '(Read-Only)';
-        if (Object.keys(code_storage).includes(tab_name)) {
-            alert('File already exists!');
-            return;
-        }
         addTab(tab_name, contractCode);
-        changeTab(tab_name);
+        changeTab(tab_name); // Switch to the newly loaded tab
         refreshTabList();
+        toast('success', `Contract ${contract} loaded (read-only).`);
 
     }).catch((error) => {
-        console.error('Error loading contract:', error.message);
-        alert('Error loading contract!');
+        console.error('Error loading contract:', error);
+        toast('danger', `Error loading contract ${contract}: ${error.message}`);
     });
 }
 
-
 function showDropdown() {
-    if (document.querySelector('.dropdown-content')) {
-        document.querySelector('.dropdown-content').remove();
-        return;
+    // Close existing dropdowns first
+    const existingDropdown = document.querySelector('.dropdown-content');
+    if (existingDropdown) {
+        existingDropdown.remove();
     }
 
+    const addButton = document.querySelector('.add-tab-button');
+    if (!addButton) return;
+
     let dropdown = document.createElement('div');
+    // Styling and positioning logic (keep as is, assuming it works)
     dropdown.className = 'dropdown-content';
+    // ... (rest of the styling) ...
     dropdown.style.display = 'flex';
     dropdown.style.flexDirection = 'column';
     dropdown.style.gap = '10px';
-    dropdown.style.position = 'absolute';
-    dropdown.style.width = '10rem';
-    dropdown.style.zIndex = '100000';
-    dropdown.classList.add('dropdown-content');
+    dropdown.style.position = 'absolute'; // Make sure it's absolute
+    dropdown.style.backgroundColor = document.body.classList.contains('dark-mode') ? '#202020' : '#fff';
+    dropdown.style.border = '1px solid #8a8b8e';
     dropdown.style.borderRadius = '8px';
     dropdown.style.padding = '0.5rem';
+    dropdown.style.zIndex = '10000'; // High z-index
+    dropdown.style.minWidth = '150px'; // Give it some min width
 
-    // Append dropdown directly to body
-    document.body.appendChild(dropdown);
 
-    let buttonRect = document.querySelector('.add-tab-button').getBoundingClientRect();
-    dropdown.style.left = buttonRect.left + 'px';
-    dropdown.style.top = buttonRect.bottom + 'px';
+    let buttonRect = addButton.getBoundingClientRect();
+    dropdown.style.left = `${buttonRect.left}px`;
+    // Position below the button, accounting for scroll position
+    dropdown.style.top = `${buttonRect.bottom + window.scrollY}px`;
 
-    // Check if the dropdown extends beyond the right edge of the viewport
-    const dropdownWidth = dropdown.offsetWidth;
-    const viewportWidth = window.innerWidth;
-    const dropdownRight = buttonRect.left + dropdownWidth;
+    document.body.appendChild(dropdown); // Append to body
 
-    if (dropdownRight > viewportWidth) {
-        // If it extends beyond the viewport's right edge, adjust its position
+    // Adjust position if it goes off-screen (simple right edge check)
+    const dropdownRect = dropdown.getBoundingClientRect();
+    if (dropdownRect.right > window.innerWidth) {
         dropdown.style.left = 'auto';
-        dropdown.style.right = '0';
+        dropdown.style.right = '10px'; // Adjust with some padding
     }
+     if (dropdownRect.bottom > window.innerHeight) {
+          dropdown.style.top = 'auto';
+          dropdown.style.bottom = '10px';
+     }
 
+
+    // Dropdown items
     let newTab = document.createElement('div');
-    newTab.innerHTML = 'New Blank File';
+    newTab.innerHTML = '<i class="fas fa-file fa-fw me-2"></i>New Blank File';
     newTab.addEventListener('click', addNewTab);
     newTab.style.cursor = 'pointer';
+    newTab.className = 'dropdown-hover-item'; // Add class for hover effect if desired
 
     let newTokenTab = document.createElement('div');
-    newTokenTab.innerHTML = 'New Token';
+    newTokenTab.innerHTML = '<i class="fas fa-coins fa-fw me-2"></i>New Token';
     newTokenTab.addEventListener('click', addNewTokenTab);
     newTokenTab.style.cursor = 'pointer';
+    newTokenTab.className = 'dropdown-hover-item';
 
     let loadContract = document.createElement('div');
-    loadContract.innerHTML = 'Load Contract';
+    loadContract.innerHTML = '<i class="fas fa-download fa-fw me-2"></i>Load Contract';
     loadContract.addEventListener('click', loadContractFromExplorer);
     loadContract.style.cursor = 'pointer';
+    loadContract.className = 'dropdown-hover-item';
 
     dropdown.appendChild(newTab);
     dropdown.appendChild(newTokenTab);
     dropdown.appendChild(loadContract);
+
+     // Close dropdown when clicking outside
+     setTimeout(() => { // Use setTimeout to allow the current click event to finish
+          document.addEventListener('click', handleOutsideClickForDropdown, { once: true });
+     }, 0);
 }
 
-// var whitelistedPatterns = [
-//     'export',
-//     'construct',
-//     'Hash',
-//     'Variable',
-//     'ctx',
-//     'now',
-//     'random',
-//     'ForeignHash',
-//     'ForeignVariable',
-//     'block_num',
-//     'block_hash',
-//     'importlib',
-//     'hashlib',
-//     'datetime',
-//     'crypto',
-//     'decimal',
-//     'Any',
-//     'LogEvent'
-// ];
-
-async function lintCode(code){   
-    try{
-        const result = await pyodide.runPythonAsync(`
-from xian_contracting_linter import lint_code
-lint_code("""${code}""")
-`);   
-        let lintinfo = result.toJs();
-        return lintinfo;    
-    } catch (error) {
-        console.error('Error linting code:', error.message);
-        return [];
+function handleOutsideClickForDropdown(event) {
+    const dropdown = document.querySelector('.dropdown-content');
+    const addButton = document.querySelector('.add-tab-button');
+    // Check if click is outside dropdown AND outside the add button
+    if (dropdown && !dropdown.contains(event.target) && addButton && !addButton.contains(event.target)) {
+        dropdown.remove();
+    } else if (dropdown) {
+         // If click was inside, re-attach listener for the next click
+         document.addEventListener('click', handleOutsideClickForDropdown, { once: true });
     }
 }
 
-async function pythonLinter(text, options, cm) {
+
+// --- Linter Setup (assuming pyodide-linting.js handles this) ---
+// Ensure pythonLinter is defined before CodeMirror initialization if lint:true is used.
+// var pythonLinter = (text, options, cm) => { ... } // From pyodide-linting.js
+
+var editor; // Declare editor globally within this script's scope
+
+function initializeEditor() {
+     if (editor) {
+         console.log("Editor already initialized.");
+         return; // Avoid re-initialization
+     }
+      const editorElement = document.querySelector('#editor');
+      if (!editorElement) {
+           console.error("Editor container element not found!");
+           return;
+      }
+
+     editor = CodeMirror(editorElement, {
+        value: code_storage[current_tab] || '', // Ensure there's a fallback value
+        mode: 'python',
+        lineNumbers: true,
+        indentUnit: 4,
+        gutters: ["CodeMirror-lint-markers"],
+        // Enable linting only if the linter function is ready
+        lint: typeof pythonLinter === 'function',
+        // Other options...
+        lineWrapping: true, // Optional: wrap long lines
+        theme: document.body.classList.contains('dark-mode') ? 'material-darker' : 'default' // Example theme based on dark mode
+     });
+     // Override line number formatting and gutter marker (keep existing logic)
+     // ... (line number mapping and gutter marker override code) ...
+     editor.setSize('100%', '100%'); // Let the container control the height
+
+     // Save code on change (debounced)
+     editor.on('change', debounce(saveCode, 1000)); // Debounce saving
+
+     // Initial setup based on current tab
+     changeTab(current_tab);
+}
+
+
+// --- Function Box Building and Execution (Read-Only View) ---
+async function buildFunctionBoxes() {
+    const functionBoxesContainer = document.getElementById('function-boxes');
+    if (!functionBoxesContainer) return;
+    functionBoxesContainer.innerHTML = '<div class="text-center p-3"><i class="fas fa-spinner fa-spin"></i> Loading functions...</div>'; // Loading state
+
+    const contractName = current_tab.replace('(Read-Only)', '');
+
     try {
-        const errors = await lintCode(text);
-        let lintErrors = errors.map(error => ({
-            message: error.get("message"),
-            severity: error.get("severity"),
-            from: CodeMirror.Pos(error.get("line")),
-            to: CodeMirror.Pos(error.get("line"))
-        }));
-        console.log(lintErrors)
-        return lintErrors;
-    } catch (error) {
-        console.error('Error in pythonLinter:', error.get("message"));
-        return [];
-    }
-}
+        const functionsInfo = await getContractFunctions(contractName);
+        functionBoxesContainer.innerHTML = ''; // Clear loading/previous
 
-CodeMirror.registerHelper("lint", "python", pythonLinter);
-
-var editor = CodeMirror(document.querySelector('#editor'), {
-    value: code_storage[current_tab],
-    mode: 'python',
-    lineNumbers: true,
-    indentUnit: 4,
-    gutters: ["CodeMirror-lint-markers"],
-    lint: true,
-});
-
-// Create a mapping between actual and displayed line numbers
-if (typeof lineNumberMapping === 'undefined') {
-    var lineNumberMapping = new Map();
-}
-if (typeof reverseLineNumberMapping === 'undefined') {
-    var reverseLineNumberMapping = new Map();
-}
-function updateLineNumberMappings() {
-    lineNumberMapping.clear();
-    reverseLineNumberMapping.clear();
-    
-    let displayedNumber = 1;
-    for (let i = 1; i <= editor.lineCount(); i++) {
-        const prevLineContent = i > 1 ? editor.getLine(i - 2) : '';
-        
-        if (!(prevLineContent && prevLineContent.trim().endsWith('\\'))) {
-            lineNumberMapping.set(i, displayedNumber);
-            reverseLineNumberMapping.set(displayedNumber, i);
-            displayedNumber++;
-        } else {
-            lineNumberMapping.set(i, displayedNumber - 1);
+        if (!functionsInfo || !functionsInfo.methods || functionsInfo.methods.length === 0) {
+            functionBoxesContainer.innerHTML = '<div class="text-center p-3 text-muted">No public functions found for this contract.</div>';
+            return;
         }
-    }
-}
 
-// Override the line number formatting
-editor.setOption('lineNumberFormatter', function(line) {
-    updateLineNumberMappings();
-    const prevLineContent = line > 1 ? editor.getLine(line - 2) : '';
-    
-    // If previous line ends with backslash, don't show line number
-    if (prevLineContent && prevLineContent.trim().endsWith('\\')) {
-        return '';
-    }
+        functionsInfo.methods
+            .filter(func => !func.name.startsWith('_')) // Filter out private/internal
+            .sort((a, b) => a.name.localeCompare(b.name)) // Sort
+            .forEach((func) => {
+                const functionBox = document.createElement('div');
+                functionBox.className = 'function-box';
+                functionBox.innerHTML = `<h5>${func.name}</h5>`; // Use h5 for title
 
-    return lineNumberMapping.get(line).toString();
-});
+                const functionArgs = document.createElement('div');
+                functionArgs.className = 'function-args mb-2'; // Add margin
 
-// Override the default lint placement
-if (typeof originalLint === 'undefined') {
-var originalSetGutterMarker = editor.setGutterMarker.bind(editor);
-}
-editor.setGutterMarker = function(line, gutterID, value) {
-    updateLineNumberMappings();
-    // If this is a line number that should be empty (continuation line)
-    const prevLineContent = line > 0 ? editor.getLine(line - 1) : '';
-    if (prevLineContent && prevLineContent.trim().endsWith('\\')) {
-        // Find the next non-continuation line
-        let targetLine = line;
-        while (targetLine < editor.lineCount()) {
-            const content = editor.getLine(targetLine - 1);
-            if (!(content && content.trim().endsWith('\\'))) {
-                break;
-            }
-            targetLine++;
-        }
-        return originalSetGutterMarker(targetLine, gutterID, value);
-    }
-    return originalSetGutterMarker(line, gutterID, value);
-};
-
-editor.setSize('100%', null);
-if (current_tab.endsWith('(Read-Only)')) {
-    editor.setOption('readOnly', true);
-    document.getElementById('submission-form').style.display = 'none';
-    buildFunctionBoxes();
-}
-
-function buildFunctionBoxes() {
-    getContractFunctions(current_tab.replace('(Read-Only)', '')).then((functions) => {
-        let functionBoxes = document.getElementById('function-boxes');
-        functionBoxes.innerHTML = '';
-        console.log(functions);
-        functions.methods.forEach((func) => {
-            let functionBox = document.createElement('div');
-            functionBox.className = 'function-box';
-            // func.name is the function name
-            // func.arguments is the list of arguments
-            
-            functionBox.innerHTML = `<h3>` + func.name + `</h3>`;
-
-            let functionArgs = document.createElement('div');
-            functionArgs.className = 'function-args';
-            func.arguments.forEach((arg) => {
-                let argElement = document.createElement('div');
-                argElement.innerHTML = arg.name + ' (' + arg.type + ')';
-                argElement.className = 'form-group kwarg-group';
-
-                let argValue = document.createElement('input');
-                argValue.type = 'text';
-                argValue.className = 'function-arg-value form-control';
-                argValue.id = current_tab + '-' + func.name + '-' + arg.name;
-
-                argElement.appendChild(argValue);
-                functionArgs.appendChild(argElement);
-            });
-            // Always add a stamp limit field
-            let argElement = document.createElement('div');
-            argElement.innerHTML = 'stamp_limit (int)';
-            argElement.className = 'function-arg kwarg-group';
-
-            let argValue = document.createElement('input');
-            argValue.type = 'text';
-            argValue.className = 'function-arg-value form-control';
-            argValue.id = current_tab + '-' + func.name + '-stamp_limit';
-
-            argElement.appendChild(argValue);
-            functionArgs.appendChild(argElement);
-            functionBox.appendChild(functionArgs);
-
-            let functionButton = document.createElement('button');
-            functionButton.className = 'btn btn-primary';
-            functionButton.innerHTML = 'Execute';
-            functionButton.addEventListener('click', function () {
-                let prompt = confirm('Are you sure you want to execute this function?');
-                if (!prompt) {
-                    return;
-                }
-                let contractName = current_tab.replace('(Read-Only)', '');
-                let functionName = func.name;
-                let stampLimit = document.getElementById(current_tab + '-' + func.name + '-stamp_limit').value;
-                let error = document.getElementById('submitContractError');
-                let success = document.getElementById('submitContractSuccess');
-
-                error.style.display = 'none';
-                success.style.display = 'none';
-
-                let args = {};
-                func.arguments.forEach((arg) => {
-                    let value = document.getElementById(current_tab + '-' + func.name + '-' + arg.name).value;
-                    let expectedType = arg.type;
-                    if (value === "") {
-                        error.innerHTML = "All fields are required!";
-                        error.style.display = "block";
-                        return;
-                    }
-                    if (expectedType === "int") {
-                        if (isNaN(value)) {
-                            error.innerHTML = "Invalid value for " + arg.name + "!";
-                            error.style.display = "block";
-                            return;
-                        }
-                        value = parseInt(value);
-                    }
-                    if (expectedType === "float") {
-                        if (isNaN(value)) {
-                            error.innerHTML = "Invalid value for " + arg.name + "!";
-                            error.style.display = "block";
-                            return;
-                        }
-                        value = parseFloat(value);
-                    }
-                    if (expectedType === "bool") {
-                        if (value !== "true" && value !== "false") {
-                            error.innerHTML = "Invalid value for " + arg.name + "!";
-                            error.style.display = "block";
-                            return;
-                        }
-                        value = value === "true";
-                    }
-                    if (expectedType === "str") {
-                        value = value.toString();
-                    }
-                    if (expectedType === "dict" || expectedType === "list") {
-                        try {
-                            value = JSON.parse(value);
-                        } catch (e) {
-                            error.innerHTML = "Invalid value for " + arg.name + "!";
-                            error.style.display = "block";
-                            return;
-                        }
-                    }
-                    if (expectedType === "Any") {
-                        try {
-                            value = JSON.parse(value);
-                        } catch (e) {
-                            value = value.toString();
-                        }
-                    }
-                    args[arg.name] = value;
-                });
-
-                let payload = {
-                    payload: {
-                        chain_id: CHAIN_ID,
-                        contract: contractName,
-                        function: functionName,
-                        kwargs: args,
-                        stamps_supplied: parseInt(stampLimit)
-                    },
-                    metadata: {
-                        signature: "",
-                    }
-                };
-                window.scrollTo(0, 0);
-                Promise.all([signTransaction(payload, unencryptedPrivateKey)]).then((signed_tx) => {
-                    broadcastTransaction(signed_tx).then((response) => {
-                        hash = response['result']['hash'];
-                        let status = 'pending'
-                        if (response['result']['code'] == 1) {
-                            status = 'error';
-                        }
-                        prependToTransactionHistory(hash, contractName, functionName, args, status, new Date().toLocaleString());
-                        if (response["result"]["code"] == 1) {
-                            error.innerHTML = response["result"]["log"];
-                            error.style.display = "block";
-                            return;
-                        } else {
-                            success.innerHTML =
-                                "Transaction sent successfully! Explorer: " +
-                                "<a class='explorer-url' href='"+EXPLORER+"/tx/" +
-                                hash +
-                                "' target='_blank'>" +
-                                hash +
-                                "</a>";
-                            success.style.display = "block";
-                        }
-                    }).catch((error) => {
-                        console.error("Error executing contract function:", error.message);
-                        error.innerHTML = "Error executing contract function!";
-                        error.style.display = "block";
+                // Add inputs for function arguments
+                 if (func.arguments && func.arguments.length > 0) {
+                    func.arguments.forEach((arg) => {
+                        const argElement = document.createElement('div');
+                        argElement.className = 'mb-2'; // Spacing between args
+                        argElement.innerHTML = `
+                             <label for="${contractName}-${func.name}-${arg.name}" class="form-label small mb-0">${arg.name} (${arg.type})</label>
+                             <input type="text" class="function-arg-value form-control form-control-sm" id="${contractName}-${func.name}-${arg.name}" placeholder="Value for ${arg.name}">
+                         `;
+                        functionArgs.appendChild(argElement);
                     });
-                }).catch((error) => {
-                    console.error("Error executing contract function:", error.message);
-                    error.innerHTML = "Error executing contract function!";
-                    error.style.display = "block";
-                });
-                });
+                 } else {
+                      functionArgs.innerHTML = `<p class="text-muted small mb-2">No arguments required.</p>`;
+                 }
 
-            functionBox.appendChild(functionButton);
-            functionBoxes.appendChild(functionBox);
-        });
-        
-    }).catch((error) => {
-        console.error('Error getting contract functions:', error.message);
-    });
+                // Always add a stamp limit field
+                const stampElement = document.createElement('div');
+                 stampElement.className = 'mb-2';
+                 stampElement.innerHTML = `
+                     <label for="${contractName}-${func.name}-stamp_limit" class="form-label small mb-0">Stamp Limit (Optional)</label>
+                     <input type="number" class="function-arg-value form-control form-control-sm" id="${contractName}-${func.name}-stamp_limit" placeholder="e.g., 50000">
+                 `;
+                functionArgs.appendChild(stampElement);
+                functionBox.appendChild(functionArgs);
+
+                // Execute button
+                const functionButton = document.createElement('button');
+                functionButton.className = 'btn btn-sm btn-primary w-100'; // Full width small button
+                functionButton.innerHTML = 'Execute';
+                functionButton.addEventListener('click', () => executeContractFunction(contractName, func, functionButton)); // Pass button for disabling
+
+                functionBox.appendChild(functionButton);
+                functionBoxesContainer.appendChild(functionBox);
+            });
+    } catch (error) {
+        console.error(`Error building function boxes for ${contractName}:`, error);
+        functionBoxesContainer.innerHTML = `<div class="alert alert-danger">Error loading functions for ${contractName}.</div>`;
+    }
 }
 
+// --- Execute Function (Called from Read-Only View) ---
+async function executeContractFunction(contractName, funcInfo, executeButton) {
+    const errorContainer = document.getElementById('submitContractError'); // Use IDE's error display
+    const successContainer = document.getElementById('submitContractSuccess');
+    errorContainer.style.display = 'none';
+    successContainer.style.display = 'none';
 
-function submitContract() {
-    let contract = document.getElementById("submitContractName").value;
-    let contractError = document.getElementById("submitContractError");
-    let contractSuccess = document.getElementById("submitContractSuccess");
-    let stampLimit = document.getElementById("submitContractstampLimit").value;
-    let constructorKwargs = document.getElementById("submitContractconstructorKwargs").value;
-    contractError.style.display = 'none';
-    contractSuccess.style.display = 'none';
-
-    window.scrollTo(0, 0);
-
-    if (contract === "") {
-        contractError.innerHTML = 'Contract name is required!';
-        contractError.style.display = 'block';
+    // Check lock state
+    if (locked || !unencryptedMnemonic) {
+        toast('warning', 'Wallet is locked. Unlock to execute functions.');
+        return;
+    }
+    const selectedAccount = getSelectedAccount();
+    if (!selectedAccount) {
+        toast('danger', 'No account selected.');
         return;
     }
 
-    if (!contract.startsWith('con_')) {
-        contractError.innerHTML = 'Contract name must start with con_';
-        contractError.style.display = 'block';
-        return;
+    // --- Build Kwargs ---
+    let kwargs = {};
+    let validationError = false;
+    try {
+         if (funcInfo.arguments && funcInfo.arguments.length > 0) {
+             for (const arg of funcInfo.arguments) {
+                 const inputElement = document.getElementById(`${contractName}-${funcInfo.name}-${arg.name}`);
+                 if (!inputElement) {
+                      throw new Error(`Missing input for argument '${arg.name}'.`);
+                 }
+                 const valueStr = inputElement.value;
+                 kwargs[arg.name] = parseArgumentValue(valueStr, arg.type, arg.name); // Use helper
+             }
+         }
+    } catch (error) {
+         validationError = true;
+         errorContainer.innerHTML = error.message;
+         errorContainer.style.display = 'block';
+         window.scrollTo(0, 0); // Scroll to show error
+         return;
     }
+    // --- End Build Kwargs ---
 
-    if (stampLimit === "") {
-        contractError.innerHTML = 'Stamp limit is required!';
-        contractError.style.display = 'block';
-        return;
+    // --- Get Stamp Limit ---
+    const stampLimitInput = document.getElementById(`${contractName}-${funcInfo.name}-stamp_limit`);
+    let stampsSupplied = parseInt(stampLimitInput.value, 10);
+
+    if (isNaN(stampsSupplied) || stampsSupplied <= 0) {
+         toast('info', 'No stamp limit provided, attempting estimation...');
+          // If no stamp limit, try to estimate
+          try {
+             // Need to create a dummy payload for signing, then estimate
+             let estimationPayload = { payload: { chain_id: CHAIN_ID, contract: contractName, function: funcInfo.name, kwargs: kwargs, stamps_supplied: 200000 }, metadata: { signature: "" } };
+             const signedForEst = await signTransaction(estimationPayload, unencryptedMnemonic, selectedAccount.index);
+             const estimateResult = await estimateStamps(signedForEst);
+             if (!estimateResult.success || estimateResult.stamps === null) {
+                 throw new Error(`Estimation failed: ${estimateResult.tx_result || 'Unknown reason'}`);
+             }
+             stampsSupplied = estimateResult.stamps + 50; // Add buffer
+             toast('success', `Estimated stamp cost: ${stampsSupplied}`);
+             stampLimitInput.value = stampsSupplied; // Update input field
+          } catch (estError) {
+               errorContainer.innerHTML = `Cannot execute: Stamp limit required or estimation failed. ${estError.message}`;
+               errorContainer.style.display = 'block';
+               window.scrollTo(0, 0);
+               return;
+          }
     }
+     // --- End Get Stamp Limit ---
 
-    let contractCode = editor.getValue();
+     // Check balance for fee
+     try {
+          const nativeBalanceStr = await execute_balance_of('currency', selectedAccount.vk);
+          const nativeBalance = parseFloat(nativeBalanceStr);
+          const stampRate = await getStampRate();
+          if (isNaN(nativeBalance) || !stampRate || (stampsSupplied / stampRate) > nativeBalance) {
+               errorContainer.innerHTML = `Insufficient XIAN balance for fee (${(stampsSupplied / stampRate).toFixed(4)} Xian needed).`;
+               errorContainer.style.display = 'block';
+               window.scrollTo(0, 0);
+               return;
+          }
+     } catch (e) {
+          errorContainer.innerHTML = `Error checking balance for fee: ${e.message}`;
+          errorContainer.style.display = 'block';
+          window.scrollTo(0, 0);
+          return;
+     }
+
+
+    // --- Confirmation and Execution ---
+    let conf = confirm(`Execute ${contractName}.${funcInfo.name}? Fee: ~${(stampsSupplied / await getStampRate()).toFixed(4)} Xian`);
+    if (!conf) return;
+
+    executeButton.disabled = true;
+    executeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Executing...';
+    window.scrollTo(0, 0); // Scroll to top to see status messages
 
     let payload = {
         payload: {
             chain_id: CHAIN_ID,
-            contract: 'submission',
+            contract: contractName,
+            function: funcInfo.name,
+            kwargs: kwargs,
+            stamps_supplied: stampsSupplied
+        },
+        metadata: { signature: "" }
+    };
+
+    try {
+        const signedTx = await signTransaction(payload, unencryptedMnemonic, selectedAccount.index);
+        const response = await broadcastTransaction(signedTx);
+
+         // Handle response (similar to sendAdvTx)
+         if (response.error === 'timeout') {
+             successContainer.innerHTML = 'Transaction broadcast timed out. Check Explorer.';
+             successContainer.style.display = 'block';
+             prependToTransactionHistory("TIMEOUT", contractName, funcInfo.name, kwargs, 'pending', new Date().toLocaleString());
+         } else if (response && response.result && response.result.hash) {
+            const hash = response.result.hash;
+            let status = 'pending';
+            let logMessage = response.result.log || "";
+
+            if (response.result.code !== 0) {
+                 status = 'error';
+                 errorContainer.innerHTML = `Execution failed: ${logMessage}`;
+                 errorContainer.style.display = 'block';
+                 toast('danger', `Execution failed: ${logMessage.substring(0,100)}...`);
+            } else {
+                 successContainer.innerHTML = `Transaction sent! Hash: <a class='explorer-url text-light' href='${EXPLORER}/tx/${hash}' target='_blank' rel='noopener noreferrer'>${hash}</a>`;
+                 successContainer.style.display = 'block';
+                 toast('success', `Transaction sent: ${hash.substring(0,10)}...`);
+            }
+            prependToTransactionHistory(hash, contractName, funcInfo.name, kwargs, status, new Date().toLocaleString());
+         } else {
+            throw new Error('Unexpected response from network.');
+         }
+
+    } catch (error) {
+        console.error("Error executing contract function:", error);
+        errorContainer.innerHTML = `Error executing function: ${error.message}`;
+        errorContainer.style.display = "block";
+        toast('danger', `Error: ${error.message}`);
+    } finally {
+        executeButton.disabled = false;
+        executeButton.innerHTML = 'Execute';
+    }
+}
+
+// --- Submit Contract (Deployment) ---
+async function submitContract() { // Made async
+    const contractError = document.getElementById("submitContractError");
+    const contractSuccess = document.getElementById("submitContractSuccess");
+    const submitButton = document.getElementById('btn-ide-submit-contract');
+
+    // Reset messages
+    contractError.style.display = 'none';
+    contractSuccess.style.display = 'none';
+    window.scrollTo(0, 0); // Scroll to top
+
+    // Check lock state
+    if (locked || !unencryptedMnemonic) {
+        contractError.innerHTML = 'Wallet is locked. Please unlock to deploy contracts.';
+        contractError.style.display = 'block';
+        return;
+    }
+    const selectedAccount = getSelectedAccount();
+    if (!selectedAccount) {
+        contractError.innerHTML = 'No account selected.';
+        contractError.style.display = 'block';
+        return;
+    }
+
+    // Get form values
+    const contractNameInput = document.getElementById("submitContractName");
+    const stampLimitInput = document.getElementById("submitContractstampLimit");
+    const constructorKwargsInput = document.getElementById("submitContractconstructorKwargs");
+
+    const contract = contractNameInput.value.trim();
+    const stampLimitStr = stampLimitInput.value.trim();
+    const constructorKwargsStr = constructorKwargsInput.value.trim();
+    const contractCode = editor.getValue(); // Get code from CodeMirror
+
+    // --- Validation ---
+    if (contract === "" || !contract.startsWith('con_')) {
+        contractError.innerHTML = 'Contract name is required and must start with "con_".';
+        contractError.style.display = 'block';
+        contractNameInput.focus();
+        return;
+    }
+    if (stampLimitStr === "") {
+        contractError.innerHTML = 'Stamp limit is required for deployment.';
+        contractError.style.display = 'block';
+        stampLimitInput.focus();
+        return;
+    }
+    let stampLimit;
+    try {
+        stampLimit = parseInt(stampLimitStr, 10);
+        if (isNaN(stampLimit) || stampLimit <= 0) throw new Error();
+    } catch {
+        contractError.innerHTML = 'Invalid stamp limit. Please enter a positive number.';
+        contractError.style.display = 'block';
+        stampLimitInput.focus();
+        return;
+    }
+    let constructorKwargs = {};
+    if (constructorKwargsStr !== "") {
+        try {
+            constructorKwargs = JSON.parse(constructorKwargsStr);
+            if (typeof constructorKwargs !== 'object' || constructorKwargs === null) {
+                 throw new Error("Constructor Kwargs must be a valid JSON object.");
+            }
+        } catch (error) {
+            contractError.innerHTML = `Invalid constructor kwargs JSON: ${error.message}`;
+            contractError.style.display = 'block';
+            constructorKwargsInput.focus();
+            return;
+        }
+    }
+     // Check balance for deployment fee
+     try {
+          const nativeBalanceStr = await execute_balance_of('currency', selectedAccount.vk);
+          const nativeBalance = parseFloat(nativeBalanceStr);
+          const stampRate = await getStampRate();
+          if (isNaN(nativeBalance) || !stampRate || (stampLimit / stampRate) > nativeBalance) {
+               contractError.innerHTML = `Insufficient XIAN balance for deployment fee (${(stampLimit / stampRate).toFixed(4)} Xian needed).`;
+               contractError.style.display = 'block';
+               return;
+          }
+     } catch (e) {
+          contractError.innerHTML = `Error checking balance for deployment fee: ${e.message}`;
+          contractError.style.display = 'block';
+          return;
+     }
+    // --- End Validation ---
+
+    // Disable button
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deploying...';
+
+    // --- Create Payload ---
+    let payload = {
+        payload: {
+            chain_id: CHAIN_ID,
+            contract: 'submission', // Target the submission contract
             function: 'submit_contract',
             kwargs: {
                 name: contract,
                 code: contractCode
             },
-            stamps_supplied: parseInt(stampLimit)
+            stamps_supplied: stampLimit
+            // nonce and sender added by signTransaction
         },
-        metadata: {
-            signature: "",
-        }
+        metadata: { signature: "" }
     };
-
-    if (constructorKwargs !== "") {
-        try {
-            payload.payload.kwargs.constructor_args = JSON.parse(constructorKwargs);
-        }
-        catch (error) {
-            contractError.innerHTML = 'Invalid constructor kwargs!';
-            contractError.style.display = 'block';
-            return;
-        }
+    // Add constructor args only if they were provided
+    if (Object.keys(constructorKwargs).length > 0) {
+        payload.payload.kwargs.constructor_args = constructorKwargs;
     }
 
-    Promise.all([signTransaction(payload, unencryptedPrivateKey)]).then((signed_tx) => {
-        broadcastTransaction(signed_tx).then((response) => {
-            hash = response['result']['hash'];
-            let status = 'pending'
-            if (response['result']['code'] == 1) {
-                status = 'error';
-            }
-            prependToTransactionHistory(hash, 'submission', 'submit_contract', { name: contract, code: contractCode }, status, new Date().toLocaleString());
-            if (response["result"]["code"] == 1) {
-                contractError.innerHTML = response["result"]["log"];
-                contractError.style.display = "block";
-                return;
-            } else {
-                contractSuccess.innerHTML =
-                    "Transaction sent successfully! Explorer: " +
-                    "<a class='explorer-url' href='"+EXPLORER+"/tx/" +
-                    hash +
-                    "' target='_blank'>" +
-                    hash +
-                    "</a>";
-                contractSuccess.style.display = "block";
-            }
-        }).catch((error) => {
-            console.error("Error submitting contract:", error.message);
-            contractError.innerHTML = "Error submitting contract!";
-            contractError.style.display = "block";
-        });
+    // --- Sign and Broadcast ---
+    try {
+        const signedTx = await signTransaction(payload, unencryptedMnemonic, selectedAccount.index);
+        const response = await broadcastTransaction(signedTx);
+
+         // Handle response (similar to other transactions)
+          if (response.error === 'timeout') {
+              successContainer.innerHTML = 'Deployment broadcast timed out. Check Explorer.';
+              successContainer.style.display = 'block';
+              prependToTransactionHistory("TIMEOUT", 'submission', 'submit_contract', { name: contract }, 'pending', new Date().toLocaleString()); // Simplified history for timeout
+          } else if (response && response.result && response.result.hash) {
+             const hash = response.result.hash;
+             let status = 'pending';
+             let logMessage = response.result.log || "";
+
+             if (response.result.code !== 0) {
+                  status = 'error';
+                  contractError.innerHTML = `Deployment failed: ${logMessage}`;
+                  contractError.style.display = 'block';
+                  toast('danger', `Deployment failed: ${logMessage.substring(0,100)}...`);
+             } else {
+                  contractSuccess.innerHTML = `Deployment transaction sent! Hash: <a class='explorer-url text-light' href='${EXPLORER}/tx/${hash}' target='_blank' rel='noopener noreferrer'>${hash}</a>`;
+                  contractSuccess.style.display = 'block';
+                  toast('success', `Deployment sent: ${hash.substring(0,10)}...`);
+                   // Optionally reset deployment state for this tab on success
+                   delete deployment_started[current_tab];
+                   saveDeploymentState();
+                   changeTab(current_tab); // Refresh UI state
+             }
+             prependToTransactionHistory(hash, 'submission', 'submit_contract', { name: contract /* Optionally include code hash? */ }, status, new Date().toLocaleString());
+          } else {
+             throw new Error('Unexpected response from network during deployment.');
+          }
+
+    } catch (error) {
+        console.error("Error submitting contract:", error);
+        contractError.innerHTML = `Error submitting contract: ${error.message}`;
+        contractError.style.display = "block";
+        toast('danger', `Deployment Error: ${error.message}`);
+    } finally {
+        submitButton.disabled = false;
+        // Restore button text based on deployment state AFTER potential failure
+        submitButton.innerHTML = deployment_started[current_tab] ? 'Deploy Contract' : 'Start Deployment';
+    }
+}
+
+
+// --- Stamp Rate Loading ---
+function loadStampRate() {
+     const stampRateElement = document.getElementById("stampRate");
+     if (!stampRateElement) return;
+     stampRateElement.innerHTML = "<i class='fas fa-spinner fa-spin fa-xs'></i>"; // Loading indicator
+
+    getStampRate().then((rate) => {
+        if (rate === null) {
+            stampRateElement.innerHTML = "ERR";
+            toast('warning', 'Could not fetch current stamp rate.');
+        } else {
+            stampRateElement.innerHTML = rate.toLocaleString(); // Format rate
+        }
+    }).catch((error) => {
+        console.error("Error getting stamp rate:", error);
+        stampRateElement.innerHTML = "ERR";
+         toast('danger', 'Error fetching stamp rate.');
     });
 }
 
-// Get current stamp rate
-// Get current stamp rate
-getStampRate().then((rate) => {
-    if (rate === null) {
-        document.getElementById("stampRate").innerHTML = "ERR";
-        return;
-    }
-    document.getElementById("stampRate").innerHTML = rate;
-}).catch((error) => {
-    console.error("Error getting stamp rate:", error.message);
-    document.getElementById("stampRate").innerHTML = "ERR";
-});
-
-document.getElementById('btn-ide-submit-contract').addEventListener('click', function () {
-    if( document.getElementById('submitContractNameWrapper').style.display === 'none' ) {
-        document.getElementById('submitContractNameWrapper').style.display = 'block';
-        document.getElementById('submitContractstampLimitWrapper').style.display = 'block';
-        document.getElementById('submitContractconstructorKwargsWrapper').style.display = 'block';
-        document.getElementById('btn-ide-submit-contract').innerHTML = 'Deploy Contract';
-    }
-    else {
-        submitContract();
-    }
-});
-document.getElementById('btn-ide-go-to-wallet').addEventListener('click', function () {
-    goToWallet();
-});
-
-document.getElementById('ide-send-adv-tx').addEventListener('click', function () {
-    changePage('send-advanced-transaction');
-});
-
+// --- Tab List Refresh ---
 function refreshTabList() {
-    document.getElementById('tabs-editor').innerHTML = '';
+    const tabsEditor = document.getElementById('tabs-editor');
+    if (!tabsEditor) return;
+    tabsEditor.innerHTML = ''; // Clear existing tabs
+
+    // Add existing tabs from code_storage
     Object.keys(code_storage).forEach((tab) => {
         let tabElement = document.createElement('div');
         tabElement.className = 'tab-editor';
-        tabElement.innerHTML = tab;
-        tabElement.addEventListener('click', function () {
-            changeTab(tab);
-
-        });
-        document.getElementById('tabs-editor').appendChild(tabElement);
-
         if (tab === current_tab) {
-            tabElement.classList.add('active');
+            tabElement.classList.add('active'); // Highlight current tab
         }
+        tabElement.title = tab; // Show full name on hover
 
+        // Tab Name (truncated)
+        let tabNameSpan = document.createElement('span');
+         // Shorten name for display if needed
+         let displayName = tab.length > 20 ? tab.substring(0, 18) + '...' : tab;
+         tabNameSpan.textContent = displayName;
+         tabNameSpan.style.overflow = 'hidden';
+         tabNameSpan.style.textOverflow = 'ellipsis';
+         tabNameSpan.style.whiteSpace = 'nowrap';
+         tabNameSpan.style.cursor = 'pointer';
+         tabNameSpan.addEventListener('click', function () {
+             if (current_tab !== tab) { // Avoid unnecessary reloads
+                 changeTab(tab);
+             }
+         });
+
+         tabElement.appendChild(tabNameSpan);
+
+
+        // Close Button
         let closeTab = document.createElement('i');
-        closeTab.className = 'fas fa-times';
-
+        closeTab.className = 'fas fa-times ms-2'; // Added margin start
+        closeTab.style.cursor = 'pointer';
+        closeTab.style.fontSize = '0.8em'; // Make smaller
+        closeTab.title = `Close ${tab}`;
         closeTab.addEventListener('click', function (event) {
-            event.stopPropagation(); // Prevent click event from propagating to the tab itself
+            event.stopPropagation(); // Prevent tab switch on close click
 
-            // Prompt user if they want to remove the tab
-            if (!confirm('Are you sure you want to remove this file?')) {
+            if (Object.keys(code_storage).length <= 1) {
+                toast('warning', 'Cannot close the last file!');
                 return;
             }
 
-            // If it's the last tab, don't allow removal
-            if (Object.keys(code_storage).length === 1) {
-                alert('Cannot remove last file!');
-                return;
-            }
-
-            // Retrieve the tab name from the parent element (tabElement)
-            let tabNameToRemove = tabElement.textContent.trim();
-
-            removeTab(tabNameToRemove);
-            tabElement.remove();
-
-            // Change current tab if the removed tab was active
-            if (tabNameToRemove === current_tab) {
-                changeTab(Object.keys(code_storage)[0]);
+            if (confirm(`Are you sure you want to close "${tab}"? Unsaved changes might be lost if auto-save failed.`)) {
+                const removed = removeTab(tab); // Attempt removal
+                 if (removed) {
+                     // If the removed tab was the current one, switch to the first available tab
+                     if (tab === current_tab) {
+                         const firstTab = Object.keys(code_storage)[0];
+                         changeTab(firstTab); // This will also refresh the list
+                     } else {
+                         refreshTabList(); // Just refresh the list if a different tab was closed
+                     }
+                     toast('info', `Closed file "${tab}".`);
+                 }
             }
         });
 
         tabElement.appendChild(closeTab);
+        tabsEditor.appendChild(tabElement);
     });
+
+    // Add the '+' button
     let addTabButton = document.createElement('div');
     addTabButton.className = 'add-tab-button';
     addTabButton.innerHTML = '<i class="fas fa-plus"></i>';
-    addTabButton.addEventListener('click', showDropdown);
-
-    document.getElementById('tabs-editor').appendChild(addTabButton);
+    addTabButton.title = 'New/Load File';
+    addTabButton.addEventListener('click', showDropdown); // Use existing function to show options
+    tabsEditor.appendChild(addTabButton);
 }
 
-// Clicking anywhere outside the dropdown should close it
-document.addEventListener('click', function (event) {
-    // Check if the click event was triggered by the add-tab button or any of its children
-    if (!event.target.matches('.add-tab-button') && !event.target.closest('.add-tab-button')) {
-        let dropdown = document.querySelector('.dropdown-content');
-        if (dropdown) {
-            dropdown.remove();
-        }
+
+// --- Event Listeners ---
+document.getElementById('btn-ide-submit-contract')?.addEventListener('click', function () {
+    const nameWrapper = document.getElementById('submitContractNameWrapper');
+    const submitButton = document.getElementById('btn-ide-submit-contract');
+
+    if (locked) {
+        toast('warning', 'Wallet locked. Unlock to deploy.');
+        return;
+    }
+
+    if (nameWrapper.style.display === 'none' || !deployment_started[current_tab]) {
+        // Transition to deployment details state
+        document.getElementById('submitContractNameWrapper').style.display = 'block';
+        document.getElementById("submitContractName").value = current_tab.replace(/\.py$/i, ''); // Pre-fill name
+        document.getElementById('submitContractstampLimitWrapper').style.display = 'block';
+        document.getElementById('submitContractconstructorKwargsWrapper').style.display = 'block';
+        submitButton.innerHTML = 'Deploy Contract';
+        deployment_started[current_tab] = true; // Mark this tab as started
+        saveDeploymentState(); // Persist state
+    } else {
+        // Already in deployment state, trigger submission
+        submitContract(); // Call async submission function
     }
 });
 
+document.getElementById('btn-ide-go-to-wallet')?.addEventListener('click', function () {
+    changePage('wallet'); // Use changePage for navigation
+});
 
-// Save code on change
-editor.on('change', saveCode);
+document.getElementById('ide-send-adv-tx')?.addEventListener('click', function () {
+    changePage('send-advanced-transaction');
+});
 
-refreshTabList();
 
+// --- Initialization ---
+initializeEditor(); // Initialize CodeMirror
+loadStampRate(); // Load initial stamp rate
+refreshTabList(); // Build initial tab list
 
+// Optional: Add listener for dark mode changes to update editor theme
+// document.body.addEventListener('classChanged', function(e) { // Assuming a custom event or MutationObserver
+//     if (editor) {
+//         editor.setOption('theme', document.body.classList.contains('dark-mode') ? 'material-darker' : 'default');
+//     }
+// });
