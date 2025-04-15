@@ -164,45 +164,84 @@ async function loadNFTPage() {
 
 function populateAccountSwitcher() {
     const dropdownMenu = document.getElementById('accountListDropdown');
-    if (!dropdownMenu) return;
+    if (!dropdownMenu) {
+        console.error("Account dropdown menu element (#accountListDropdown) not found!");
+        return;
+    }
 
-    // Clear existing accounts (keeping the "Create Account" and divider)
-    const existingItems = dropdownMenu.querySelectorAll('li:not(:first-child):not(:nth-child(2))');
-    existingItems.forEach(item => item.remove());
+    // *** Add check for static items before clearing ***
+    const createAccountLink = document.getElementById('wallet-add-account-btn');
+    const divider = dropdownMenu.querySelector('li hr.dropdown-divider');
+    if (!createAccountLink || !divider) {
+        console.error("Static 'Create Account' link or divider missing from dropdown menu structure!");
+        // Avoid proceeding if the base structure is broken
+        return;
+    }
+    // *** End check ***
 
-    // Add current accounts
-    accounts.forEach(account => {
+
+    // Ensure global accounts array is available and is an array
+    if (typeof accounts === 'undefined' || !Array.isArray(accounts)) {
+        console.error("Global 'accounts' variable is missing or not an array during populateAccountSwitcher.");
+        return;
+    }
+
+    // Clear only existing dynamic account items (leave static 'Create' link and divider)
+    dropdownMenu.querySelectorAll('li.dynamic-account-item').forEach(item => item.remove());
+
+    // Sort accounts by index before displaying
+    const sortedAccounts = [...accounts].sort((a, b) => a.index - b.index);
+
+    console.log("Populating dropdown with accounts:", sortedAccounts); // Debug log
+
+    // Get the list item containing the 'Create Account' link to insert before it
+    const createAccountListItem = createAccountLink.closest('li');
+
+    sortedAccounts.forEach(account => {
+        if (!account || typeof account.index === 'undefined' || !account.vk) {
+            console.warn("Skipping invalid account object during dropdown population:", account);
+            return; // Skip invalid account entries
+        }
+
         const listItem = document.createElement('li');
+        listItem.classList.add('dynamic-account-item'); // Class for easy clearing
+
         const link = document.createElement('a');
-        link.className = 'dropdown-item d-flex justify-content-between align-items-center'; // Use flex for layout
+        link.className = 'dropdown-item d-flex justify-content-between align-items-center';
         link.href = '#';
-        link.dataset.index = account.index; // Store index for switching
+        link.dataset.index = account.index;
 
         const nameSpan = document.createElement('span');
-        nameSpan.textContent = account.name;
-        nameSpan.style.overflow = 'hidden';
-        nameSpan.style.textOverflow = 'ellipsis';
-        nameSpan.style.whiteSpace = 'nowrap';
-        nameSpan.style.flexGrow = '1';
-        nameSpan.style.marginRight = '10px'; // Space before checkmark
+        nameSpan.textContent = account.name || `Account ${account.index + 1}`;
+        nameSpan.title = account.vk;
+        nameSpan.classList.add('text-truncate'); // Use Bootstrap class
+        nameSpan.style.flexGrow = "1";
+        nameSpan.style.marginRight = "10px";
+        nameSpan.style.maxWidth = "calc(100% - 35px)"; // Adjust if needed
 
         link.appendChild(nameSpan);
 
-
         if (account.index === selectedAccountIndex) {
             const checkIcon = document.createElement('i');
-            checkIcon.className = 'fas fa-check text-success'; // Checkmark for selected
+            checkIcon.className = 'fas fa-check text-success flex-shrink-0';
             link.appendChild(checkIcon);
-            link.classList.add('active'); // Highlight selected
         }
 
         link.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation();
             switchAccount(account.index);
         });
 
         listItem.appendChild(link);
-        dropdownMenu.appendChild(listItem);
+
+        // Insert the new account item *before* the 'Create Account' link's list item
+        if (createAccountListItem) {
+            dropdownMenu.insertBefore(listItem, createAccountListItem);
+        } else {
+            // Fallback if 'Create Account' isn't found (shouldn't happen)
+            dropdownMenu.appendChild(listItem);
+        }
     });
 }
 
