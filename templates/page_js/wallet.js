@@ -3,160 +3,110 @@
 
 var token_list = JSON.parse(localStorage.getItem("token_list")) || ["currency"];
 
-// --- NFT Loading (Adapted for Selected Account) ---
 async function getNFTData(nftKey) {
-    // This function seems specific to a particular NFT standard (con_pixel_frames_info)
-    // It remains largely unchanged internally but is called by the adapted loadNFTPage.
-    let graphQLEndpoint = RPC + "/graphql"; // Ensure RPC is current
-    try {
-        let nftDataRes = await fetchWithTimeout(graphQLEndpoint, { // Use fetchWithTimeout
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                query: `query NFTInfo {
-                    allStates(
-                        filter: { key: { startsWith: "con_pixel_frames_info.S:${nftKey}" } }
-                    ) {
-                        nodes { key value }
+    let graphQLEndpoint = RPC + "/graphql";
+    let nftData = await fetch(graphQLEndpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            query: `query MyQuery {
+                        i_0: allStates(
+                        filter: {key: {startsWith: "con_pixel_frames_info.S:`+nftKey+`"}}
+                        ) {
+                        nodes {
+                            key
+                            value
+                        }
+                        }
                     }
-                }` // Simplified query name
-            })
-        });
-        if (!nftDataRes.ok) throw new Error(`GraphQL query failed: ${nftDataRes.statusText}`);
-        const nftData = await nftDataRes.json();
-        // Basic check for expected data structure
-        if (!nftData || !nftData.data || !nftData.data.allStates || !nftData.data.allStates.nodes) {
-             console.warn(`Unexpected NFT data structure for key ${nftKey}:`, nftData);
-             return null; // Return null if structure is wrong
-        }
-        // Extract specific fields based on assumed order/key names (fragile!)
-        // It's better to filter by key name explicitly if possible.
-        const nodes = nftData.data.allStates.nodes;
-        const findValue = (keySuffix) => nodes.find(n => n.key.endsWith(keySuffix))?.value;
-
-        return {
-            name: findValue("name") || 'Unknown NFT', // Provide defaults
-            description: findValue("description") || '',
-            // Add other relevant fields if needed
-        };
-    } catch (error) {
-        console.error(`Error fetching NFT data for key ${nftKey}:`, error);
-        toast('danger', `Failed to load details for NFT ${nftKey.substring(0, 8)}...`);
-        return null; // Return null on error
-    }
+            `
+        })
+    });
+    const nftData_ = await nftData.json();
+    return nftData_;
 }
 
-
 async function loadNFTPage() {
-    const nftListElement = document.getElementById("wallet-nfts");
-    const refreshIcon = document.getElementById("wallet-refresh-all")?.querySelector("i");
-    const selectedAccount = getSelectedAccount(); // Use helper from router.js
+    const selectedAccount = getSelectedAccount();
+    document.getElementById("wallet-refresh-all").querySelector("i").classList.add("fa-spin");
 
-    if (!nftListElement || !selectedAccount) {
-        console.error("NFT list element or selected account not found.");
-        return;
-    }
+    let nftList = document.getElementById("wallet-nfts");
+    nftList.innerHTML = `<div class="title-container">
+        <h2 class="token-list-title">NFTs</h2>
+    </div>`;
+    nftList.innerHTML += `<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading NFTs...</div>`;
 
-    // Start loading indicator
-    nftListElement.innerHTML = `<div class="title-container"><h2 class="token-list-title">NFTs</h2></div>`;
-    nftListElement.innerHTML += `<div class="loading-spinner" id="nft-loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading NFTs...</div>`;
-    if (refreshIcon) refreshIcon.classList.add("fa-spin");
-
+    // Fetch nft list
     let graphQLEndpoint = RPC + "/graphql";
 
-    try {
-        const response = await fetchWithTimeout(graphQLEndpoint, { // Use fetchWithTimeout
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                query: `
-                  query OwnedNFTs($ownerAddress: String!) {
-                    allStates(
-                      filter: {
-                        key: { startsWith: "con_pixel_frames_info.S:", endsWith: ":owner" } # Adjusted key format assumption
-                        value: { equalTo: $ownerAddress }
-                      }
-                      offset: 0
-                      first: 100 # Consider pagination for large collections
-                      orderBy: KEY_ASC # Or UPDATED_DESC if applicable
-                    ) {
-                      nodes { key }
-                    }
-                  }
-                `,
-                variables: { ownerAddress: selectedAccount.vk } // Pass selected VK as variable
-            })
-        });
-
-        if (!response.ok) throw new Error(`GraphQL query failed: ${response.statusText}`);
-
-        const data = await response.json();
-
-        // Stop loading indicator
-        const spinner = document.getElementById('nft-loading-spinner');
-        if (spinner) spinner.remove();
-
-        if (!data || !data.data || !data.data.allStates) {
-             throw new Error("Unexpected GraphQL response structure for NFTs.");
+    // POST request to GraphQL endpoint
+    let response = await fetch(graphQLEndpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            query: `
+  query MyQuery {
+      allStates(
+        filter: {
+          key: { startsWith: "con_pixel_frames_info.S", endsWith: "owner" }
+          value: {
+            equalTo: "`+selectedAccount.vk+`"
+          }
         }
-
-        const nfts = data.data.allStates.nodes;
-
-        if (nfts.length === 0) {
-            nftListElement.innerHTML += `<div class="text-center p-3">No NFTs found for this account.</div>`;
-            return;
+        offset: 0
+        first: 100
+        orderBy: UPDATED_DESC
+      ) {
+        nodes {
+          key
         }
-
-        // Prepare container for NFT cards
-        let containerNFTs = document.createElement("div");
-        containerNFTs.className = "container row p-0 m-0"; // Added Bootstrap row class, reset padding/margin
-         nftListElement.appendChild(containerNFTs);
-
-        // Fetch details for each NFT concurrently
-        const nftDetailPromises = nfts.map(async (nft) => {
-            // Extract the NFT key (e.g., frame ID) - This depends heavily on the key structure
-            // Example: "con_pixel_frames_info.S:FRAMEID123:owner" -> "FRAMEID123"
-             const keyParts = nft.key.split(':');
-             const nftAddress = keyParts.length >= 2 ? keyParts[keyParts.length - 2] : null; // Adjust index based on actual key structure
-
-
-            if (!nftAddress) {
-                console.warn("Could not extract NFT address from key:", nft.key);
-                return null; // Skip if key format is unexpected
-            }
-
-            const nftData = await getNFTData(nftAddress);
-            if (!nftData) return null; // Skip if data fetch failed
-
-             // Create card HTML - ensure template literals handle potential nulls gracefully
-             return `
-             <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-4"> <!-- Use Bootstrap grid and margin -->
-                 <div class="card h-100" data-contract="${nftAddress || ''}" style="background-color:transparent; border: 1px solid #8a8b8e;"> <!-- Added h-100 for equal height -->
-                     <img class="card-img-top" src="https://pixelsnek.xian.org/gif/${nftAddress || 'error'}.gif" alt="${nftData.name || 'NFT Image'}" onerror="this.style.display='none'"> <!-- Basic error handling -->
-                     <div class="card-body d-flex flex-column justify-content-between"> <!-- Flex column for layout -->
-                          <div> <!-- Group title and description -->
-                             <h5 class="card-title token-symbol">${nftData.name}</h5>
-                             <p class="card-text small">${nftData.description || ''}</p>
-                          </div>
-                         <a class="btn btn-sm send-btn mt-2" style="background-color: #ffffff; width: 100%; border-radius: 0 0 .25rem .25rem;" href="https://pixelsnek.xian.org/frames/${nftAddress || ''}" target="_blank" rel="noopener noreferrer"><i class="fas fa-eye"></i> View</a>
-                     </div>
-                 </div>
-             </div>`;
-        });
-
-        // Wait for all details to be fetched and render
-        const nftCardsHtml = (await Promise.all(nftDetailPromises)).filter(Boolean).join('');
-        containerNFTs.innerHTML = nftCardsHtml;
-
-    } catch (error) {
-        console.error("Error loading NFTs:", error);
-        const spinner = document.getElementById('nft-loading-spinner');
-        if (spinner) spinner.innerHTML = `<i class="fas fa-exclamation-circle"></i> Error loading NFTs.`;
-        else nftListElement.innerHTML += `<div class="text-center p-3 text-danger">Error loading NFTs.</div>`;
-         toast('danger', 'Failed to load NFTs.');
-    } finally {
-        if (refreshIcon) refreshIcon.classList.remove("fa-spin");
+      }
     }
+  `
+        })
+    });
+    const data = await response.json();
+    let nfts = data.data.allStates.nodes;
+    nftList.innerHTML = nftList.innerHTML.replace('<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading NFTs...</div>', '');
+    if (nfts.length === 0) {
+        nftList.innerHTML += `<div class="loading-spinner">No NFTs found</div>`;
+    }
+    let containerNFTs = document.createElement("div");
+    containerNFTs.classList.add("container");
+    containerNFTs.classList.add("row");
+    nftList.appendChild(containerNFTs);
+    nfts.forEach(nft => {
+        let nftAddress = nft.key.split("S:")[1].split(":")[0];
+        getNFTData(nftAddress).then((nftData) => {
+            let nftName = nftData.data.i_0.nodes[9].value;
+            let nftDescription = nftData.data.i_0.nodes[3].value;
+            containerNFTs.innerHTML += `
+            <div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 col-12" style="margin-bottom:30px;">
+                <div class="card" style="background-color:transparent;    border: 1px solid #8a8b8e;height: 100%;" data-contract="${nftAddress}">
+                    <img class="card-img-top" src="https://pixelsnek.xian.org/gif/${nftAddress}.gif" alt="Card image cap">
+                    <div class="card-body" style="    flex-direction: column;
+    justify-content: space-between;    gap: 1rem;"
+                        <div class="token-title-container">
+                            <div class="token-name"><span class="token-symbol">${nftName}</span><br><span style="font-weight:400">${nftDescription}</span></div>
+                        </div>
+                        <a class="btn send-btn" style="
+    background-color: #ffffff;
+    width: unset;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    " data-contract="${nftAddress}" href="https://pixelsnek.xian.org/frames/${nftAddress}" target="_blank"><i class="fas fa-eye"></i> View</a>
+                    </div>
+                </div>
+            </div>`;
+        });
+
+    });
+
+    document.getElementById("wallet-refresh-all").querySelector("i").classList.remove("fa-spin");
 }
 
 
@@ -453,49 +403,34 @@ async function loadWalletPage() {
          else tokenListElement.innerHTML += `<div class="text-center p-3 text-danger">Error loading tokens.</div>`;
          toast('danger', 'Failed to load token list.');
     }
+        
+    let local_activity = document.getElementById("local-activity-list");
+    local_activity.innerHTML = "";
+    tx_history.forEach((tx) => {
+        local_activity.innerHTML += `
+        <div class="activity-item">
+            <div class="activity-details">
+                <div class="activity-hash">`+tx["hash"]+`</div>
+                <div class="activity-contract">`+tx["contract"]+`</div>
+                <div class="activity-function">`+tx["function"]+`</div>
+                <div class="activity-status">`+tx["status"]+`</div>
+                <div class="activity-timestamp">`+tx["timestamp"]+`</div>
+            </div>
+            <div class="activity-actions">
+                <a href="`+EXPLORER+`/tx/`+tx["hash"]+`" target="_blank"><i class="fas fa-eye"></i> View</a>
+            </div>
+        </div>`;
+    });
 
-
-    // --- Load Local Activity (Remains unchanged for now) ---
-    const localActivityList = document.getElementById("local-activity-list");
-    localActivityList.innerHTML = ""; // Clear previous
-    if (tx_history.length === 0) {
-         localActivityList.innerHTML = `<div class="text-center p-3">No recent activity.</div>`;
-    } else {
-        tx_history.forEach((tx) => {
-            // Determine status color/icon
-            let statusIndicator;
-            switch (tx.status) {
-                case 'success': statusIndicator = '<i class="fas fa-check-circle text-success" title="Success"></i>'; break;
-                case 'error': statusIndicator = '<i class="fas fa-times-circle text-danger" title="Error"></i>'; break;
-                case 'pending':
-                default: statusIndicator = '<i class="fas fa-spinner fa-spin" title="Pending"></i>'; break;
-            }
-
-             // Format timestamp
-            //  const timestamp = tx.timestamp ? new Date(tx.timestamp).toLocaleString() : 'N/A';
-             // Basic display of kwargs - consider pretty printing for complex objects
-             const kwargsDisplay = typeof tx.kwargs === 'object' ? JSON.stringify(tx.kwargs) : tx.kwargs;
-
-            localActivityList.innerHTML += `
-            <div class="activity-item">
-                <div class="activity-details">
-                    <div style="flex-basis: 10%; min-width: 40px;" class="text-center">${statusIndicator}</div>
-                     <div style="flex-basis: 30%; min-width: 150px;" title="${tx.hash}"><strong class="me-2">Hash:</strong><a href="${EXPLORER}/tx/${tx.hash}" target="_blank" rel="noopener noreferrer" class="text-truncate d-inline-block" style="max-width: 120px;">${tx.hash}</a></div>
-                     <div style="flex-basis: 20%; min-width: 100px;"><strong class="me-2">Contract:</strong>${tx.contract}</div>
-                     <div style="flex-basis: 20%; min-width: 100px;"><strong class="me-2">Function:</strong>${tx.function}</div>
-                     <div style="flex-basis: 20%; min-width: 150px;" class="text-muted small">${tx.timestamp}</div>
-                     <!-- Optionally display kwargs in a collapsed section -->
-                     <!-- <details><summary>Params</summary><pre style="font-size: 0.8em; max-height: 100px; overflow: auto;">${kwargsDisplay}</pre></details> -->
-                 </div>
-                <!-- Actions removed for simplicity, View link is inline now -->
-            </div>`;
-        });
+    if (local_activity.innerHTML === "") {
+        local_activity.innerHTML = `<div class="activity-item">
+            <div class="activity-details">
+                <div class="activity-hash">No recent activity</div>
+            </div>
+        </div>`;
     }
-
-    // Ensure correct tab is shown initially
-    changeWalletTab('wallet-tokens'); // Default to tokens tab
-
-    if (refreshIcon) refreshIcon.classList.remove("fa-spin");
+    
+    document.getElementById("wallet-refresh-all").querySelector("i").classList.remove("fa-spin");       
 }
 
 // --- Event Listener Setup ---
