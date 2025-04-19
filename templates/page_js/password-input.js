@@ -20,7 +20,7 @@ async function unlockWallet() { // Made async
         // 1. Read necessary data from storage
         const storedEncryptedSeed = await readEncryptedSeed();
         const storedAccounts = await readAccounts(); // Read accounts to ensure state consistency
-        const storedSelectedIndex = await readSelectedAccountIndex(); // Read index
+        const storedSelectedVk = await readSelectedAccountVk(); // Read index
 
         if (!storedEncryptedSeed) {
             // This case should ideally not happen if password-input page is shown,
@@ -52,8 +52,29 @@ async function unlockWallet() { // Made async
         window.unencryptedMnemonic = decryptedMnemonic; // Store the decrypted mnemonic globally
         window.encryptedSeed = storedEncryptedSeed; // Ensure global encryptedSeed is up-to-date
         window.accounts = storedAccounts;           // Ensure global accounts are up-to-date
-        window.selectedAccountIndex = storedSelectedIndex; // Ensure global index is up-to-date
+        window.selectedAccountVk = storedSelectedVk; // Ensure global index is up-to-date
         window.locked = false;                      // Set wallet to unlocked state
+
+        // Decrypt all available imported keys now that password is confirmed good
+        if (window.accounts.length > 0) {
+            for (const account of window.accounts) {
+                if (account.type === 'imported' && account.encryptedSk) {
+                    try {
+                        const decryptedSk = decryptSk(account.encryptedSk, password);
+                        if (decryptedSk !== null) {
+                            console.log(`Successfully decrypted SK for imported account: ${account.name || account.vk}`);
+                            window.unencryptedImportedSks[account.vk] = decryptedSk;
+                        } else {
+                            // This case is less likely now since we verified the password works for at least one key if needed.
+                            // Could indicate corruption for this specific key.
+                            console.warn(`Failed to decrypt SK for imported account ${account.name || account.vk} despite correct password. Key data might be corrupted.`);
+                        }
+                    } catch (decryptionError) {
+                        console.error(`Error decrypting SK for imported account ${account.name || account.vk}:`, decryptionError);
+                    }
+                }
+            }
+        }
 
         // Clear password field immediately after successful unlock
         document.getElementById('unlock_password').value = '';
@@ -82,7 +103,7 @@ async function removeWallet() { // Made async
         // Remove all HD wallet related data
         await removeEncryptedSeed();
         await removeAccounts();
-        await removeSelectedAccountIndex();
+        await removeSelectedAccountVk();
         // Also clear transaction history associated with this wallet instance
         localStorage.removeItem('tx_history'); // Assuming tx_history is global to the install
 

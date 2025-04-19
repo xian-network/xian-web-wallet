@@ -1,6 +1,7 @@
 var RPC = localStorage.getItem("rpc") || "https://node.xian.org";
 var EXPLORER = localStorage.getItem("explorer") || "https://explorer.xian.org";
 var CHAIN_ID = null;
+var unencryptedImportedSks = {}; // Map: { vk: decryptedSkHex, ... }
 
 // Assuming 'nacl' and 'bip39' are globally available from included scripts
 // Assuming 'HDKey' is available (needs micro-ed25519-hdkey library) - NOTE: This dependency wasn't in the original index.html, it needs to be added. Let's proceed assuming it's added.
@@ -214,73 +215,156 @@ async function getNonce(publicKey) { // Added publicKey parameter
 }
 
 /**
- * Signs a transaction using the private key derived for the specified account index.
- * @param {object} transaction - The transaction object.
- * @param {string} decryptedMnemonic - The user's decrypted mnemonic phrase.
- * @param {number} accountIndex - The index of the account to sign with.
+ * Signs a transaction using the private key associated with the senderVk.
+ * @param {object} transaction - The transaction object (payload will be modified).
+ * @param {string | null} decryptedMnemonic - The user's decrypted mnemonic (needed for derived accounts).
+ * @param {string} senderVk - The public key (vk) of the account signing the transaction.
  * @returns {Promise<object>} The signed transaction object.
+ * @throws {Error} If the account is not found, keys are unavailable, or signing fails.
  */
-async function signTransaction(transaction, decryptedMnemonic, accountIndex) {
+async function signTransaction(transaction, decryptedMnemonic, senderVk) {
     try {
-        const keyPair = deriveKeyPairFromMnemonic(decryptedMnemonic, accountIndex);
-        const senderVk = toHexString(keyPair.vk);
-        const derivedSk = keyPair.sk; // This is the 32-byte secret key
+        let keyPair;
+        let derivedSkBytes; // Use bytes for nacl
 
-        // Get nonce for the specific sender public key
-        const nonce = await getNonce(senderVk);
+        // Find the account details using the provided VK
+        const selectedAccount = accounts.find(acc => acc.vk === senderVk);
+
+        if (!selectedAccount) {
+            throw new Error(`Account not found for vk: ${senderVk}`);
+        }
+
+        // Retrieve the correct private key based on account type
+        if (selectedAccount.type === 'derived') {
+            if (!decryptedMnemonic) throw new Error("Mnemonic required for derived account signing.");
+            // Derive the key pair using the account's index
+            keyPair = deriveKeyPairFromMnemonic(decryptedMnemonic, selectedAccount.index);
+            // Ensure derived VK matches the expected VK (optional but good check)
+            if (toHexString(keyPair.vk) !== senderVk) {
+                console.error("Derived VK does not match account VK!", selectedAccount);
+                throw new Error("Public key mismatch during derivation.");
+            }
+            derivedSkBytes = keyPair.sk;
+        } else if (selectedAccount.type === 'imported') {
+            const decryptedSkHex = unencryptedImportedSks[senderVk];
+            if (!decryptedSkHex) throw new Error(`Decrypted private key not available for imported account ${senderVk}. Wallet might be locked or import failed.`);
+            derivedSkBytes = fromHexString(decryptedSkHex);
+            // Re-derive the keypair from the SK to get the necessary format for nacl
+            keyPair = nacl.sign.keyPair.fromSeed(derivedSkBytes);
+            keyPair.vk = keyPair.publicKey; //for consistency sake with deriveKeyPairFromMnemonic output object
+            // Verification: Ensure derived VK matches stored VK
+            if (toHexString(keyPair.vk) !== senderVk) {
+                throw new Error(`Public key mismatch for imported account ${senderVk}.`);
+            }
+        } else {
+            throw new Error(`Unknown account type '${selectedAccount.type}' for account ${senderVk}`);
+        }
+
+        // --- Nonce, Payload Ordering, Signing ---
+        const nonce = await getNonce(senderVk); // Get nonce for this specific VK
         transaction.payload.nonce = nonce;
-        transaction.payload.sender = senderVk; // Make sure sender VK is correct
+        transaction.payload.sender = senderVk; // Set sender VK
 
-        // Sort the keys in payload for deterministic signature generation
         let orderedPayload = {};
         Object.keys(transaction.payload).sort().forEach(function(key) {
             orderedPayload[key] = transaction.payload[key];
         });
-        transaction.payload = orderedPayload; // Update transaction with ordered payload
+        transaction.payload = orderedPayload;
 
         let serializedTransaction = JSON.stringify(orderedPayload);
-        let transactionUint8Array = str2buf(serializedTransaction); // Use helper
+        let transactionUint8Array = str2buf(serializedTransaction);
 
         // Create the 64-byte key required by nacl.sign.detached (sk + vk)
-        let combinedKey = concatUint8Arrays(derivedSk, keyPair.vk);
+        let combinedKey = concatUint8Arrays(derivedSkBytes, keyPair.vk);
 
-        // Use nacl.sign.detached to get the signature
         let signatureUint8Array = nacl.sign.detached(transactionUint8Array, combinedKey);
-
-        // Add the signature to metadata
         transaction.metadata.signature = toHexString(signatureUint8Array);
 
         return transaction;
 
     } catch (error) {
-        console.error("Error signing transaction:", error);
-        throw error; // Re-throw the error to be handled by the caller
+        console.error(`Error signing transaction for ${senderVk}:`, error);
+        throw error; // Re-throw the error
     }
 }
 
 
 /**
- * Signs a message using the private key derived for the specified account index.
+ * Signs a message using the private key associated with the senderVk.
  * @param {string} message - The message string to sign.
- * @param {string} decryptedMnemonic - The user's decrypted mnemonic phrase.
- * @param {number} accountIndex - The index of the account to sign with.
+ * @param {string | null} decryptedMnemonic - The user's decrypted mnemonic (needed for derived accounts).
+ * @param {string} senderVk - The public key (vk) of the account signing the message.
  * @returns {Promise<string>} The hex string of the signature.
  */
-async function signMessage(message, decryptedMnemonic, accountIndex) {
+async function signMessage(message, decryptedMnemonic, senderVk) {
      try {
-        const keyPair = deriveKeyPairFromMnemonic(decryptedMnemonic, accountIndex);
-        const derivedSk = keyPair.sk;
+         let keyPair;
+         let derivedSkBytes;
 
-        // Create the 64-byte key required by nacl.sign.detached (sk + vk)
-        let combinedKey = concatUint8Arrays(derivedSk, keyPair.vk);
+         const selectedAccount = accounts.find(acc => acc.vk === senderVk);
+         if (!selectedAccount) throw new Error(`Account not found for vk: ${senderVk}`);
 
-        let messageUint8Array = str2buf(message); // Use helper
+         if (selectedAccount.type === 'derived') {
+             if (!decryptedMnemonic) throw new Error("Mnemonic required for derived account signing.");
+             keyPair = deriveKeyPairFromMnemonic(decryptedMnemonic, selectedAccount.index);
+              if (toHexString(keyPair.vk) !== senderVk) throw new Error("Public key mismatch during derivation.");
+             derivedSkBytes = keyPair.sk;
+         } else if (selectedAccount.type === 'imported') {
+             const decryptedSkHex = unencryptedImportedSks[senderVk];
+             if (!decryptedSkHex) throw new Error(`Decrypted private key not available for imported account ${senderVk}.`);
+             derivedSkBytes = fromHexString(decryptedSkHex);
+             keyPair = nacl.sign.keyPair.fromSeed(derivedSkBytes);
+             if (toHexString(keyPair.publicKey) !== senderVk) throw new Error(`Public key mismatch for imported account ${senderVk}.`);
+         } else {
+             throw new Error(`Unknown account type '${selectedAccount.type}' for account ${senderVk}`);
+         }
+
+        let combinedKey = concatUint8Arrays(derivedSkBytes, keyPair.vk);
+        let messageUint8Array = str2buf(message);
         let signatureUint8Array = nacl.sign.detached(messageUint8Array, combinedKey);
 
         return toHexString(signatureUint8Array);
     } catch (error) {
-        console.error("Error signing message:", error);
+        console.error(`Error signing message for ${senderVk}:`, error);
         throw error;
+    }
+}
+
+function encryptSk(privateKeyHex, password) {
+    // Re-use the same key derivation logic as encryptSeed
+    let passwordBytes = new TextEncoder().encode(password);
+    let key = nacl.hash(passwordBytes).slice(0, 32);
+    let nonce = nacl.randomBytes(nacl.secretbox.nonceLength);
+    let privateKeyBytes = fromHexString(privateKeyHex); // Convert hex SK to bytes
+    let encryptedSk = nacl.secretbox(privateKeyBytes, nonce, key);
+
+    let combined = new Uint8Array(nonce.length + encryptedSk.length);
+    combined.set(nonce);
+    combined.set(encryptedSk, nonce.length);
+
+    return toHexString(combined);
+}
+
+function decryptSk(encryptedSkHex, password) {
+    try {
+        let combined = fromHexString(encryptedSkHex);
+        let nonce = combined.slice(0, nacl.secretbox.nonceLength);
+        let message = combined.slice(nacl.secretbox.nonceLength);
+
+        let passwordBytes = new TextEncoder().encode(password);
+        let key = nacl.hash(passwordBytes).slice(0, 32);
+
+        let decryptedBytes = nacl.secretbox.open(message, nonce, key);
+
+        if (!decryptedBytes) {
+            console.error("SK decryption failed.");
+            return null;
+        }
+
+        return toHexString(decryptedBytes); // Return decrypted SK as hex
+    } catch (error) {
+        console.error("Error during SK decryption:", error);
+        return null;
     }
 }
 

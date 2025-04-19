@@ -1,5 +1,5 @@
-// Assumes global vars: unencryptedMnemonic, locked, accounts, selectedAccountIndex, RPC, EXPLORER
-// Assumes functions: readEncryptedSeed, decryptSeed, saveAccounts, saveSelectedAccountIndex,
+// Assumes global vars: unencryptedMnemonic, locked, accounts, selectedAccountVk, RPC, EXPLORER
+// Assumes functions: readEncryptedSeed, decryptSeed, saveAccounts, saveSelectedAccountVk,
 //                    deriveKeyPairFromMnemonic, changePage, toast, readData, saveData, removeData, ping, getChainID
 // Assumes bip39 library is loaded
 
@@ -236,6 +236,146 @@ function setupRecoveryPhraseView() {
     });
 }
 
+// --- Import Account with Private Key ---
+async function importPrivateKeyAccount() {
+    const privateKeyInput = document.getElementById('importPrivateKeyInput');
+    const accountNameInput = document.getElementById('importAccountNameInput');
+    const passwordConfirmInput = document.getElementById('importPasswordConfirm');
+    const importSkError = document.getElementById('importSkError');
+    const importSkSuccess = document.getElementById('importSkSuccess');
+    const importButton = document.getElementById('setting-import-private-key-btn');
+
+    const privateKeyHex = privateKeyInput.value.trim();
+    const accountName = accountNameInput.value.trim();
+    const password = passwordConfirmInput.value; // Don't trim password
+
+    // Reset messages
+    importSkError.style.display = 'none';
+    importSkSuccess.style.display = 'none';
+
+    // --- Basic Validation ---
+    if (!privateKeyHex || privateKeyHex.length !== 64 || !/^[0-9a-fA-F]+$/.test(privateKeyHex)) {
+        importSkError.innerHTML = 'Invalid private key format (must be 64 hex characters).';
+        importSkError.style.display = 'block';
+        return;
+    }
+    if (!accountName) {
+        importSkError.innerHTML = 'Account name cannot be empty.';
+        importSkError.style.display = 'block';
+        return;
+    }
+     if (accountName.length > 32) { // Add a reasonable length limit
+         importSkError.innerHTML = 'Account name is too long (max 32 characters).';
+         importSkError.style.display = 'block';
+         return;
+     }
+    if (!password) {
+        importSkError.innerHTML = 'Wallet password confirmation is required to encrypt the private key.';
+        importSkError.style.display = 'block';
+        return;
+    }
+    // --- End Basic Validation ---
+
+    importButton.disabled = true;
+    importButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing...';
+
+    // --- Verify Password ---
+    let verified = false;
+    try {
+        if (encryptedSeed) {
+            // Use the globally available encryptedSeed
+            verified = decryptSeed(encryptedSeed, password) !== null;
+        } else { // If no mnemonic, try decrypting an existing imported key
+            const firstImported = accounts.find(a => a.type === 'imported');
+            if (firstImported && firstImported.encryptedSk) {
+                verified = decryptSk(firstImported.encryptedSk, password) !== null;
+            } else if (accounts.length === 0 && !encryptedSeed){
+                 // This state shouldn't normally be reachable if settings page requires unlock
+                 throw new Error('Cannot verify password. No existing wallet data found.');
+            } else {
+                // Should have encryptedSeed if derived accounts exist
+                 throw new Error('Password verification failed. Inconsistent state.');
+            }
+        }
+    } catch (verifyError) {
+        console.error("Password verification error:", verifyError);
+        importSkError.innerHTML = 'Error verifying password: ' + verifyError.message;
+        importSkError.style.display = 'block';
+        importButton.disabled = false;
+        importButton.innerHTML = '<i class="fas fa-key"></i> Import Account';
+        return;
+    }
+
+    if (!verified) {
+        importSkError.innerHTML = 'Incorrect wallet password.';
+        importSkError.style.display = 'block';
+        passwordConfirmInput.value = ''; // Clear password field
+        passwordConfirmInput.focus();
+        importButton.disabled = false;
+        importButton.innerHTML = '<i class="fas fa-key"></i> Import Account';
+        return;
+    }
+    // --- End Password Verification ---
+
+
+    try {
+        // Derive VK from SK using nacl
+        const privateKeyBytes = fromHexString(privateKeyHex);
+        // Use fromSeed to get the full keypair, including the public key part
+        const keyPair = nacl.sign.keyPair.fromSeed(privateKeyBytes);
+        const publicKeyHex = toHexString(keyPair.publicKey);
+
+        // Check if account with this VK already exists
+        if (accounts.some(acc => acc.vk === publicKeyHex)) {
+            importSkError.innerHTML = 'This account (derived from the private key) already exists in your wallet.';
+            importSkError.style.display = 'block';
+            importButton.disabled = false;
+            importButton.innerHTML = '<i class="fas fa-key"></i> Import Account';
+            return;
+        }
+
+        // Encrypt the private key using the verified password
+        const encryptedSk = encryptSk(privateKeyHex, password);
+
+        // Create new account object
+        const newAccount = {
+            vk: publicKeyHex,
+            name: accountName,
+            encryptedSk: encryptedSk,
+            type: 'imported', // Mark as imported
+            // No 'index' field for imported accounts
+        };
+
+        // Add to accounts array and save
+        accounts.push(newAccount);
+        await saveAccounts(accounts);
+
+        // If wallet is currently unlocked, add the decrypted key to the temporary store
+        if (!locked) {
+            unencryptedImportedSks[publicKeyHex] = privateKeyHex;
+        }
+
+        toast('success', `Account "${accountName}" imported successfully!`);
+
+        // Clear the form fields
+        privateKeyInput.value = '';
+        accountNameInput.value = '';
+        passwordConfirmInput.value = '';
+
+        // Refresh the accounts list displayed on the settings page (if it exists)
+        // loadAccountsList(); // You might need to implement/call this if you add a list to settings.html
+
+    } catch (error) {
+        console.error("Error importing private key:", error);
+        importSkError.innerHTML = `Failed to import account: ${error.message}`;
+        importSkError.style.display = 'block';
+        toast('danger', `Failed to import account: ${error.message}`);
+    } finally {
+        importButton.disabled = false;
+        importButton.innerHTML = '<i class="fas fa-key"></i> Import Account';
+    }
+}
+
 // --- Account Management ---
 
 async function loadAccountsList() {
@@ -251,7 +391,7 @@ async function loadAccountsList() {
 
     try {
         accounts = await readAccounts(); // Refresh global accounts from storage
-        selectedAccountIndex = await readSelectedAccountIndex(); // Refresh selected index
+        selectedAccountVk = await readSelectedAccountVk(); // Refresh selected index
 
         if (accounts.length === 0) {
              listContainer.innerHTML = '<div class="list-group-item text-muted">No accounts found. Create one!</div>'; // Handle empty state
@@ -265,7 +405,7 @@ async function loadAccountsList() {
         accounts.forEach(account => {
             const item = document.createElement('div');
             item.className = 'list-group-item d-flex justify-content-between align-items-center';
-            if (account.index === selectedAccountIndex) {
+            if (account.vk === selectedAccountVk) {
                 item.classList.add('active'); // Highlight selected account
             }
 
@@ -273,7 +413,7 @@ async function loadAccountsList() {
             nameAndAddressDiv.style.overflow = 'hidden'; // Prevent long names/addresses from breaking layout
 
             const nameSpan = document.createElement('span');
-            nameSpan.textContent = account.name || `Account ${account.index + 1}`; // Display name or default
+            nameSpan.textContent = account.name || `Account ${account.vk + 1}`; // Display name or default
             nameSpan.className = 'fw-bold'; // Make name bold
 
             const addressSpan = document.createElement('span');
@@ -291,19 +431,19 @@ async function loadAccountsList() {
             renameButton.className = 'btn btn-sm btn-outline-secondary';
             renameButton.innerHTML = '<i class="fas fa-pencil-alt"></i>';
             renameButton.title = 'Rename Account';
-            renameButton.addEventListener('click', () => openRenameModal(account.index, account.name));
+            renameButton.addEventListener('click', () => openRenameModal(account.vk, account.name));
 
             const switchButton = document.createElement('button');
             switchButton.className = 'btn btn-sm btn-outline-primary';
             switchButton.innerHTML = '<i class="fas fa-sign-in-alt"></i>';
             switchButton.title = 'Switch to this Account';
-             if (account.index === selectedAccountIndex) {
+             if (account.vk === selectedAccountVk) {
                  switchButton.disabled = true; // Disable switch for already selected account
              }
             switchButton.addEventListener('click', async () => {
-                await saveSelectedAccountIndex(account.index);
-                selectedAccountIndex = account.index; // Update global state
-                toast('info', `Switched to account ${account.name || `Account ${account.index + 1}`}`);
+                await saveSelectedAccountVk(account.vk);
+                selectedAccountVk = account.vk; // Update global state
+                toast('info', `Switched to account ${account.name || `Account ${account.vk + 1}`}`);
                 loadAccountsList(); // Refresh list highlighting
                  // Optionally reload main wallet view: changePage('wallet');
             });
@@ -325,51 +465,51 @@ async function loadAccountsList() {
 }
 
 
-async function createNewAccountSettings() {
-    const createButton = document.getElementById('setting-create-account-btn');
-    const settingsWarning = document.getElementById('settingsWarning');
-    settingsWarning.style.display = 'none'; // Hide warning
+// async function createNewAccountSettings() {
+//     const createButton = document.getElementById('setting-create-account-btn');
+//     const settingsWarning = document.getElementById('settingsWarning');
+//     settingsWarning.style.display = 'none'; // Hide warning
 
-    // Check if wallet is unlocked by checking for the unencryptedMnemonic
-    if (locked || !window.unencryptedMnemonic) {
-        settingsWarning.innerHTML = 'Please unlock your wallet to create a new account.';
-        settingsWarning.style.display = 'block';
-        // Optionally redirect to unlock page:
-        // changePage('password-input');
-        return;
-    }
+//     // Check if wallet is unlocked by checking for the unencryptedMnemonic
+//     if (locked || !window.unencryptedMnemonic) {
+//         settingsWarning.innerHTML = 'Please unlock your wallet to create a new account.';
+//         settingsWarning.style.display = 'block';
+//         // Optionally redirect to unlock page:
+//         // changePage('password-input');
+//         return;
+//     }
 
-    createButton.disabled = true;
-    createButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+//     createButton.disabled = true;
+//     createButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
 
-    try {
-        // Determine the next index
-        const nextIndex = accounts.length > 0 ? Math.max(...accounts.map(a => a.index)) + 1 : 0;
+//     try {
+//         // Determine the next index
+//         const nextIndex = accounts.length > 0 ? Math.max(...accounts.map(a => a.index)) + 1 : 0;
 
-        // Derive the key pair for the new index
-        const newKeyPair = deriveKeyPairFromMnemonic(window.unencryptedMnemonic, nextIndex); // Use global mnemonic
+//         // Derive the key pair for the new index
+//         const newKeyPair = deriveKeyPairFromMnemonic(window.unencryptedMnemonic, nextIndex); // Use global mnemonic
 
-        const newAccount = {
-            index: nextIndex,
-            vk: toHexString(newKeyPair.vk),
-            name: `Account ${nextIndex + 1}` // Default name
-        };
+//         const newAccount = {
+//             index: nextIndex,
+//             vk: toHexString(newKeyPair.vk),
+//             name: `Account ${nextIndex + 1}` // Default name
+//         };
 
-        // Add to global accounts array and save
-        accounts.push(newAccount);
-        await saveAccounts(accounts);
+//         // Add to global accounts array and save
+//         accounts.push(newAccount);
+//         await saveAccounts(accounts);
 
-        toast('success', `Account "${newAccount.name}" created.`);
-        loadAccountsList(); // Refresh the list in settings
+//         toast('success', `Account "${newAccount.name}" created.`);
+//         loadAccountsList(); // Refresh the list in settings
 
-    } catch (error) {
-        console.error("Error creating new account:", error);
-        toast('danger', 'Failed to create new account: ' + error.message);
-    } finally {
-        createButton.disabled = false;
-        createButton.innerHTML = '<i class="fas fa-plus"></i> Create New Account';
-    }
-}
+//     } catch (error) {
+//         console.error("Error creating new account:", error);
+//         toast('danger', 'Failed to create new account: ' + error.message);
+//     } finally {
+//         createButton.disabled = false;
+//         createButton.innerHTML = '<i class="fas fa-plus"></i> Create New Account';
+//     }
+// }
 
 function openRenameModal(index, currentName) {
      // Initialize modal if it hasn't been already
@@ -428,7 +568,7 @@ async function saveNewAccountName() {
         loadAccountsList(); // Refresh the list to show the new name
 
          // Also update the name in the main wallet header if it was the selected account
-         if (indexToRename === selectedAccountIndex && typeof updateSelectedAccountDisplay === 'function') {
+         if (indexToRename === selectedAccountVk && typeof updateSelectedAccountDisplay === 'function') {
             updateSelectedAccountDisplay(); // Assumes a function exists to update header/wallet view name
          }
 
@@ -451,7 +591,7 @@ async function removeWalletHD() { // Renamed to avoid conflict if old one is kep
         // Remove all HD wallet related data using async functions
         await removeEncryptedSeed();
         await removeAccounts();
-        await removeSelectedAccountIndex();
+        await removeSelectedAccountVk();
         // Clear transaction history (kept in localStorage for now)
         localStorage.removeItem('tx_history');
 
@@ -459,7 +599,7 @@ async function removeWalletHD() { // Renamed to avoid conflict if old one is kep
         window.unencryptedMnemonic = null;
         window.encryptedSeed = null;
         window.accounts = [];
-        window.selectedAccountIndex = 0;
+        window.selectedAccountVk = 0;
         window.locked = true;
         window.tx_history = [];
 
@@ -560,6 +700,7 @@ function loadSettingsPage() {
          saveSettings(); // Update storage and global state
     }
 
+    document.getElementById('setting-import-private-key-btn')?.addEventListener('click', importPrivateKeyAccount);
 
     loadWalletVersion(); // Load and display wallet version
     setupRecoveryPhraseView(); // Set up listeners for recovery phrase section
@@ -579,8 +720,8 @@ document.getElementById('rpc_select')?.addEventListener('change', saveSettings);
 document.getElementById('add_rpc_button')?.addEventListener('click', addCustomRPC);
 document.getElementById('remove_rpc_button')?.addEventListener('click', removeCustomRPC);
 document.getElementById('remove_wallet_export')?.addEventListener('click', removeWalletHD);
-document.getElementById('setting-create-account-btn')?.addEventListener('click', createNewAccountSettings);
-document.getElementById('saveAccountNameBtn')?.addEventListener('click', saveNewAccountName);
+// document.getElementById('setting-create-account-btn')?.addEventListener('click', createNewAccountSettings);
+// document.getElementById('saveAccountNameBtn')?.addEventListener('click', saveNewAccountName);
 
 
 // Initial load

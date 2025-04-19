@@ -30,10 +30,10 @@
     </div>
     <hr> <!-- Separator -->
 
-    <!-- View Recovery Phrase Section -->
+    <!-- View Recovery Phrase Section (Unchanged) -->
     <div class="form-group">
         <label>Recovery Phrase (Mnemonic)</label>
-        <p>This is your master key. Keep it secret and safe! Anyone with this phrase can access all your accounts.</p>
+        <p>This is your master key for accounts derived within this wallet. Keep it secret and safe! Anyone with this phrase can access all your *derived* accounts.</p>
         <a href="#" id="view_recovery_phrase_link">View Recovery Phrase</a>
         <div id="recovery_phrase_confirmation" style="display: none; margin-top: 10px;">
             <input type="password" class="form-control mb-2" id="recovery_phrase_password" placeholder="Enter password to confirm">
@@ -48,25 +48,38 @@
     </div>
     <hr> <!-- Separator -->
 
-     <!-- Account Management Section -->
-     <div class="form-group">
-        <label>Accounts</label>
-        <p>Manage accounts derived from your recovery phrase.</p>
-        <div id="account-list-settings" class="list-group mb-3" style="max-height: 200px; overflow-y: auto;">
-            <!-- Account list populated by JS -->
-            <div class="list-group-item text-center" id="accounts-loading">
-                <i class="fas fa-spinner fa-spin"></i> Loading Accounts...
-            </div>
+    <!-- **** NEW: Import Account with Private Key Section **** -->
+    <div class="form-group">
+        <label>Import Account with Private Key</label>
+        <p>Import an existing external account using its private key. This account's key is **not** derived from your recovery phrase and must be backed up separately.</p>
+         <div class="alert alert-danger" role="alert" id="importSkError" style="display: none;"></div> <!-- Specific Error Message Area -->
+         <div class="alert alert-success" role="alert" id="importSkSuccess" style="display: none;"></div> <!-- Specific Success Message Area -->
+
+        <div class="mb-2">
+            <label for="importPrivateKeyInput" class="form-label small mb-1">Private Key (64 hex characters)</label>
+            <input type="password" class="form-control form-control-sm" id="importPrivateKeyInput" placeholder="Enter private key">
         </div>
-        <button class="btn btn-sm btn-primary" id="setting-create-account-btn"><i class="fas fa-plus"></i> Create New Account</button>
-     </div>
-     <hr> <!-- Separator -->
+        <div class="mb-2">
+            <label for="importAccountNameInput" class="form-label small mb-1">Account Name</label>
+            <input type="text" class="form-control form-control-sm" id="importAccountNameInput" placeholder="Enter a name for this account">
+        </div>
+        <div class="mb-3">
+            <label for="importPasswordConfirm" class="form-label small mb-1">Confirm Wallet Password</label>
+            <input type="password" class="form-control form-control-sm" id="importPasswordConfirm" placeholder="Enter your wallet password to encrypt this key">
+        </div>
+        <button class="btn btn-sm btn-info" id="setting-import-private-key-btn">
+             <i class="fas fa-key"></i> Import Account
+        </button>
+         <p class="small text-muted mt-2">Importing adds the account to this wallet instance. The private key will be encrypted with your wallet password. Remember to back up the original private key securely elsewhere.</p>
+    </div>
+    <hr> <!-- Separator -->
+    <!-- **** END NEW SECTION **** -->
 
 
     <!-- Remove Wallet (Unchanged) -->
     <div class="form-group">
         <label for="remove_wallet_export">Remove Wallet</label>
-        <p>Remove this wallet (including all accounts and the recovery phrase) from this browser. This action is irreversible without your recovery phrase.</p>
+        <p>Remove this wallet (including all accounts and the recovery phrase) from this browser. This action is irreversible without your recovery phrase or individual private keys.</p>
         <a href="#" id="remove_wallet_export" class="text-danger">Remove this Wallet</a>
     </div>
     <hr> <!-- Separator -->
@@ -77,33 +90,6 @@
         <p id="version">Loading...</p>
     </div>
 
-    <!-- Back button hidden as it's in side nav now -->
-    <!--
-    <div class="btn-group" style="display:none">
-        <button class="btn btn-secondary" id="settings-back">Back</button>
-    </div>
-    -->
 </div>
-<!-- Modal for Renaming Account -->
-<div class="modal fade" id="renameAccountModal" tabindex="-1" aria-labelledby="renameAccountModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="renameAccountModalLabel">Rename Account</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="renameAccountIndex">
-        <div class="mb-3">
-          <label for="renameAccountName" class="form-label">New Account Name</label>
-          <input type="text" class="form-control" id="renameAccountName" required>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" id="saveAccountNameBtn">Save Name</button>
-      </div>
-    </div>
-  </div>
-</div>
+
 <script src="templates/page_js/settings.js"></script>

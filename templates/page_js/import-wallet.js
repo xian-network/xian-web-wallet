@@ -59,20 +59,21 @@ async function importHdWallet() { // Renamed and made async
         const initialAccount = {
             index: 0,
             vk: importedWalletData.publicKey, // VK of the first account (index 0)
-            name: "Account 1" // Default name for the first account
+            name: "Account 1", // Default name for the first account
+            type: 'derived'
         };
 
         // 3. Update Global State (in router.js scope)
         window.encryptedSeed = importedWalletData.encryptedSeed;
         window.unencryptedMnemonic = importedWalletData.unencryptedMnemonic; // Store temporarily
         window.accounts = [initialAccount]; // Start with just the first account
-        window.selectedAccountIndex = 0;
+        window.selectedAccountVk = initialAccount.vk;
         window.locked = false; // Wallet is imported and immediately unlocked
 
         // 4. Save State to Storage
         await saveEncryptedSeed(window.encryptedSeed);
         await saveAccounts(window.accounts);
-        await saveSelectedAccountIndex(window.selectedAccountIndex);
+        await saveSelectedAccountVk(window.selectedAccountVk);
 
         // Clear sensitive fields
         document.getElementById('import_mnemonic').value = '';

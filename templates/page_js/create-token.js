@@ -152,7 +152,7 @@ async function estimateCreateTokenStamps() { // Renamed to be specific
 
     try {
         // Sign for estimation
-        const signedTxForEstimation = await signTransaction(transaction, unencryptedMnemonic, selectedAccount.index);
+        const signedTxForEstimation = await signTransaction(transaction, unencryptedMnemonic, selectedAccount.vk);
         // Estimate
         const stampResult = await estimateStamps(signedTxForEstimation);
 
@@ -321,7 +321,7 @@ async function createToken() { // Renamed and made async
 
     // Sign and Broadcast
     try {
-        const signedTx = await signTransaction(payload, unencryptedMnemonic, selectedAccount.index);
+        const signedTx = await signTransaction(payload, unencryptedMnemonic, selectedAccount.vk);
         const response = await broadcastTransaction(signedTx);
 
         // Handle response (similar to advanced tx)
@@ -385,7 +385,7 @@ document.getElementById("NameCreateToken")?.addEventListener("input", function()
 });
 
 // Add listeners to other inputs to trigger debounced estimation
-const debouncedEstimateCreateTokenStamps = debounce(estimateCreateTokenStamps, 500);
+function debouncedEstimateCreateTokenStamps(){debounce(estimateCreateTokenStamps, 500);};
 document.getElementById("SymbolCreateToken")?.addEventListener("input", debouncedEstimateCreateTokenStamps);
 document.getElementById("SupplyCreateToken")?.addEventListener("input", debouncedEstimateCreateTokenStamps);
 document.getElementById("ContractNameCreateToken")?.addEventListener("input", debouncedEstimateCreateTokenStamps);

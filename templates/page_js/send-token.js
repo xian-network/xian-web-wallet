@@ -71,9 +71,10 @@ async function sendToken() { // Made async
 
     // --- Fee and Balance Check ---
     let stampsRequired;
+    await estimateSendStamps_();
     try {
          // Rely on estimateSendStamps to have calculated the fee and stored it
-         stampsRequired = parseInt(document.getElementById('tokenFee').innerHTML, 10);
+         stampsRequired = parseInt(document.getElementById('tokenFee').innerHTML);
          if (isNaN(stampsRequired)) {
              toast('warning', 'Transaction fee not estimated. Please wait or try again.');
              await estimateSendStamps_(); // Try estimating again
@@ -155,7 +156,7 @@ async function sendToken() { // Made async
 
     try {
         // Sign using the selected account's derived key and mnemonic
-        const signedTx = await signTransaction(transaction, unencryptedMnemonic, selectedAccount.index);
+        const signedTx = await signTransaction(transaction, unencryptedMnemonic, selectedAccount.vk);
 
         // Optional: Confirmation dialog
         let conf = confirm(`Send ${amount} ${contract === 'currency' ? 'Xian' : contract} to ${recipient.substring(0, 6)}...? Fee: ~${(stampsRequired / await getStampRate()).toFixed(4)} Xian`);
@@ -316,7 +317,7 @@ async function estimateSendStamps_() { // Renamed to avoid conflict with global 
 
     try {
         // Sign the transaction *before* estimating stamps
-        const signedTxForEstimation = await signTransaction(transaction, unencryptedMnemonic, selectedAccount.index);
+        const signedTxForEstimation = await signTransaction(transaction, unencryptedMnemonic, selectedAccount.vk);
 
         // Estimate stamps using the signed transaction
         const stampResult = await estimateStamps(signedTxForEstimation);
@@ -470,7 +471,7 @@ document.getElementById('send-token-send-token')?.addEventListener('click', send
 document.getElementById('send-token-cancel')?.addEventListener('click', () => changePage('wallet'));
 
 // Debounced estimation listener
-const debouncedEstimateSendStamps_ = debounce(estimateSendStamps_, 500);
+function debouncedEstimateSendStamps_(){ debounce(estimateSendStamps_, 500); };
 document.getElementById('toAddress')?.addEventListener('input', () => {
     getXNSAddress(); // Resolve XNS on input change
     debouncedEstimateSendStamps_(); // Estimate fee after potential XNS resolution delay

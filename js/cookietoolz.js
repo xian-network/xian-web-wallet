@@ -147,23 +147,21 @@ async function removeAccounts() {
     await removeData('accounts');
 }
 
-// Wrapper for saving the selected account index
-async function saveSelectedAccountIndex(index) {
-    // Ensure index is stored as a string for consistency with localStorage
-    await saveData('selectedAccountIndex', String(index));
+async function saveSelectedAccountVk(vk) {
+    if (vk) {
+        await saveData('selectedAccountVk', vk);
+    } else {
+        // If vk is null/undefined, remove the key
+        await removeData('selectedAccountVk');
+    }
 }
 
-// Wrapper for reading the selected account index (parses to number)
-async function readSelectedAccountIndex() {
-    const indexStr = await readData('selectedAccountIndex');
-    // Default to 0 if not found or invalid
-    const index = parseInt(indexStr, 10);
-    return isNaN(index) ? 0 : index;
+async function readSelectedAccountVk() {
+    return await readData('selectedAccountVk'); // Returns null if not set
 }
 
-// Wrapper for removing the selected account index
-async function removeSelectedAccountIndex() {
-    await removeData('selectedAccountIndex');
+async function removeSelectedAccountVk() {
+    await removeData('selectedAccountVk');
 }
 
 // --- Keep old cookie functions for reference or potential specific use, but mark as deprecated ---

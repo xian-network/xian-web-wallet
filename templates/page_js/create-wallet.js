@@ -75,7 +75,8 @@ async function createHdWallet() { // Renamed function and made async
         const initialAccount = {
             index: 0,
             vk: newWalletData.publicKey, // VK of the first account (index 0)
-            name: "Account 1" // Default name for the first account
+            name: "Account 1", // Default name for the first account
+            type: 'derived'
         };
 
         // 3. Update Global State (in router.js scope)
@@ -84,13 +85,13 @@ async function createHdWallet() { // Renamed function and made async
         window.encryptedSeed = newWalletData.encryptedSeed;
         window.unencryptedMnemonic = newWalletData.unencryptedMnemonic; // Store temporarily for immediate use
         window.accounts = [initialAccount];
-        window.selectedAccountIndex = 0;
+        window.selectedAccountVk = initialAccount.vk;
         window.locked = false; // Wallet is created and immediately unlocked
 
         // 4. Save State to Storage (using async functions from cookietoolz.js)
         await saveEncryptedSeed(window.encryptedSeed);
         await saveAccounts(window.accounts);
-        await saveSelectedAccountIndex(window.selectedAccountIndex);
+        await saveSelectedAccountVk(window.selectedAccountVk);
 
         // Clear password fields after successful creation for security
         document.getElementById('password').value = '';

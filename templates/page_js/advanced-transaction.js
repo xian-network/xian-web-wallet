@@ -1,8 +1,3 @@
-// Assumes global vars: selectedAccountIndex, unencryptedMnemonic, locked, accounts, CHAIN_ID, EXPLORER, RPC
-// Assumes functions: getSelectedAccount, signTransaction, estimateStamps, broadcastTransaction,
-//                    prependToTransactionHistory, changePage, toast, getContractFunctions, getStampRate
-
-// --- Main Send Function ---
 async function sendAdvTx() { // Made async
     // Check lock state
     if (locked || !unencryptedMnemonic) {
@@ -84,6 +79,7 @@ async function sendAdvTx() { // Made async
 
     // --- Fee Check ---
     let stampsRequired;
+    await estimateSendStampsAdv();
     try {
         stampsRequired = parseInt(document.getElementById("tokenFee").textContent, 10);
         if (isNaN(stampsRequired)) {
@@ -139,7 +135,7 @@ async function sendAdvTx() { // Made async
 
     try {
         // Sign using selected account
-        const signedTx = await signTransaction(payload, unencryptedMnemonic, selectedAccount.index);
+        const signedTx = await signTransaction(payload, unencryptedMnemonic, selectedAccount.vk);
 
         let conf = confirm(`Execute ${contractName}.${functionName} with provided arguments? Fee: ~${(stampsRequired / await getStampRate()).toFixed(4)} Xian`);
         if (!conf) {
@@ -192,7 +188,134 @@ async function sendAdvTx() { // Made async
     }
 }
 
+// function sendAdvTx() {
+//     if (locked || !unencryptedMnemonic) {
+//         toast('warning', 'Wallet is locked. Please unlock to send transactions.');
+//         return;
+//     }
+//     const selectedAccount = getSelectedAccount();
+//     if (!selectedAccount) {
+//         toast('danger', 'Error: No account selected.');
+//         return;
+//     }
+//     let contractName = document.getElementById("contractName").value;
+//     let functionName = document.getElementById("functionName").value;
+//     let error = document.getElementById("sendAdvTxError");
+//     let success = document.getElementById("sendAdvTxSuccess");
+//     error.style.display = "none";
+//     success.style.display = "none";
+//     let args = document.getElementById("adv_args");
+//     let list_kwargs = document.getElementById("adv_kwargs");
+//     let kwargs = {};
+//     let stamps = document.getElementById("tokenFee").innerHTML;
+//     let payload = {
+//         payload: {
+//             chain_id: CHAIN_ID,
+//             contract: contractName,
+//             function: functionName,
+//             kwargs: {},
+//             stamps_supplied: parseInt(stamps)
+//         },
+//         metadata: {
+//             signature: "",
+//         }
+//     };
+
+//     let functionInfo;
+//     getContractFunctions(contractName)
+//         .then(functions => {
+//             functionInfo = functions.methods.find(func => func.name === functionName);
+//             functionInfo.arguments.forEach(arg => {
+//                 let value = document.getElementById(arg.name).value;
+//                 let expectedType = arg.type;
+//                 if (value === "") {
+//                     error.innerHTML = "All fields are required!";
+//                     error.style.display = "block";
+//                     return;
+//                 }
+//                 if (expectedType === "int") {
+//                     if (isNaN(value)) {
+//                         error.innerHTML = "Invalid value for " + arg.name + "!";
+//                         error.style.display = "block";
+//                         return;
+//                     }
+//                     value = parseInt(value);
+//                 }
+//                 if (expectedType === "float") {
+//                     if (isNaN(value)) {
+//                         error.innerHTML = "Invalid value for " + arg.name + "!";
+//                         error.style.display = "block";
+//                         return;
+//                     }
+//                     value = parseFloat(value);
+//                 }
+//                 if (expectedType === "bool") {
+//                     if (value !== "true" && value !== "false") {
+//                         error.innerHTML = "Invalid value for " + arg.name + "!";
+//                         error.style.display = "block";
+//                         return;
+//                     }
+//                     value = value === "true";
+//                 }
+//                 if (expectedType === "str") {
+//                     value = value.toString();
+//                 }
+//                 if (expectedType === "dict" || expectedType === "list") {
+//                     try {
+//                         value = JSON.parse(value);
+//                     } catch (e) {
+//                         error.innerHTML = "Invalid value for " + arg.name + "!";
+//                         error.style.display = "block";
+//                         return;
+//                     }
+//                 }
+//                 if (expectedType === "Any") {
+//                     try {
+//                         value = JSON.parse(value);
+//                     } catch (e) {
+//                         value = value.toString();
+//                     }
+//                 }
+//                 kwargs[arg.name] = value;
+//             });
+//             payload.payload.kwargs = kwargs;
+//             console.log("payload: ", payload)
+
+//             Promise.all([signTransaction(payload, unencryptedMnemonic, selectedAccount.vk)]).then(signed_tx => {
+//                 let conf = confirm("Are you sure you want to send this transaction?");
+//                 console.log("signed: ",signed_tx);
+//                 if (!conf) return;
+//                 broadcastTransaction(signed_tx).then(response => {
+//                     hash = response['result']['hash'];
+//                     let status = 'pending'
+//                     if (response['result']['code'] == 1) {
+//                         status = 'error';
+//                     }
+//                     prependToTransactionHistory(hash, contractName, functionName, kwargs, status, new Date().toLocaleString());
+    
+//                     if (response['result']['code'] == 1) {
+//                         error.innerHTML = response["result"]["log"];
+//                         // console.log("reproduce: ", response);
+//                         error.style.display = 'block';
+//                         return;
+//                     } else {
+//                         success.innerHTML = 'Transaction sent successfully! Explorer: ' + "<a class='explorer-url' href='"+EXPLORER+"/tx/" + hash + "' target='_blank'>" + hash + "</a>"
+//                         success.style.display = 'block';
+//                     }
+//                 }).catch(error_ => {
+//                     console.error('Error sending advanced transaction:', error_);
+//                     alert('Error sending advanced transaction: ' + error_.message);
+//                 });
+//             })
+//         })
+//         .catch(error_ => {
+//             console.error('Error sending advanced transaction:', error_);
+//             alert('Error sending advanced transaction: ' + error_.message);
+//         });
+// }
+
 // --- Argument Parsing Helper ---
+
 function parseArgumentValue(valueStr, expectedType, argName) {
     // Trim only if not expecting a string where spaces might matter
     // const trimmedValue = (expectedType === 'str') ? valueStr : valueStr.trim();
@@ -252,174 +375,108 @@ function parseArgumentValue(valueStr, expectedType, argName) {
     }
 }
 
+document.getElementById('btn-adv-tx-send').addEventListener('click', sendAdvTx);
+
 
 // --- Load Page & Function/Argument Display ---
-async function loadAdvancedTransactionPage() { // Made async
-    const contractInput = document.getElementById("contractName");
-    const functionSelect = document.getElementById("functionName");
-    const argsSection = document.getElementById("adv_args");
-    const argsContainer = document.getElementById("adv_kwargs");
-    const errorMsg = document.getElementById("sendAdvTxError");
-    const successMsg = document.getElementById("sendAdvTxSuccess");
-    const feeContainer = document.getElementById('tokenFeeContainer');
+function loadAdvancedTransactionPage() {
+    document.getElementById("adv_args").style.display = "none";
+    document.getElementById("contractName").addEventListener("focusout", function () {
+        let contractName = document.getElementById("contractName").value;
+        let error = document.getElementById("sendAdvTxError");
+        let success = document.getElementById("sendAdvTxSuccess");
+        let functionSelect = document.getElementById("functionName");
+        let args = document.getElementById("adv_args");
+        error.style.display = "none";
+        success.style.display = "none";
 
-    // Reset UI elements
-    argsSection.style.display = "none";
-    argsContainer.innerHTML = "";
-    errorMsg.style.display = "none";
-    successMsg.style.display = "none";
-    feeContainer.style.display = "none";
-    functionSelect.innerHTML = "<option value=''>--- Select Contract First ---</option>"; // Clear options
-    functionSelect.disabled = true;
-    document.getElementById('btn-adv-tx-send').disabled = true; // Disable send initially
-
-    // Event listener for contract name input (on blur)
-    contractInput.addEventListener("blur", async function () {
-        const contractName = contractInput.value.trim();
-        errorMsg.style.display = "none";
-        successMsg.style.display = "none";
-        functionSelect.innerHTML = "<option value=''>Loading Functions...</option>";
-        functionSelect.disabled = true;
-        argsSection.style.display = "none";
-        argsContainer.innerHTML = "";
-        feeContainer.style.display = 'none'; // Hide fee on contract change
-        document.getElementById('btn-adv-tx-send').disabled = true;
-
-        if (!contractName) {
-            functionSelect.innerHTML = "<option value=''>--- Enter Contract Name ---</option>";
-            return;
-        }
-
-        try {
-            const functionsInfo = await getContractFunctions(contractName);
-            if (functionsInfo === null || !functionsInfo.methods || functionsInfo.methods.length === 0) {
-                errorMsg.innerHTML = `Contract '${contractName}' not found or has no public methods.`;
-                errorMsg.style.display = "block";
-                functionSelect.innerHTML = "<option value=''>--- Contract Not Found ---</option>";
-                return;
-            }
-
-            functionSelect.innerHTML = "<option value=''>--- Select Function ---</option>"; // Default option
-            // Filter out internal/private methods if necessary (e.g., starting with '_')
-            functionsInfo.methods
-                .filter(func => !func.name.startsWith('_')) // Example filter
-                .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically
-                .forEach((func) => {
-                    functionSelect.innerHTML += `<option value="${func.name}">${func.name}</option>`;
-                });
-            functionSelect.disabled = false; // Enable function selection
-
-        } catch (error) {
-            console.error('Error fetching contract functions:', error);
-            errorMsg.innerHTML = `RPC Error: Could not fetch functions for ${contractName}.`;
-            errorMsg.style.display = "block";
-            functionSelect.innerHTML = "<option value=''>--- Error Loading ---</option>";
-        }
-    });
-
-    // Event listener for function selection change
-    functionSelect.addEventListener("change", async function () {
-        const contractName = contractInput.value.trim();
-        const functionName = functionSelect.value;
-        errorMsg.style.display = "none";
-        successMsg.style.display = "none";
-        argsContainer.innerHTML = ""; // Clear previous args
-        argsSection.style.display = "none";
-        feeContainer.style.display = 'none'; // Hide fee
-        document.getElementById('btn-adv-tx-send').disabled = true; // Disable send
-
-
-        if (!contractName || !functionName) {
-            return; // Do nothing if contract or function isn't selected
-        }
-
-        argsSection.style.display = "block"; // Show the args section container
-
-        try {
-            const functionsInfo = await getContractFunctions(contractName); // Fetch again or cache
-            if (functionsInfo !== null) {
-                const selectedFunctionInfo = functionsInfo.methods.find(func => func.name === functionName);
-                if (selectedFunctionInfo && selectedFunctionInfo.arguments) {
-                    if (selectedFunctionInfo.arguments.length === 0) {
-                         argsContainer.innerHTML = "<p class='text-muted small'>This function takes no arguments.</p>";
-                    } else {
-                        selectedFunctionInfo.arguments.forEach((arg) => {
-                            // Create label and input for each argument
-                            const formGroup = document.createElement('div');
-                            formGroup.className = 'form-group mb-2'; // Spacing between args
-
-                            const label = document.createElement('label');
-                            label.htmlFor = arg.name;
-                            label.textContent = `${arg.name} (${arg.type})`;
-                            label.className = 'form-label small'; // Smaller label
-
-                            const input = document.createElement('input');
-                            input.type = 'text'; // Use text for all, parsing happens on send
-                            input.className = 'form-control form-control-sm'; // Smaller input
-                            input.id = arg.name;
-                            input.placeholder = `Enter value for ${arg.name}`;
-                            // Add listener to estimate stamps when args change
-                            input.addEventListener('input', debouncedEstimateSendStampsAdv);
-
-                            formGroup.appendChild(label);
-                            formGroup.appendChild(input);
-                            argsContainer.appendChild(formGroup);
-                        });
-                    }
-                    // After arguments are displayed (or if none), estimate stamps
-                    await estimateSendStampsAdv();
-                } else {
-                     argsContainer.innerHTML = "<p class='text-danger small'>Could not find argument details for this function.</p>";
+        getContractFunctions(contractName)
+            .then(functions => {
+                if (functions === null) {
+                    error.innerHTML = "Contract does not exist!";
+                    error.style.display = "block";
+                    functionSelect.innerHTML = "";
+                    args.style.display = "none";
+                    return;
                 }
-            } else {
-                 argsContainer.innerHTML = "<p class='text-danger small'>Could not load contract details.</p>";
-            }
-        } catch (error) {
-            console.error('Error processing function selection:', error);
-            errorMsg.innerHTML = `Error loading arguments: ${error.message}`;
-            errorMsg.style.display = "block";
-        }
+                functionSelect.innerHTML = "";
+                functionSelect.innerHTML += "<option value=''>Select a function</option>";
+                console.log(functions);
+                functions.methods.forEach((func) => {
+                    functionSelect.innerHTML +=
+                      "<option value='" + func.name + "'>" + func.name + "</option>";
+                });
+            })
+            .catch(error_ => {
+                console.error('RPC error:', error_);
+                error.innerHTML = "RPC error!";
+                error.style.display = "block";
+            });
+    });
+
+    document.getElementById("functionName").addEventListener("change", function () {
+        let contractName = document.getElementById("contractName").value;
+        let functionName = document.getElementById("functionName").value;
+        let error = document.getElementById("sendAdvTxError");
+        let success = document.getElementById("sendAdvTxSuccess");
+        error.style.display = "none";
+        success.style.display = "none";
+        let args = document.getElementById("adv_args");
+        let list_kwargs = document.getElementById("adv_kwargs");
+
+        getContractFunctions(contractName)
+            .then(functions => {
+                if (functions !== null) {
+                    args.style.display = "block";
+                    let functionInfo = functions.methods.find(
+                      (func) => func.name === functionName
+                    );
+                    list_kwargs.innerHTML = "";
+                    functionInfo.arguments.forEach((arg) => {
+                      list_kwargs.innerHTML +=
+                        `<div class="form-group kwarg-group">
+                        <label for="` +
+                        arg.name +
+                        `">` +
+                        arg.name +
+                        `(` +
+                        arg.type +
+                        `)</label>
+                        <input type="text" class="form-control" id="` +
+                        arg.name +
+                        `">
+                    </div>`;
+                    });
+                }
+            })
+            .catch(error_ => {
+                console.error('RPC error:', error_);
+                error.innerHTML = "RPC error!";
+                error.style.display = "block";
+            });
     });
 }
 
-
-// --- Debounce Helper (Keep as is) ---
-function debounce(func, delay) {
-    let timeout;
-    return function(...args) {
-        const context = this;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(context, args), delay);
-    };
-}
-
-// Debounced version of the estimation function
-const debouncedEstimateSendStampsAdv = debounce(estimateSendStampsAdv, 500); // Increased debounce slightly
-
-// --- Estimate Stamps (Modified for HD & Async) ---
-async function estimateSendStampsAdv() { // Renamed to avoid global conflicts, made async
-    const errorMsg = document.getElementById('sendAdvTxError');
-    const successMsg = document.getElementById('sendAdvTxSuccess');
-    const estimation_loading = document.getElementById('estimation-loading');
-    const estimation_finished = document.getElementById('estimation-result');
-    const feeContainer = document.getElementById('tokenFeeContainer');
-    const feeElement = document.getElementById('tokenFee');
-    const feeXianElement = document.getElementById('tokenFeeXian');
-    const send_btn = document.getElementById('btn-adv-tx-send');
-
-    // Reset UI elements related to fee/status
-    feeContainer.style.display = 'none';
+async function estimateSendStampsAdv(){
+    let error = document.getElementById('sendAdvTxError');
+    let success = document.getElementById('sendAdvTxSuccess');
+    error.style.display = 'none';
+    success.style.display = 'none';
+    let function_name = document.getElementById('functionName').value;
+    let contract = document.getElementById('contractName').value;
+    let estimation_loading = document.getElementById('estimation-loading');
+    let estimation_finished = document.getElementById('estimation-result');
     estimation_loading.style.display = 'inline-block';
     estimation_finished.style.display = 'none';
-    send_btn.disabled = true; // Disable send button until estimation succeeds
-    // Don't hide general error/success messages here, only fee-related ones if needed
+    let send_btn = document.getElementById('btn-adv-tx-send');
+    send_btn.disabled = true;
 
-    // Check lock state and basic inputs
     if (locked || !unencryptedMnemonic) {
         toast('warning', 'Wallet locked. Cannot estimate fees.');
         estimation_loading.style.display = 'none'; // Hide loader
         return;
     }
+
     const selectedAccount = getSelectedAccount();
     if (!selectedAccount) {
         toast('danger', 'No account selected.');
@@ -427,122 +484,259 @@ async function estimateSendStampsAdv() { // Renamed to avoid global conflicts, m
         return;
     }
 
-    const contractName = document.getElementById('contractName').value.trim();
-    const functionName = document.getElementById('functionName').value;
-
-    if (!contractName || !functionName) {
-        estimation_loading.style.display = 'none';
-        return; // Not enough info to estimate
-    }
-
-
-    // --- Build Kwargs for Estimation ---
-    let kwargs = {};
     let functionInfo;
-    let validationError = false;
-    try {
-        functionInfo = await getContractFunctions(contractName);
-         if (!functionInfo || !functionInfo.methods) {
-             throw new Error("Could not get contract methods.");
-         }
-        const selectedFunctionInfo = functionInfo.methods.find(func => func.name === functionName);
-         if (!selectedFunctionInfo) {
-              throw new Error("Selected function not found.");
-         }
-
-        // Try to parse all arguments for estimation, but don't block if some are empty/invalid yet
-         for (const arg of selectedFunctionInfo.arguments) {
-             const inputElement = document.getElementById(arg.name);
-             if (!inputElement) continue; // Skip if element missing
-             const valueStr = inputElement.value;
-             try {
-                 // Use the parser, but don't throw fatal error here, just skip bad args for estimation
-                 kwargs[arg.name] = parseArgumentValue(valueStr, arg.type, arg.name);
-             } catch (e) {
-                 // console.warn(`Skipping arg ${arg.name} for estimation due to parse error: ${e.message}`);
-                  validationError = true; // Mark that there was an issue
-                  // Optionally provide feedback near the input field instead of global error
-             }
-         }
-         // If validation failed for *any* argument, don't proceed with estimation yet
-          if (validationError) {
-               // toast('info', 'Please fill all arguments correctly to estimate fee.');
-               estimation_loading.style.display = 'none'; // Hide loader
-               return;
-          }
-
-    } catch (error) {
-         console.error("Error preparing args for estimation:", error);
-         estimation_loading.style.display = 'none';
-         // Maybe show a subtle error near the contract/function selectors
-         return;
-    }
-    // --- End Build Kwargs for Estimation ---
-
-
-    // --- Create Transaction Payload for Estimation ---
+    let kwargs = {};
     let transaction = {
         payload: {
-            // chain_id, nonce, sender will be added by signTransaction
-            contract: contractName,
-            function: functionName,
+            chain_id: CHAIN_ID,
+            contract: contract,
+            function: function_name,
             kwargs: kwargs,
-            stamps_supplied: 200000 // High default for estimation
+            stamps_supplied: 100000
         },
         metadata: {
-            signature: "", // Placeholder
+            signature: "",
         }
     };
-
-    // --- Sign and Estimate ---
-    try {
-        // Sign first
-        const signedTxForEstimation = await signTransaction(transaction, unencryptedMnemonic, selectedAccount.index);
-
-        // Then estimate
-        const stampResult = await estimateStamps(signedTxForEstimation); // Use global estimateStamps
-
-        estimation_loading.style.display = 'none';
-        feeContainer.style.display = 'block'; // Show fee container
-        estimation_finished.style.display = 'inline-block'; // Show result part
-
-        if (stampResult.stamps === null || stampResult.success === false) {
-            feeElement.innerHTML = 'Error';
-            feeXianElement.innerHTML = 'N/A';
-             // Display the error from the estimation result if available
-             errorMsg.innerHTML = `Transaction will likely fail: ${stampResult.tx_result || 'Estimation error'}`;
-             errorMsg.style.display = 'block';
-             send_btn.disabled = true; // Keep send disabled
-        } else {
-            const stamps = stampResult.stamps;
-            const stamp_rate = await getStampRate();
-            if (stamp_rate) {
-                feeElement.innerHTML = stamps;
-                feeXianElement.innerHTML = (stamps / stamp_rate).toFixed(8);
-                send_btn.disabled = false; // Enable send button on successful estimation
-                 errorMsg.style.display = 'none'; // Hide error message if estimation succeeds
-            } else {
-                feeElement.innerHTML = 'Error';
-                feeXianElement.innerHTML = 'N/A';
-                errorMsg.innerHTML = 'Could not retrieve stamp rate.';
-                 errorMsg.style.display = 'block';
-                send_btn.disabled = true;
-            }
-        }
-    } catch (error) {
-        console.error("Error during stamp estimation process:", error);
-        estimation_loading.style.display = 'none';
-        feeContainer.style.display = 'block'; // Show container even on error
-        estimation_finished.style.display = 'inline-block';
-        feeElement.innerHTML = 'Error';
-        feeXianElement.innerHTML = 'N/A';
-         errorMsg.innerHTML = `Fee estimation error: ${error.message}`;
-         errorMsg.style.display = 'block';
-        send_btn.disabled = true;
+    if (function_name === "" || contract === "") {
+        return;
     }
+    functionInfo = await getContractFunctions(contract)
+        .then(functions => {
+            functionInfo = functions.methods.find(func => func.name === function_name);
+            functionInfo.arguments.forEach(arg => {
+                let value = document.getElementById(arg.name).value;
+                let expectedType = arg.type;
+                if (value === "") {
+                    error.innerHTML = "All fields are required!";
+                    error.style.display = "block";
+                    return;
+                }
+                if (expectedType === "int") {
+                    if (isNaN(value)) {
+                        error.innerHTML = "Invalid value for " + arg.name + "!";
+                        error.style.display = "block";
+                        return;
+                    }
+                    value = parseInt(value);
+                }
+                if (expectedType === "float") {
+                    if (isNaN(value)) {
+                        error.innerHTML = "Invalid value for " + arg.name + "!";
+                        error.style.display = "block";
+                        return;
+                    }
+                    value = parseFloat(value);
+                }
+                if (expectedType === "bool") {
+                    if (value !== "true" && value !== "false") {
+                        error.innerHTML = "Invalid value for " + arg.name + "!";
+                        error.style.display = "block";
+                        return;
+                    }
+                    value = value === "true";
+                }
+                if (expectedType === "str") {
+                    value = value.toString();
+                }
+                if (expectedType === "dict" || expectedType === "list") {
+                    try {
+                        value = JSON.parse(value);
+                    } catch (e) {
+                        error.innerHTML = "Invalid value for " + arg.name + "!";
+                        error.style.display = "block";
+                        return;
+                    }
+                }
+                if (expectedType === "Any") {
+                    try {
+                        value = JSON.parse(value);
+                    } catch (e) {
+                        value = value.toString();
+                    }
+                }
+                kwargs[arg.name] = value;
+            });
+            transaction.payload.kwargs = kwargs;
+        })
+        .catch(error_ => {
+            toast('warning', `Error estimating stamps:${error}`);
+            document.getElementById('tokenFee').innerHTML = "..";
+        });
+
+    
+
+
+    try {
+        let signed_tx = await signTransaction(transaction, unencryptedMnemonic, selectedAccount.vk);
+        let stamps = await estimateStamps(signed_tx);
+        stamps = stamps["stamps"];
+        
+        let stamp_rate = await getStampRate();
+        estimation_loading.style.display = 'none';
+        estimation_finished.style.display = 'inline-block';
+        send_btn.disabled = false;
+        if (stamps === null) {
+            document.getElementById('tokenFee').innerHTML = 0;
+            return;
+        }
+        document.getElementById('tokenFeeXian').innerHTML = stamps / stamp_rate;
+        document.getElementById('tokenFee').innerHTML = stamps;
+    } catch (error) {
+        toast('warning', `Error estimating stamps: ${error}`);
+        document.getElementById('tokenFee').innerHTML = "Error";
+    }
+    document.getElementById('tokenFeeContainer').style.display = 'block';
 }
+
+// --- Estimate Stamps (Modified for HD & Async) ---
+// async function estimateSendStampsAdv() { // Renamed to avoid global conflicts, made async
+//     const errorMsg = document.getElementById('sendAdvTxError');
+//     const successMsg = document.getElementById('sendAdvTxSuccess');
+//     const estimation_loading = document.getElementById('estimation-loading');
+//     const estimation_finished = document.getElementById('estimation-result');
+//     const feeContainer = document.getElementById('tokenFeeContainer');
+//     const feeElement = document.getElementById('tokenFee');
+//     const feeXianElement = document.getElementById('tokenFeeXian');
+//     const send_btn = document.getElementById('btn-adv-tx-send');
+
+//     // Reset UI elements related to fee/status
+//     feeContainer.style.display = 'none';
+//     estimation_loading.style.display = 'inline-block';
+//     estimation_finished.style.display = 'none';
+//     send_btn.disabled = true; // Disable send button until estimation succeeds
+//     // Don't hide general error/success messages here, only fee-related ones if needed
+
+//     // Check lock state and basic inputs
+//     if (locked || !unencryptedMnemonic) {
+//         toast('warning', 'Wallet locked. Cannot estimate fees.');
+//         estimation_loading.style.display = 'none'; // Hide loader
+//         return;
+//     }
+//     const selectedAccount = getSelectedAccount();
+//     if (!selectedAccount) {
+//         toast('danger', 'No account selected.');
+//         estimation_loading.style.display = 'none';
+//         return;
+//     }
+
+//     const contractName = document.getElementById('contractName').value.trim();
+//     const functionName = document.getElementById('functionName').value;
+
+//     if (!contractName || !functionName) {
+//         estimation_loading.style.display = 'none';
+//         return; // Not enough info to estimate
+//     }
+
+
+//     // --- Build Kwargs for Estimation ---
+//     let kwargs = {};
+//     let functionInfo;
+//     let validationError = false;
+//     try {
+//         functionInfo = await getContractFunctions(contractName);
+//          if (!functionInfo || !functionInfo.methods) {
+//              throw new Error("Could not get contract methods.");
+//          }
+//         const selectedFunctionInfo = functionInfo.methods.find(func => func.name === functionName);
+//          if (!selectedFunctionInfo) {
+//               throw new Error("Selected function not found.");
+//          }
+
+//         // Try to parse all arguments for estimation, but don't block if some are empty/invalid yet
+//          for (const arg of selectedFunctionInfo.arguments) {
+//              const inputElement = document.getElementById(arg.name);
+//              if (!inputElement) continue; // Skip if element missing
+//              const valueStr = inputElement.value;
+//              try {
+//                  // Use the parser, but don't throw fatal error here, just skip bad args for estimation
+//                  kwargs[arg.name] = parseArgumentValue(valueStr, arg.type, arg.name);
+//              } catch (e) {
+//                  // console.warn(`Skipping arg ${arg.name} for estimation due to parse error: ${e.message}`);
+//                   validationError = true; // Mark that there was an issue
+//                   // Optionally provide feedback near the input field instead of global error
+//              }
+//          }
+//          // If validation failed for *any* argument, don't proceed with estimation yet
+//           if (validationError) {
+//                // toast('info', 'Please fill all arguments correctly to estimate fee.');
+//                estimation_loading.style.display = 'none'; // Hide loader
+//                return;
+//           }
+
+//     } catch (error) {
+//          console.error("Error preparing args for estimation:", error);
+//          estimation_loading.style.display = 'none';
+//          // Maybe show a subtle error near the contract/function selectors
+//          return;
+//     }
+//     // --- End Build Kwargs for Estimation ---
+
+
+//     // --- Create Transaction Payload for Estimation ---
+//     let transaction = {
+//         payload: {
+//             // chain_id, nonce, sender will be added by signTransaction
+//             contract: contractName,
+//             function: functionName,
+//             kwargs: kwargs,
+//             stamps_supplied: 200000 // High default for estimation
+//         },
+//         metadata: {
+//             signature: "", // Placeholder
+//         }
+//     };
+
+//     // --- Sign and Estimate ---
+//     try {
+//         // Sign first
+//         const signedTxForEstimation = await signTransaction(transaction, unencryptedMnemonic, selectedAccount.vk);
+
+//         // Then estimate
+//         const stampResult = await estimateStamps(signedTxForEstimation); // Use global estimateStamps
+
+//         estimation_loading.style.display = 'none';
+//         feeContainer.style.display = 'block'; // Show fee container
+//         estimation_finished.style.display = 'inline-block'; // Show result part
+
+//         console.log("stampResult: ", stampResult);
+
+//         if (stampResult.stamps === null || stampResult.success === false) {
+//             feeElement.innerHTML = 'Error';
+//             feeXianElement.innerHTML = 'N/A';
+//              // Display the error from the estimation result if available
+//              errorMsg.innerHTML = `Transaction will likely fail: ${stampResult.tx_result || 'Estimation error'}`;
+//              errorMsg.style.display = 'block';
+//              send_btn.disabled = true; // Keep send disabled
+//         } else {
+//             const stamps = stampResult.stamps;
+//             const stamp_rate = await getStampRate();
+//             if (stamp_rate) {
+//                 feeElement.innerHTML = stamps;
+//                 feeXianElement.innerHTML = (stamps / stamp_rate).toFixed(8);
+//                 send_btn.disabled = false; // Enable send button on successful estimation
+//                  errorMsg.style.display = 'none'; // Hide error message if estimation succeeds
+//             } else {
+//                 feeElement.innerHTML = 'Error';
+//                 feeXianElement.innerHTML = 'N/A';
+//                 errorMsg.innerHTML = 'Could not retrieve stamp rate.';
+//                  errorMsg.style.display = 'block';
+//                 send_btn.disabled = true;
+//             }
+//         }
+//     } catch (error) {
+//         console.error("Error during stamp estimation process:", error);
+//         estimation_loading.style.display = 'none';
+//         feeContainer.style.display = 'block'; // Show container even on error
+//         estimation_finished.style.display = 'inline-block';
+//         feeElement.innerHTML = 'Error';
+//         feeXianElement.innerHTML = 'N/A';
+//          errorMsg.innerHTML = `Fee estimation error: ${error.message}`;
+//          errorMsg.style.display = 'block';
+//         send_btn.disabled = true;
+//     }
+// }
 
 
 // --- Initialize Page ---
-document.getElementById('btn-adv-tx-send')?.addEventListener('click', sendAdvTx);
 loadAdvancedTransactionPage(); // Run setup function

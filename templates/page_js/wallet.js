@@ -186,42 +186,52 @@ function populateAccountSwitcher() {
         return;
     }
 
-    // Clear only existing dynamic account items (leave static 'Create' link and divider)
+    // Clear only dynamic items
     dropdownMenu.querySelectorAll('li.dynamic-account-item').forEach(item => item.remove());
 
-    // Sort accounts by index before displaying
-    const sortedAccounts = [...accounts].sort((a, b) => a.index - b.index);
+    // Sort accounts (optional, e.g., by type then name or original index)
+    // Let's keep the original sort for now, but be mindful derived indices aren't sequential if imports exist
+    const sortedAccounts = [...accounts].sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity)); // Sort derived first, then imported
 
-    console.log("Populating dropdown with accounts:", sortedAccounts); // Debug log
+    console.log("Populating dropdown with accounts:", sortedAccounts);
 
-    // Get the list item containing the 'Create Account' link to insert before it
     const createAccountListItem = createAccountLink.closest('li');
 
     sortedAccounts.forEach(account => {
-        if (!account || typeof account.index === 'undefined' || !account.vk) {
+        // Validate account object (check for vk)
+        if (!account || !account.vk) {
             console.warn("Skipping invalid account object during dropdown population:", account);
-            return; // Skip invalid account entries
+            return;
         }
 
         const listItem = document.createElement('li');
-        listItem.classList.add('dynamic-account-item'); // Class for easy clearing
+        listItem.classList.add('dynamic-account-item');
 
         const link = document.createElement('a');
         link.className = 'dropdown-item d-flex justify-content-between align-items-center';
         link.href = '#';
-        link.dataset.index = account.index;
+        // Store VK in dataset for the click listener
+        link.dataset.vk = account.vk;
 
         const nameSpan = document.createElement('span');
-        nameSpan.textContent = account.name || `Account ${account.index + 1}`;
-        nameSpan.title = account.vk;
-        nameSpan.classList.add('text-truncate'); // Use Bootstrap class
+        // Determine default name based on type
+        let defaultName = account.type === 'imported' ? `Imported Account` : `Account ${account.index + 1}`;
+        if (account.type === 'imported' && !account.index) { // Add a visual cue for imported potentially
+             // Find its position in the sorted array to give a pseudo-index for display if needed
+             const displayIndex = sortedAccounts.findIndex(a => a.vk === account.vk);
+             defaultName = `Imported ${displayIndex + 1}`;
+        }
+        nameSpan.textContent = account.name || defaultName;
+        nameSpan.title = account.vk; // Tooltip shows full VK
+        nameSpan.classList.add('text-truncate');
         nameSpan.style.flexGrow = "1";
         nameSpan.style.marginRight = "10px";
-        nameSpan.style.maxWidth = "calc(100% - 35px)"; // Adjust if needed
+        nameSpan.style.maxWidth = "calc(100% - 35px)";
 
         link.appendChild(nameSpan);
 
-        if (account.index === selectedAccountIndex) {
+        // Use selectedAccountVk for checkmark
+        if (account.vk === selectedAccountVk) {
             const checkIcon = document.createElement('i');
             checkIcon.className = 'fas fa-check text-success flex-shrink-0';
             link.appendChild(checkIcon);
@@ -230,67 +240,90 @@ function populateAccountSwitcher() {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            switchAccount(account.index);
+            // Call switchAccount with the VK stored in the dataset
+            switchAccount(e.currentTarget.dataset.vk);
         });
 
         listItem.appendChild(link);
 
-        // Insert the new account item *before* the 'Create Account' link's list item
         if (createAccountListItem) {
             dropdownMenu.insertBefore(listItem, createAccountListItem);
         } else {
-            // Fallback if 'Create Account' isn't found (shouldn't happen)
             dropdownMenu.appendChild(listItem);
         }
     });
 }
 
-async function switchAccount(index) {
-    if (index === selectedAccountIndex) return; // No change needed
+async function switchAccount(vkToSwitchTo) { // Parameter is now VK
+    if (vkToSwitchTo === selectedAccountVk) return; // No change needed
 
-    selectedAccountIndex = index;
-    await saveSelectedAccountIndex(index); // Save the new index persistently
-    toast('info', `Switched to ${accounts.find(a=>a.index === index)?.name || 'Account'}`);
+    selectedAccountVk = vkToSwitchTo;
+    await saveSelectedAccountVk(vkToSwitchTo); // Save the new VK persistently
+    const switchedAccount = accounts.find(a => a.vk === vkToSwitchTo);
+    toast('info', `Switched to ${switchedAccount?.name || 'Account'}`);
     changePage('wallet'); // Reload wallet page to reflect the change
 }
 
 async function createNewAccount() {
-     if (locked || !unencryptedMnemonic) {
-         toast('warning', 'Wallet must be unlocked to create a new account.');
-         return;
-     }
+    if (locked || !unencryptedMnemonic) {
+        toast('warning', 'Wallet must be unlocked to create a new derived account.');
+        // Wallet must be unlocked and mnemonic available to derive new keys.
+        return;
+    }
 
-     const createButton = document.getElementById('wallet-add-account-btn');
-     if (createButton) {
-         createButton.innerHTML = '<i class="fas fa-spinner fa-spin fa-fw me-2"></i>Creating...';
-         createButton.style.pointerEvents = 'none'; // Disable clicking
-     }
+    const createButton = document.getElementById('wallet-add-account-btn');
+    if (createButton) {
+        // Disable button visually during creation
+        createButton.innerHTML = '<i class="fas fa-spinner fa-spin fa-fw me-2"></i>Creating...';
+        createButton.style.pointerEvents = 'none';
+    }
 
-     try {
-         const nextIndex = accounts.length > 0 ? Math.max(...accounts.map(a => a.index)) + 1 : 0;
-         const newKeyPair = deriveKeyPairFromMnemonic(unencryptedMnemonic, nextIndex); // Derive next key
+    try {
+        // --- CORRECTED INDEX CALCULATION ---
+        // 1. Filter the accounts array to get only the ones derived from the mnemonic
+        const derivedAccounts = accounts.filter(acc => acc.type === 'derived' && typeof acc.index === 'number');
 
-         const newAccount = {
-             index: nextIndex,
-             vk: toHexString(newKeyPair.vk),
-             name: `Account ${nextIndex + 1}` // Default name
-         };
+        // 2. Calculate the next available derivation index
+        // If there are existing derived accounts, find the max index and add 1.
+        // If there are no derived accounts yet, start with index 0.
+        const nextIndex = derivedAccounts.length > 0
+            ? Math.max(...derivedAccounts.map(a => a.index)) + 1
+            : 0;
+        // --- END CORRECTION ---
 
-         accounts.push(newAccount);
-         await saveAccounts(accounts); // Save updated accounts list
+        console.log(`Attempting to derive new account at index: ${nextIndex}`);
 
-         toast('success', `Account "${newAccount.name}" created.`);
-         switchAccount(nextIndex); // Switch to the new account and reload
+        // Derive the key pair for the *new derived* account index
+        const newKeyPair = deriveKeyPairFromMnemonic(unencryptedMnemonic, nextIndex);
 
-     } catch (error) {
-         console.error("Error creating new account:", error);
-         toast('danger', 'Failed to create new account.');
-          if (createButton) { // Restore button on error
-               createButton.innerHTML = '<i class="fas fa-plus fa-fw me-2"></i>Create Account';
-               createButton.style.pointerEvents = 'auto';
-          }
-     }
-     // Button state is handled by the page reload via switchAccount on success
+        // Create the new account object, ensuring type is 'derived'
+        const newAccount = {
+            index: nextIndex, // Store the calculated derivation index
+            vk: toHexString(newKeyPair.vk),
+            name: `Account ${nextIndex + 1}`, // Default name using the index
+            type: 'derived'                 // Explicitly set the type
+        };
+
+        // Add the new account to the global list and save
+        accounts.push(newAccount);
+        await saveAccounts(accounts); // Persist the updated list
+
+        toast('success', `Account "${newAccount.name}" created successfully.`);
+
+        // Switch to the newly created account using its VK
+        // switchAccount handles saving the new selected VK and reloading the page
+        switchAccount(newAccount.vk);
+
+    } catch (error) {
+        console.error("Error creating new derived account:", error);
+        toast('danger', `Failed to create new account: ${error.message}`);
+        // Restore button state on error
+        if (createButton) {
+             createButton.innerHTML = '<i class="fas fa-plus fa-fw me-2"></i>Create Account';
+             createButton.style.pointerEvents = 'auto';
+        }
+    }
+    // On success, the page reload initiated by switchAccount will restore the button state.
 }
 
 
@@ -344,7 +377,7 @@ async function loadWalletPage() {
 
     // Update Wallet Info Card
     document.getElementById("walletAddress").innerHTML = selectedAccount.vk;
-    document.getElementById("selectedAccountName").innerHTML = selectedAccount.name || `Account ${selectedAccount.index + 1}`; // Display name or default
+    document.getElementById("selectedAccountName").innerHTML = selectedAccount.name || (selectedAccount.type === 'imported' ? 'Imported Account' : `Account ${selectedAccount.index + 1}`);
     populateAccountSwitcher(); // Populate the account dropdown
 
     // --- Load Tokens ---
@@ -439,7 +472,7 @@ async function loadWalletPage() {
             }
 
              // Format timestamp
-             const timestamp = tx.timestamp ? new Date(tx.timestamp).toLocaleString() : 'N/A';
+            //  const timestamp = tx.timestamp ? new Date(tx.timestamp).toLocaleString() : 'N/A';
              // Basic display of kwargs - consider pretty printing for complex objects
              const kwargsDisplay = typeof tx.kwargs === 'object' ? JSON.stringify(tx.kwargs) : tx.kwargs;
 
@@ -450,7 +483,7 @@ async function loadWalletPage() {
                      <div style="flex-basis: 30%; min-width: 150px;" title="${tx.hash}"><strong class="me-2">Hash:</strong><a href="${EXPLORER}/tx/${tx.hash}" target="_blank" rel="noopener noreferrer" class="text-truncate d-inline-block" style="max-width: 120px;">${tx.hash}</a></div>
                      <div style="flex-basis: 20%; min-width: 100px;"><strong class="me-2">Contract:</strong>${tx.contract}</div>
                      <div style="flex-basis: 20%; min-width: 100px;"><strong class="me-2">Function:</strong>${tx.function}</div>
-                     <div style="flex-basis: 20%; min-width: 150px;" class="text-muted small">${timestamp}</div>
+                     <div style="flex-basis: 20%; min-width: 150px;" class="text-muted small">${tx.timestamp}</div>
                      <!-- Optionally display kwargs in a collapsed section -->
                      <!-- <details><summary>Params</summary><pre style="font-size: 0.8em; max-height: 100px; overflow: auto;">${kwargsDisplay}</pre></details> -->
                  </div>
