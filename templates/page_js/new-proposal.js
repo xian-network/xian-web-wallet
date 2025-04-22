@@ -23,7 +23,7 @@ async function estimateProposalStamps() { // Made async
         toast('warning', 'Wallet locked. Cannot estimate fees.');
         return;
     }
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
     if (!selectedAccount) {
         toast('danger', 'No account selected.');
         return;
@@ -117,7 +117,7 @@ async function sendProposal() { // Made async
         errorMsg.style.display = 'block';
         return;
     }
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
     if (!selectedAccount) {
         errorMsg.innerHTML = 'Error: No account selected.';
         errorMsg.style.display = 'block';

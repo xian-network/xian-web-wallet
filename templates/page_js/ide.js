@@ -404,7 +404,7 @@ async function executeContractFunction(funcInfo) {
     if (!prompt) {
         return;
     }
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
     let contractName = current_tab.replace('(Read-Only)', '');
     let functionName = funcInfo.name;
     let stampLimit = document.getElementById(current_tab + '-' + funcInfo.name + '-stamp_limit').value;
@@ -514,7 +514,7 @@ async function executeContractFunction(funcInfo) {
 }
 
 async function submitContract() {
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
     let contract = document.getElementById("submitContractName").value;
     let contractError = document.getElementById("submitContractError");
     let contractSuccess = document.getElementById("submitContractSuccess");

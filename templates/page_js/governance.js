@@ -7,7 +7,7 @@ async function estimateVoteStamps(proposal_id, voteBool) { // Made async
         toast('warning', 'Wallet locked. Cannot estimate vote fee.');
         return null; // Return null to indicate failure
     }
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
     if (!selectedAccount) {
          toast('danger', 'No account selected for voting.');
         return null;
@@ -59,7 +59,7 @@ async function voteProposal(proposal_id, voteBool) { // Made async
          toast('warning', 'Wallet locked. Please unlock to vote.');
          return;
      }
-      const selectedAccount = getSelectedAccount();
+      const selectedAccount = await getSelectedAccount();
       if (!selectedAccount) {
           toast('danger', 'No account selected for voting.');
           return;
@@ -196,8 +196,8 @@ document.addEventListener("click", async (event) => {
 });
 
 // Modify getValidatorState to check the SELECTED account
-function getValidatorState() {
-     const selectedAccount = getSelectedAccount();
+async function getValidatorState() {
+     const selectedAccount = await getSelectedAccount();
      const displayElement = document.getElementById('validator-state');
      const proposalButton = document.getElementById('new-proposal'); // Assuming this ID exists
 

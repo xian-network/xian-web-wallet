@@ -29,7 +29,7 @@ async function getNFTData(nftKey) {
 }
 
 async function loadNFTPage() {
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
     document.getElementById("wallet-refresh-all").querySelector("i").classList.add("fa-spin");
 
     let nftList = document.getElementById("wallet-nfts");
@@ -280,7 +280,7 @@ async function createNewAccount() {
 // --- Token List and Balance Refresh (Adapted for Selected Account) ---
 
 async function refreshBalance(contract) {
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
     if (!selectedAccount) return; // No account selected or wallet locked
 
     const balanceElement = document.getElementById(`${contract}Balance`);
@@ -314,7 +314,7 @@ async function refreshBalance(contract) {
 // --- Main Wallet Page Loading Logic ---
 
 async function loadWalletPage() {
-    const selectedAccount = getSelectedAccount(); // Get current account {index, vk, name}
+    const selectedAccount = await getSelectedAccount(); // Get current account {index, vk, name}
     const refreshIcon = document.getElementById("wallet-refresh-all")?.querySelector("i");
 
     if (!selectedAccount) {

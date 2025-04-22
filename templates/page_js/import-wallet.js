@@ -71,8 +71,8 @@ async function importHdWallet() { // Renamed and made async
         window.locked = false; // Wallet is imported and immediately unlocked
 
         // 4. Save State to Storage
-        await saveEncryptedSeed(window.encryptedSeed);
-        await saveAccounts(window.accounts);
+        saveEncryptedSeed(window.encryptedSeed);
+        saveAccounts(window.accounts);
         await saveSelectedAccountVk(window.selectedAccountVk);
 
         // Clear sensitive fields

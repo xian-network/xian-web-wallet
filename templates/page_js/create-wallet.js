@@ -89,8 +89,8 @@ async function createHdWallet() { // Renamed function and made async
         window.locked = false; // Wallet is created and immediately unlocked
 
         // 4. Save State to Storage (using async functions from cookietoolz.js)
-        await saveEncryptedSeed(window.encryptedSeed);
-        await saveAccounts(window.accounts);
+        saveEncryptedSeed(window.encryptedSeed);
+        saveAccounts(window.accounts);
         await saveSelectedAccountVk(window.selectedAccountVk);
 
         // Clear password fields after successful creation for security

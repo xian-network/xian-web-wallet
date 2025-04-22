@@ -4,7 +4,7 @@ async function sendAdvTx() { // Made async
         toast('warning', 'Wallet is locked. Please unlock to send transactions.');
         return;
     }
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
     if (!selectedAccount) {
         toast('danger', 'Error: No account selected.');
         return;
@@ -477,7 +477,7 @@ async function estimateSendStampsAdv(){
         return;
     }
 
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
     if (!selectedAccount) {
         toast('danger', 'No account selected.');
         estimation_loading.style.display = 'none';

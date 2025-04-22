@@ -110,7 +110,7 @@ async function estimateCreateTokenStamps() { // Renamed to be specific
         toast('warning', 'Wallet locked. Cannot estimate fees.');
         return;
     }
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
     if (!selectedAccount) {
          estimation_loading.style.display = 'none';
          feeElement.textContent = 'Error';
@@ -226,7 +226,7 @@ async function createToken() { // Renamed and made async
         createTokenError.style.display = 'block';
         return;
     }
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
     if (!selectedAccount) {
          createTokenError.innerHTML = 'Error: No account selected.';
          createTokenError.style.display = 'block';

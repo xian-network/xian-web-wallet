@@ -203,9 +203,9 @@ function addTempChat() {
     switchChat(address_chat_);
 }
 
-function switchChat(address_chat) {
+async function switchChat(address_chat) {
     let publicKey;
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
     publicKey = selectedAccount.vk;
     // Highlight the selected chat in the inbox
     const inbox_items = document.querySelectorAll('.messenger-inbox-item');
@@ -276,7 +276,7 @@ function switchChat(address_chat) {
 
 
 async function estimateSendStamps(message_receiver, message_input) {
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
     let estimation_loading = document.getElementById('estimation-loading');
     let estimation_finished = document.getElementById('estimation-result');
     let send_btn = document.getElementById('send_message');
@@ -322,7 +322,7 @@ async function estimateSendStamps(message_receiver, message_input) {
     }
 }
 async function sendMessage() {
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
     const message_input = document.getElementById('message_input').value;
     const message_receiver = document.getElementById('address_chat').innerText;
 
@@ -411,7 +411,7 @@ function loadLocalMessages(publicKey) {
 
 async function getAllMessagesUsingGraphQL() {
     let publicKey;
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
     publicKey = selectedAccount.vk;
     messages = {};
     document.querySelector('.messenger-chat-body').innerHTML = ''; // Clear existing messages

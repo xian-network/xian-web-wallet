@@ -49,7 +49,7 @@ function popup_params(width, height) {
      var top = parseInt(i + ((f-height) / 2.5), 10);
      return 'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top + ',scrollbars=1';
 }
-function getSelectedAccount() {
+async function getSelectedAccount() {
     if (locked || accounts.length === 0) {
         return null;
     }
@@ -57,22 +57,22 @@ function getSelectedAccount() {
         // If no VK is selected (e.g., first load after clearing storage), default to the first account
         selectedAccountVk = accounts[0].vk;
         console.warn("No selected account VK found, defaulting to the first account:", selectedAccountVk);
-        saveSelectedAccountVk(selectedAccountVk); // Save the default selection
+        await saveSelectedAccountVk(selectedAccountVk); // Save the default selection
     }
     const account = accounts.find(acc => acc.vk === selectedAccountVk);
     if (!account && accounts.length > 0) {
         // If the selected VK doesn't match any current account (e.g., account was removed)
         console.warn(`Selected account VK ${selectedAccountVk} not found in accounts list. Defaulting to the first account.`);
         selectedAccountVk = accounts[0].vk;
-        saveSelectedAccountVk(selectedAccountVk);
+        await saveSelectedAccountVk(selectedAccountVk);
         return accounts[0];
     }
     return account || null; // Return null if no accounts exist at all
 }
 
-function getSelectedVK() {
+async function getSelectedVK() {
     // Directly return the global variable
-    const account = getSelectedAccount(); // Ensure the VK is valid and potentially defaulted
+    const account = await getSelectedAccount(); // Ensure the VK is valid and potentially defaulted
     return account ? account.vk : null;
 }
 
@@ -183,7 +183,7 @@ function createExternalWindow(page, some_data = null, send_response = null) {
 
 
 // --- Message Listener from External Window (Update Signing Calls) ---
-window.addEventListener("message", (event) => {
+window.addEventListener("message", async(event) => {
     const callbackKey = event.data.callbackKey;
     const sendResponseFunc = callbacks[callbackKey];
     if (!sendResponseFunc) return;
@@ -192,7 +192,7 @@ window.addEventListener("message", (event) => {
         console.log("Transaction response from popup:", event.data.data);
         if (event.data.data.confirmed && event.data.data.details) {
             const details = event.data.data.details;
-               const selectedAcct = getSelectedAccount(); // Get current account
+               const selectedAcct = await getSelectedAccount(); // Get current account
 
                if (locked || !unencryptedMnemonic || !selectedAcct) {
                     sendResponseFunc({ errors: ['Wallet locked or unavailable for signing.'] });
@@ -236,7 +236,7 @@ window.addEventListener("message", (event) => {
         console.log("Signature response from popup:", event.data.data);
         if (event.data.data.confirmed && event.data.data.message) {
             const messageToSign = event.data.data.message;
-            const selectedAcct = getSelectedAccount();
+            const selectedAcct = await getSelectedAccount();
 
               if (locked || !unencryptedMnemonic || !selectedAcct) {
                    sendResponseFunc({ signature: null, errors: ['Wallet locked or unavailable for signing.'] });
@@ -373,11 +373,11 @@ function changePage(page, some_data = null) {
         fetch(htmlPath)
             .then((response) => response.text())
             .then((htmlContent) => insertHTMLAndExecuteScripts(app_box, htmlContent))
-            .then(() => {
+            .then(async() => {
                 // Page-specific initializations
                 if (page === "send-token") {
                     // Use getSelectedAccount to ensure we have the current account context
-                    const currentAccount = getSelectedAccount();
+                    const currentAccount = await getSelectedAccount();
                     if (currentAccount) {
                          document.getElementById("tokenName").innerHTML = some_data; // some_data is the contract name
                     } else {

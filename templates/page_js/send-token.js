@@ -12,7 +12,7 @@ async function sendToken() { // Made async
         return;
     }
 
-    const selectedAccount = getSelectedAccount(); // Get { index, vk, name }
+    const selectedAccount = await getSelectedAccount(); // Get { index, vk, name }
     if (!selectedAccount) {
         toast('danger', 'Error: No account selected or found.');
         return; // Should not happen if unlocked, but good practice
@@ -255,7 +255,7 @@ async function estimateSendStamps_() { // Renamed to avoid conflict with global 
         return;
     }
 
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
     if (!selectedAccount) {
         feeContainer.style.display = 'none';
         send_btn.disabled = true;
@@ -391,7 +391,7 @@ async function getXNSAddress(){
 // --- Page Load Logic ---
 async function loadPage() {
     const tokenContractName = document.getElementById('tokenName').innerHTML;
-    const selectedAccount = getSelectedAccount();
+    const selectedAccount = await getSelectedAccount();
 
     if (!selectedAccount) {
         changePage('password-input'); // Redirect if locked or no account
