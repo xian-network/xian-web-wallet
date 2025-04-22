@@ -1,8 +1,3 @@
-// Assumes global vars: unencryptedMnemonic, locked, accounts, selectedAccountVk, RPC, EXPLORER
-// Assumes functions: readEncryptedSeed, decryptSeed, saveAccounts, saveSelectedAccountVk,
-//                    deriveKeyPairFromMnemonic, changePage, toast, readData, saveData, removeData, ping, getChainID
-// Assumes bip39 library is loaded
-
 var customRPCs = JSON.parse(localStorage.getItem('customRPCs')) || [];
 var renameModalInstance = null; // To hold the Bootstrap Modal instance
 
@@ -278,45 +273,6 @@ async function importPrivateKeyAccount() {
 
     importButton.disabled = true;
     importButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing...';
-
-    // --- Verify Password ---
-    let verified = false;
-    try {
-        if (encryptedSeed) {
-            // Use the globally available encryptedSeed
-            verified = decryptSeed(encryptedSeed, password) !== null;
-        } else { // If no mnemonic, try decrypting an existing imported key
-            const firstImported = accounts.find(a => a.type === 'imported');
-            if (firstImported && firstImported.encryptedSk) {
-                verified = decryptSk(firstImported.encryptedSk, password) !== null;
-            } else if (accounts.length === 0 && !encryptedSeed){
-                 // This state shouldn't normally be reachable if settings page requires unlock
-                 throw new Error('Cannot verify password. No existing wallet data found.');
-            } else {
-                // Should have encryptedSeed if derived accounts exist
-                 throw new Error('Password verification failed. Inconsistent state.');
-            }
-        }
-    } catch (verifyError) {
-        console.error("Password verification error:", verifyError);
-        importSkError.innerHTML = 'Error verifying password: ' + verifyError.message;
-        importSkError.style.display = 'block';
-        importButton.disabled = false;
-        importButton.innerHTML = '<i class="fas fa-key"></i> Import Account';
-        return;
-    }
-
-    if (!verified) {
-        importSkError.innerHTML = 'Incorrect wallet password.';
-        importSkError.style.display = 'block';
-        passwordConfirmInput.value = ''; // Clear password field
-        passwordConfirmInput.focus();
-        importButton.disabled = false;
-        importButton.innerHTML = '<i class="fas fa-key"></i> Import Account';
-        return;
-    }
-    // --- End Password Verification ---
-
 
     try {
         // Derive VK from SK using nacl
