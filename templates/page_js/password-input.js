@@ -49,21 +49,21 @@ async function unlockWallet() { // Made async
         }
 
         // 3. Decryption Successful: Update Global State
-        window.unencryptedMnemonic = decryptedMnemonic; // Store the decrypted mnemonic globally
-        window.encryptedSeed = storedEncryptedSeed; // Ensure global encryptedSeed is up-to-date
-        window.accounts = storedAccounts;           // Ensure global accounts are up-to-date
-        window.selectedAccountVk = storedSelectedVk; // Ensure global index is up-to-date
-        window.locked = false;                      // Set wallet to unlocked state
+        unencryptedMnemonic = decryptedMnemonic; // Store the decrypted mnemonic globally
+        encryptedSeed = storedEncryptedSeed; // Ensure global encryptedSeed is up-to-date
+        accounts = storedAccounts;           // Ensure global accounts are up-to-date
+        selectedAccountVk = storedSelectedVk; // Ensure global index is up-to-date
+        locked = false;                      // Set wallet to unlocked state
 
         // Decrypt all available imported keys now that password is confirmed good
-        if (window.accounts.length > 0) {
-            for (const account of window.accounts) {
+        if (accounts.length > 0) {
+            for (const account of accounts) {
                 if (account.type === 'imported' && account.encryptedSk) {
                     try {
                         const decryptedSk = decryptSk(account.encryptedSk, password);
                         if (decryptedSk !== null) {
                             console.log(`Successfully decrypted SK for imported account: ${account.name || account.vk}`);
-                            window.unencryptedImportedSks[account.vk] = decryptedSk;
+                            unencryptedImportedSks[account.vk] = decryptedSk;
                         } else {
                             // This case is less likely now since we verified the password works for at least one key if needed.
                             // Could indicate corruption for this specific key.
@@ -108,12 +108,12 @@ async function removeWallet() { // Made async
         localStorage.removeItem('tx_history'); // Assuming tx_history is global to the install
 
         // Reset global state variables
-        window.unencryptedMnemonic = null;
-        window.encryptedSeed = null;
-        window.accounts = [];
-        window.selectedAccountIndex = 0;
-        window.locked = true;
-        window.tx_history = []; // Reset local copy too
+        unencryptedMnemonic = null;
+        encryptedSeed = null;
+        accounts = [];
+        selectedAccountIndex = 0;
+        locked = true;
+        tx_history = []; // Reset local copy too
 
         toast('success', 'Wallet removed successfully.');
         changePage('get-started');

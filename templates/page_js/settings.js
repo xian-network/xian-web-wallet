@@ -552,12 +552,12 @@ async function removeWalletHD() { // Renamed to avoid conflict if old one is kep
         localStorage.removeItem('tx_history');
 
         // Reset global state variables immediately
-        window.unencryptedMnemonic = null;
-        window.encryptedSeed = null;
-        window.accounts = [];
-        window.selectedAccountVk = 0;
-        window.locked = true;
-        window.tx_history = [];
+        unencryptedMnemonic = null;
+        encryptedSeed = null;
+        accounts = [];
+        selectedAccountVk = 0;
+        locked = true;
+        tx_history = [];
 
         toast('success', 'Wallet removed successfully.');
         changePage('get-started'); // Navigate to the initial setup page
