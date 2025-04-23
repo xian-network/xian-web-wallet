@@ -50,7 +50,6 @@ async function unlockWallet() { // Made async
 
         // 3. Decryption Successful: Update Global State
         unencryptedMnemonic = decryptedMnemonic; // Store the decrypted mnemonic globally
-        encryptedSeed = storedEncryptedSeed; // Ensure global encryptedSeed is up-to-date
         accounts = storedAccounts;           // Ensure global accounts are up-to-date
         selectedAccountVk = storedSelectedVk; // Ensure global index is up-to-date
         locked = false;                      // Set wallet to unlocked state
@@ -109,7 +108,6 @@ async function removeWallet() { // Made async
 
         // Reset global state variables
         unencryptedMnemonic = null;
-        encryptedSeed = null;
         accounts = [];
         selectedAccountIndex = 0;
         locked = true;

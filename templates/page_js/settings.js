@@ -553,7 +553,6 @@ async function removeWalletHD() { // Renamed to avoid conflict if old one is kep
 
         // Reset global state variables immediately
         unencryptedMnemonic = null;
-        encryptedSeed = null;
         accounts = [];
         selectedAccountVk = 0;
         locked = true;

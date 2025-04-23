@@ -82,14 +82,13 @@ async function createHdWallet() { // Renamed function and made async
         // 3. Update Global State (in router.js scope)
         // Note: Direct modification of globals isn't ideal, but follows existing pattern.
         // Consider passing these back or using a state management approach later.
-        encryptedSeed = newWalletData.encryptedSeed;
         unencryptedMnemonic = newWalletData.unencryptedMnemonic; // Store temporarily for immediate use
         accounts = [initialAccount];
         selectedAccountVk = initialAccount.vk;
         locked = false; // Wallet is created and immediately unlocked
 
         // 4. Save State to Storage (using async functions from cookietoolz.js)
-        saveEncryptedSeed(encryptedSeed);
+        saveEncryptedSeed(newWalletData.encryptedSeed);
         saveAccounts(accounts);
         await saveSelectedAccountVk(selectedAccountVk);
 

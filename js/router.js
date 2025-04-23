@@ -1,7 +1,6 @@
 // --- Global Variables ---
 var app_page = "get-started";
 var app_box = document.getElementById("app-box");
-var encryptedSeed = null;
 var unencryptedMnemonic = null;
 var accounts = [];
 // var selectedAccountIndex = 0; // REMOVE THIS
@@ -361,6 +360,7 @@ function changePage(page, some_data = null) {
         sideNavActive();
     }
     const creationPages = ["get-started", "create-wallet", "import-wallet"];
+    const encryptedSeed = (async function(){await readEncryptedSeed()});
     if (creationPages.includes(page) && !locked && encryptedSeed) {
          console.log("Wallet exists and unlocked, redirecting to wallet.");
          page = "wallet";
@@ -489,7 +489,7 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     await getChainID();
 
     // Read HD Wallet related data
-    encryptedSeed = await readEncryptedSeed();
+    const encryptedSeed = await readEncryptedSeed();
     accounts = await readAccounts();
     // Read the stored VK instead of index
     const storedVk = await readSelectedAccountVk();

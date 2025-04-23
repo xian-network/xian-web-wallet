@@ -64,14 +64,13 @@ async function importHdWallet() { // Renamed and made async
         };
 
         // 3. Update Global State (in router.js scope)
-        encryptedSeed = importedWalletData.encryptedSeed;
         unencryptedMnemonic = importedWalletData.unencryptedMnemonic; // Store temporarily
         accounts = [initialAccount]; // Start with just the first account
         selectedAccountVk = initialAccount.vk;
         locked = false; // Wallet is imported and immediately unlocked
 
         // 4. Save State to Storage
-        saveEncryptedSeed(encryptedSeed);
+        saveEncryptedSeed(importedWalletData.encryptedSeed);
         saveAccounts(accounts);
         await saveSelectedAccountVk(selectedAccountVk);
 
