@@ -334,7 +334,7 @@ function sideNavActive() {
        }
 }
 
-function changePage(page, some_data = null) {
+async function changePage(page, some_data = null) {
     // --- Check if app_box exists ---
     app_box = document.getElementById("app-box"); // Re-check element
     if (!app_box) {
@@ -360,7 +360,7 @@ function changePage(page, some_data = null) {
         sideNavActive();
     }
     const creationPages = ["get-started", "create-wallet", "import-wallet"];
-    const encryptedSeed = (async function(){await readEncryptedSeed()});
+    const encryptedSeed = await readEncryptedSeed()
     if (creationPages.includes(page) && !locked && encryptedSeed) {
          console.log("Wallet exists and unlocked, redirecting to wallet.");
          page = "wallet";
