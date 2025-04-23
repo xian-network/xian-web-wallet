@@ -1,7 +1,6 @@
 var RPC = localStorage.getItem("rpc") || "https://node.xian.org";
 var EXPLORER = localStorage.getItem("explorer") || "https://explorer.xian.org";
 var CHAIN_ID = null;
-var unencryptedImportedSks = {}; // Map: { vk: decryptedSkHex, ... }
 
 // Assuming 'nacl' and 'bip39' are globally available from included scripts
 // Assuming 'HDKey' is available (needs micro-ed25519-hdkey library) - NOTE: This dependency wasn't in the original index.html, it needs to be added. Let's proceed assuming it's added.
