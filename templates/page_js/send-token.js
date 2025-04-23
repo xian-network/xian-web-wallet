@@ -1,8 +1,3 @@
-// Assumes global vars: selectedAccountIndex, unencryptedMnemonic, locked, accounts, CHAIN_ID, EXPLORER, RPC
-// Assumes functions: getSelectedAccount, execute_balance_of, signTransaction, estimateStamps, broadcastTransaction,
-//                    prependToTransactionHistory, changePage, toast, readSecureCookie (if still used anywhere, though likely not needed here),
-//                    getTokenInfo, getStampRate, execute_get_main_name_to_address
-
 async function sendToken() { // Made async
     // Check if wallet is locked
     if (locked || !unencryptedMnemonic) {

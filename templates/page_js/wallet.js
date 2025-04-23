@@ -1,6 +1,3 @@
-// Global reference for the current page, assumed from router.js
-// Assumes global vars: accounts, selectedAccountIndex, unencryptedMnemonic, locked, RPC, EXPLORER, tx_history, token_list
-
 var token_list = JSON.parse(localStorage.getItem("token_list")) || ["currency"];
 
 async function getNFTData(nftKey) {

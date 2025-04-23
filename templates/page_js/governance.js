@@ -1,5 +1,3 @@
-// Keep existing functions: getValidatorState, getDAOBalance, getProposals, getProposal, buildProposalTable, getRewardPercentages, etc.
-
 // --- Estimate Vote Stamps (Modified for HD) ---
 async function estimateVoteStamps(proposal_id, voteBool) { // Made async
     // Check lock state FIRST

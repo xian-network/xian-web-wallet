@@ -1,7 +1,3 @@
-// Assumes global vars: CHAIN_ID, RPC, EXPLORER, locked, unencryptedMnemonic, selectedAccountIndex, accounts
-// Assumes functions: getSelectedAccount, signTransaction, estimateStamps, broadcastTransaction,
-//                    prependToTransactionHistory, changePage, toast, getStampRate, execute_balance_of
-
 // --- Estimate Stamps (Modified for HD) ---
 async function estimateProposalStamps() { // Made async
     const typeInput = document.getElementById('proposalType');

@@ -1,8 +1,3 @@
-// Assumes global vars: CHAIN_ID, RPC, EXPLORER, locked, unencryptedMnemonic, selectedAccountIndex, accounts, token_list
-// Assumes functions: getSelectedAccount, signTransaction, estimateStamps, broadcastTransaction,
-//                    prependToTransactionHistory, changePage, toast, getStampRate, execute_balance_of
-
-// Define tokenContract globally or ensure it's loaded/available
 var tokenContract = `
 balances = Hash(default_value=0)
 metadata = Hash()
