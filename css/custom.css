@@ -765,10 +765,19 @@ a:hover{
 .wallet-info-card{
     padding: 20px;
     border-radius: 5px;
-    border: 1px solid #8a8b8e;
-    overflow: auto;
-    width: 100%;
-    max-width: fit-content;
+    border: 1px solid #8a8b8e; /* Keep border */
+    /* overflow: auto; */ /* <--- REMOVE THIS LINE */
+    width: 100%; /* Keep width 100% or adjust as needed */
+    /* max-width: fit-content; */ /* <--- REMOVE THIS LINE */
+    /* If the card content genuinely needs scrolling,
+       apply overflow to an inner container within the card,
+       not the card itself which needs to contain the dropdown. */
+}
+
+.dark-mode .wallet-info-card {
+    /* Ensure dark mode styles don't reintroduce overflow */
+    border: 1px solid #8a8b8e; /* Keep dark mode border */
+    background-color: #202020; /* Keep dark mode background */
 }
 
 .wallet-info-title{
@@ -779,10 +788,13 @@ a:hover{
     padding-right: 0.5rem;
 }
 
+/* Also review the .wallet-info-address container */
 .wallet-info-address{
     display: flex;
     flex-direction: row;
     gap: 10px;
+    /* Ensure no overflow: hidden here */
+    /* Ensure no fixed height here */
 }
 
 .messenger-inbox {

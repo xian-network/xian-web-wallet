@@ -1,5 +1,6 @@
 var code_storage = JSON.parse(localStorage.getItem('code_storage')) || { "contract": "@construct\ndef seed():\n    pass\n\n@export\ndef test():\n    return 'Hello, World!'" };
 var current_tab = Object.keys(code_storage)[0];
+var deployment_started = {};
 
 function saveCode() {
     code_storage[current_tab] = editor.getValue();
@@ -24,6 +25,7 @@ function removeTab(tab_name) {
     );
 
     localStorage.setItem('code_storage', JSON.stringify(code_storage));
+    if(deployment_started[tab_name]) deployment_started[tab_name] = false;
 }
 
 function changeTab(tab_name) {
@@ -41,6 +43,19 @@ function changeTab(tab_name) {
         editor.setOption('lint', true);
         document.getElementById('submission-form').style.display = 'block';
         document.getElementById('function-boxes').style.display = 'none';
+
+        if(!deployment_started[current_tab]){
+            document.getElementById('submitContractNameWrapper').style.display = 'none';
+            document.getElementById('submitContractstampLimitWrapper').style.display = 'none';
+            document.getElementById('submitContractconstructorKwargsWrapper').style.display = 'none';
+            document.getElementById('btn-ide-submit-contract').innerHTML = 'Start Deployment';
+        } else{
+            document.getElementById('submitContractNameWrapper').style.display = 'block';
+            document.getElementById("submitContractName").value = current_tab;
+            document.getElementById('submitContractstampLimitWrapper').style.display = 'block';
+            document.getElementById('submitContractconstructorKwargsWrapper').style.display = 'block';
+            document.getElementById('btn-ide-submit-contract').innerHTML = 'Deploy Contract'; 
+        }
     }
     refreshTabList();
 }
@@ -330,178 +345,176 @@ if (current_tab.endsWith('(Read-Only)')) {
     buildFunctionBoxes();
 }
 
-function buildFunctionBoxes() {
-    getContractFunctions(current_tab.replace('(Read-Only)', '')).then((functions) => {
-        let functionBoxes = document.getElementById('function-boxes');
-        functionBoxes.innerHTML = '';
-        console.log(functions);
-        functions.methods.forEach((func) => {
-            let functionBox = document.createElement('div');
-            functionBox.className = 'function-box';
-            // func.name is the function name
-            // func.arguments is the list of arguments
-            
-            functionBox.innerHTML = `<h3>` + func.name + `</h3>`;
+async function buildFunctionBoxes() {
+    const functions = await getContractFunctions(current_tab.replace('(Read-Only)', ''));
+    // getContractFunctions(current_tab.replace('(Read-Only)', '')).then((functions) => {
+    let functionBoxes = document.getElementById('function-boxes');
+    functionBoxes.innerHTML = '';
+    console.log(functions);
+    functions.methods.forEach((func) => {
+        let functionBox = document.createElement('div');
+        functionBox.className = 'function-box';
+        // func.name is the function name
+        // func.arguments is the list of arguments
+        
+        functionBox.innerHTML = `<h3>` + func.name + `</h3>`;
 
-            let functionArgs = document.createElement('div');
-            functionArgs.className = 'function-args';
-            func.arguments.forEach((arg) => {
-                let argElement = document.createElement('div');
-                argElement.innerHTML = arg.name + ' (' + arg.type + ')';
-                argElement.className = 'form-group kwarg-group';
-
-                let argValue = document.createElement('input');
-                argValue.type = 'text';
-                argValue.className = 'function-arg-value form-control';
-                argValue.id = current_tab + '-' + func.name + '-' + arg.name;
-
-                argElement.appendChild(argValue);
-                functionArgs.appendChild(argElement);
-            });
-            // Always add a stamp limit field
+        let functionArgs = document.createElement('div');
+        functionArgs.className = 'function-args';
+        func.arguments.forEach((arg) => {
             let argElement = document.createElement('div');
-            argElement.innerHTML = 'stamp_limit (int)';
-            argElement.className = 'function-arg kwarg-group';
+            argElement.innerHTML = arg.name + ' (' + arg.type + ')';
+            argElement.className = 'form-group kwarg-group';
 
             let argValue = document.createElement('input');
             argValue.type = 'text';
             argValue.className = 'function-arg-value form-control';
-            argValue.id = current_tab + '-' + func.name + '-stamp_limit';
+            argValue.id = current_tab + '-' + func.name + '-' + arg.name;
 
             argElement.appendChild(argValue);
             functionArgs.appendChild(argElement);
-            functionBox.appendChild(functionArgs);
-
-            let functionButton = document.createElement('button');
-            functionButton.className = 'btn btn-primary';
-            functionButton.innerHTML = 'Execute';
-            functionButton.addEventListener('click', function () {
-                let prompt = confirm('Are you sure you want to execute this function?');
-                if (!prompt) {
-                    return;
-                }
-                let contractName = current_tab.replace('(Read-Only)', '');
-                let functionName = func.name;
-                let stampLimit = document.getElementById(current_tab + '-' + func.name + '-stamp_limit').value;
-                let error = document.getElementById('submitContractError');
-                let success = document.getElementById('submitContractSuccess');
-
-                error.style.display = 'none';
-                success.style.display = 'none';
-
-                let args = {};
-                func.arguments.forEach((arg) => {
-                    let value = document.getElementById(current_tab + '-' + func.name + '-' + arg.name).value;
-                    let expectedType = arg.type;
-                    if (value === "") {
-                        error.innerHTML = "All fields are required!";
-                        error.style.display = "block";
-                        return;
-                    }
-                    if (expectedType === "int") {
-                        if (isNaN(value)) {
-                            error.innerHTML = "Invalid value for " + arg.name + "!";
-                            error.style.display = "block";
-                            return;
-                        }
-                        value = parseInt(value);
-                    }
-                    if (expectedType === "float") {
-                        if (isNaN(value)) {
-                            error.innerHTML = "Invalid value for " + arg.name + "!";
-                            error.style.display = "block";
-                            return;
-                        }
-                        value = parseFloat(value);
-                    }
-                    if (expectedType === "bool") {
-                        if (value !== "true" && value !== "false") {
-                            error.innerHTML = "Invalid value for " + arg.name + "!";
-                            error.style.display = "block";
-                            return;
-                        }
-                        value = value === "true";
-                    }
-                    if (expectedType === "str") {
-                        value = value.toString();
-                    }
-                    if (expectedType === "dict" || expectedType === "list") {
-                        try {
-                            value = JSON.parse(value);
-                        } catch (e) {
-                            error.innerHTML = "Invalid value for " + arg.name + "!";
-                            error.style.display = "block";
-                            return;
-                        }
-                    }
-                    if (expectedType === "Any") {
-                        try {
-                            value = JSON.parse(value);
-                        } catch (e) {
-                            value = value.toString();
-                        }
-                    }
-                    args[arg.name] = value;
-                });
-
-                let payload = {
-                    payload: {
-                        chain_id: CHAIN_ID,
-                        contract: contractName,
-                        function: functionName,
-                        kwargs: args,
-                        stamps_supplied: parseInt(stampLimit)
-                    },
-                    metadata: {
-                        signature: "",
-                    }
-                };
-                window.scrollTo(0, 0);
-                Promise.all([signTransaction(payload, unencryptedPrivateKey)]).then((signed_tx) => {
-                    broadcastTransaction(signed_tx).then((response) => {
-                        hash = response['result']['hash'];
-                        let status = 'pending'
-                        if (response['result']['code'] == 1) {
-                            status = 'error';
-                        }
-                        prependToTransactionHistory(hash, contractName, functionName, args, status, new Date().toLocaleString());
-                        if (response["result"]["code"] == 1) {
-                            error.innerHTML = response["result"]["log"];
-                            error.style.display = "block";
-                            return;
-                        } else {
-                            success.innerHTML =
-                                "Transaction sent successfully! Explorer: " +
-                                "<a class='explorer-url' href='"+EXPLORER+"/tx/" +
-                                hash +
-                                "' target='_blank'>" +
-                                hash +
-                                "</a>";
-                            success.style.display = "block";
-                        }
-                    }).catch((error) => {
-                        console.error("Error executing contract function:", error.message);
-                        error.innerHTML = "Error executing contract function!";
-                        error.style.display = "block";
-                    });
-                }).catch((error) => {
-                    console.error("Error executing contract function:", error.message);
-                    error.innerHTML = "Error executing contract function!";
-                    error.style.display = "block";
-                });
-                });
-
-            functionBox.appendChild(functionButton);
-            functionBoxes.appendChild(functionBox);
         });
-        
-    }).catch((error) => {
-        console.error('Error getting contract functions:', error.message);
+        // Always add a stamp limit field
+        let argElement = document.createElement('div');
+        argElement.innerHTML = 'stamp_limit (int)';
+        argElement.className = 'function-arg kwarg-group';
+
+        let argValue = document.createElement('input');
+        argValue.type = 'text';
+        argValue.className = 'function-arg-value form-control';
+        argValue.id = current_tab + '-' + func.name + '-stamp_limit';
+
+        argElement.appendChild(argValue);
+        functionArgs.appendChild(argElement);
+        functionBox.appendChild(functionArgs);
+
+        let functionButton = document.createElement('button');
+        functionButton.className = 'btn btn-primary';
+        functionButton.innerHTML = 'Execute';
+        functionButton.addEventListener('click', function (){executeContractFunction(func)});
+        functionBox.appendChild(functionButton);
+        functionBoxes.appendChild(functionBox);
     });
+
+           
 }
 
+async function executeContractFunction(funcInfo) {
+    let prompt = confirm('Are you sure you want to execute this function?');
+    if (!prompt) {
+        return;
+    }
+    const selectedAccount = await getSelectedAccount();
+    let contractName = current_tab.replace('(Read-Only)', '');
+    let functionName = funcInfo.name;
+    let stampLimit = document.getElementById(current_tab + '-' + funcInfo.name + '-stamp_limit').value;
+    let error = document.getElementById('submitContractError');
+    let success = document.getElementById('submitContractSuccess');
 
-function submitContract() {
+    error.style.display = 'none';
+    success.style.display = 'none';
+
+    let args = {};
+    funcInfo.arguments.forEach((arg) => {
+        let value = document.getElementById(current_tab + '-' + funcInfo.name + '-' + arg.name).value;
+        let expectedType = arg.type;
+        if (value === "") {
+            error.innerHTML = "All fields are required!";
+            error.style.display = "block";
+            return;
+        }
+        if (expectedType === "int") {
+            if (isNaN(value)) {
+                error.innerHTML = "Invalid value for " + arg.name + "!";
+                error.style.display = "block";
+                return;
+            }
+            value = parseInt(value);
+        }
+        if (expectedType === "float") {
+            if (isNaN(value)) {
+                error.innerHTML = "Invalid value for " + arg.name + "!";
+                error.style.display = "block";
+                return;
+            }
+            value = parseFloat(value);
+        }
+        if (expectedType === "bool") {
+            if (value !== "true" && value !== "false") {
+                error.innerHTML = "Invalid value for " + arg.name + "!";
+                error.style.display = "block";
+                return;
+            }
+            value = value === "true";
+        }
+        if (expectedType === "str") {
+            value = value.toString();
+        }
+        if (expectedType === "dict" || expectedType === "list") {
+            try {
+                value = JSON.parse(value);
+            } catch (e) {
+                error.innerHTML = "Invalid value for " + arg.name + "!";
+                error.style.display = "block";
+                return;
+            }
+        }
+        if (expectedType === "Any") {
+            try {
+                value = JSON.parse(value);
+            } catch (e) {
+                value = value.toString();
+            }
+        }
+        args[arg.name] = value;
+    });
+
+    let payload = {
+        payload: {
+            chain_id: CHAIN_ID,
+            contract: contractName,
+            function: functionName,
+            kwargs: args,
+            stamps_supplied: parseInt(stampLimit)
+        },
+        metadata: {
+            signature: "",
+        }
+    };
+    window.scrollTo(0, 0);
+    try {
+        const signedTx = await signTransaction(payload, unencryptedMnemonic, selectedAccount.vk);
+        const response = await broadcastTransaction(signedTx);
+
+        hash = response['result']['hash'];
+        let status = 'pending'
+        if (response['result']['code'] == 1) {
+            status = 'error';
+        }
+        prependToTransactionHistory(hash, contractName, functionName, args, status, new Date().toLocaleString());
+        if (response["result"]["code"] == 1) {
+            error.innerHTML = response["result"]["log"];
+            error.style.display = "block";
+            return;
+        } else {
+            success.innerHTML =
+                "Transaction sent successfully! Explorer: " +
+                "<a class='explorer-url' href='"+EXPLORER+"/tx/" +
+                hash +
+                "' target='_blank'>" +
+                hash +
+                "</a>";
+            success.style.display = "block";
+        }
+    }catch(error){
+        console.error("Error executing contract function:", error.message);
+        error.innerHTML = "Error executing contract function!";
+        error.style.display = "block";
+    };
+}
+
+async function submitContract() {
+    const selectedAccount = await getSelectedAccount();
     let contract = document.getElementById("submitContractName").value;
     let contractError = document.getElementById("submitContractError");
     let contractSuccess = document.getElementById("submitContractSuccess");
@@ -559,34 +572,63 @@ function submitContract() {
         }
     }
 
-    Promise.all([signTransaction(payload, unencryptedPrivateKey)]).then((signed_tx) => {
-        broadcastTransaction(signed_tx).then((response) => {
-            hash = response['result']['hash'];
-            let status = 'pending'
-            if (response['result']['code'] == 1) {
-                status = 'error';
-            }
-            prependToTransactionHistory(hash, 'submission', 'submit_contract', { name: contract, code: contractCode }, status, new Date().toLocaleString());
-            if (response["result"]["code"] == 1) {
-                contractError.innerHTML = response["result"]["log"];
-                contractError.style.display = "block";
-                return;
-            } else {
-                contractSuccess.innerHTML =
-                    "Transaction sent successfully! Explorer: " +
-                    "<a class='explorer-url' href='"+EXPLORER+"/tx/" +
-                    hash +
-                    "' target='_blank'>" +
-                    hash +
-                    "</a>";
-                contractSuccess.style.display = "block";
-            }
-        }).catch((error) => {
-            console.error("Error submitting contract:", error.message);
-            contractError.innerHTML = "Error submitting contract!";
+    // Promise.all([signTransaction(payload, unencryptedMnemonic, selectedAccount.vk)]).then((signed_tx) => {
+    //     broadcastTransaction(signed_tx).then((response) => {
+    //         hash = response['result']['hash'];
+    //         let status = 'pending'
+    //         if (response['result']['code'] == 1) {
+    //             status = 'error';
+    //         }
+    //         prependToTransactionHistory(hash, 'submission', 'submit_contract', { name: contract, code: contractCode }, status, new Date().toLocaleString());
+    //         if (response["result"]["code"] == 1) {
+    //             contractError.innerHTML = response["result"]["log"];
+    //             contractError.style.display = "block";
+    //             return;
+    //         } else {
+    //             contractSuccess.innerHTML =
+    //                 "Transaction sent successfully! Explorer: " +
+    //                 "<a class='explorer-url' href='"+EXPLORER+"/tx/" +
+    //                 hash +
+    //                 "' target='_blank'>" +
+    //                 hash +
+    //                 "</a>";
+    //             contractSuccess.style.display = "block";
+    //         }
+    //     }).catch((error) => {
+    //         console.error("Error submitting contract:", error.message);
+    //         contractError.innerHTML = "Error submitting contract!";
+    //         contractError.style.display = "block";
+    //     });
+    // });
+
+    try {
+        const signedTx = await signTransaction(payload, unencryptedMnemonic, selectedAccount.index);
+        const response = await broadcastTransaction(signedTx);
+        hash = response['result']['hash'];
+        let status = 'pending'
+        if (response['result']['code'] == 1) {
+            status = 'error';
+        }
+        prependToTransactionHistory(hash, 'submission', 'submit_contract', { name: contract, code: contractCode }, status, new Date().toLocaleString());
+        if (response["result"]["code"] == 1) {
+            contractError.innerHTML = response["result"]["log"];
             contractError.style.display = "block";
-        });
-    });
+            return;
+        } else {
+            contractSuccess.innerHTML =
+                "Transaction sent successfully! Explorer: " +
+                "<a class='explorer-url' href='"+EXPLORER+"/tx/" +
+                hash +
+                "' target='_blank'>" +
+                hash +
+                "</a>";
+            contractSuccess.style.display = "block";
+        }
+    } catch(error){
+        console.error("Error submitting contract:", error.message);
+        contractError.innerHTML = "Error submitting contract!";
+        contractError.style.display = "block";
+    };
 }
 
 // Get current stamp rate
@@ -605,9 +647,11 @@ getStampRate().then((rate) => {
 document.getElementById('btn-ide-submit-contract').addEventListener('click', function () {
     if( document.getElementById('submitContractNameWrapper').style.display === 'none' ) {
         document.getElementById('submitContractNameWrapper').style.display = 'block';
+        document.getElementById("submitContractName").value = current_tab;
         document.getElementById('submitContractstampLimitWrapper').style.display = 'block';
         document.getElementById('submitContractconstructorKwargsWrapper').style.display = 'block';
         document.getElementById('btn-ide-submit-contract').innerHTML = 'Deploy Contract';
+        deployment_started[current_tab]= true;
     }
     else {
         submitContract();
@@ -692,5 +736,3 @@ document.addEventListener('click', function (event) {
 editor.on('change', saveCode);
 
 refreshTabList();
-
-

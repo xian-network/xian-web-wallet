@@ -203,7 +203,10 @@ function addTempChat() {
     switchChat(address_chat_);
 }
 
-function switchChat(address_chat) {
+async function switchChat(address_chat) {
+    let publicKey;
+    const selectedAccount = await getSelectedAccount();
+    publicKey = selectedAccount.vk;
     // Highlight the selected chat in the inbox
     const inbox_items = document.querySelectorAll('.messenger-inbox-item');
 
@@ -273,6 +276,7 @@ function switchChat(address_chat) {
 
 
 async function estimateSendStamps(message_receiver, message_input) {
+    const selectedAccount = await getSelectedAccount();
     let estimation_loading = document.getElementById('estimation-loading');
     let estimation_finished = document.getElementById('estimation-result');
     let send_btn = document.getElementById('send_message');
@@ -298,7 +302,7 @@ async function estimateSendStamps(message_receiver, message_input) {
     };
 
     try {
-        let signed_tx = await signTransaction(transaction, unencryptedPrivateKey);
+        let signed_tx = await signTransaction(transaction, unencryptedMnemonic, selectedAccount.vk);
         let stamps = await estimateStamps(signed_tx);
         stamps = stamps["stamps"];
         let stamp_rate = await getStampRate();
@@ -317,7 +321,8 @@ async function estimateSendStamps(message_receiver, message_input) {
         document.getElementById('tokenFee').innerHTML = "Error";
     }
 }
-function sendMessage() {
+async function sendMessage() {
+    const selectedAccount = await getSelectedAccount();
     const message_input = document.getElementById('message_input').value;
     const message_receiver = document.getElementById('address_chat').innerText;
 
@@ -328,7 +333,7 @@ function sendMessage() {
 
     const timestamp = new Date().toISOString();
     const plaintextMessage = {
-        sender: publicKey,
+        sender: selectedAccount.vk,
         recipient: message_receiver,
         message: message_input,
         timestamp: timestamp
@@ -351,31 +356,52 @@ function sendMessage() {
     };
 
     // Encrypt and send the message
-    Promise.resolve()
-        .then(() => encrypt_nacl_box(message_input, message_receiver))
-        .then((encryptedMessage) => {
-            transaction.payload.kwargs.msg = encryptedMessage;
-            return signTransaction(transaction, unencryptedPrivateKey);
-        })
-        .then((signed_tx) => broadcastTransaction([signed_tx]))
-        .then((response) => {
-            if (response.result.code === 0) {
-                toast("success", "Message sent successfully");
-                document.getElementById('message_input').value = ''; // Clear the input field
-                // Save the plaintext message locally
-                saveMessageLocally(publicKey, message_receiver, plaintextMessage);
-                // Reload the chat to reflect the new message
-                getAllMessagesUsingGraphQL().then(() => {
-                    switchChat(message_receiver); // Focus on the current chat
-                });
-            } else {
-                toast("danger", "Error sending message");
-            }
-        })
-        .catch((error) => {
-            console.error("Error sending message:", error);
-            toast("danger", "An unexpected error occurred");
-        });
+    // Promise.resolve()
+    //     .then(() => encrypt_nacl_box(message_input, message_receiver))
+    //     .then((encryptedMessage) => {
+    //         transaction.payload.kwargs.msg = encryptedMessage;
+    //         return signTransaction(transaction, unencryptedPrivateKey);
+    //     })
+    //     .then((signed_tx) => broadcastTransaction([signed_tx]))
+    //     .then((response) => {
+    //         if (response.result.code === 0) {
+    //             toast("success", "Message sent successfully");
+    //             document.getElementById('message_input').value = ''; // Clear the input field
+    //             // Save the plaintext message locally
+    //             saveMessageLocally(publicKey, message_receiver, plaintextMessage);
+    //             // Reload the chat to reflect the new message
+    //             getAllMessagesUsingGraphQL().then(() => {
+    //                 switchChat(message_receiver); // Focus on the current chat
+    //             });
+    //         } else {
+    //             toast("danger", "Error sending message");
+    //         }
+    //     })
+    //     .catch((error) => {
+    //         console.error("Error sending message:", error);
+    //         toast("danger", "An unexpected error occurred");
+    //     });
+    try {
+        const encryptedMessage = encrypt_nacl_box(message_input, message_receiver);
+        transaction.payload.kwargs.msg = encryptedMessage;
+        const signed_tx = await signTransaction(transaction, unencryptedMnemonic, selectedAccount.vk);
+        const response = await broadcastTransaction(signed_tx);
+        if (response.result.code === 0) {
+            toast("success", "Message sent successfully");
+            document.getElementById('message_input').value = ''; // Clear the input field
+            // Save the plaintext message locally
+            saveMessageLocally(selectedAccount.vk, message_receiver, plaintextMessage);
+            // Reload the chat to reflect the new message
+            getAllMessagesUsingGraphQL().then(() => {
+                switchChat(message_receiver); // Focus on the current chat
+            });
+        } else {
+            toast("danger", "Error sending message");
+        }
+    } catch(error){
+        console.error("Error sending message:", error);
+        toast("danger", "An unexpected error occurred");
+    };
 }
 
 function loadLocalMessages(publicKey) {
@@ -384,6 +410,9 @@ function loadLocalMessages(publicKey) {
 }
 
 async function getAllMessagesUsingGraphQL() {
+    let publicKey;
+    const selectedAccount = await getSelectedAccount();
+    publicKey = selectedAccount.vk;
     messages = {};
     document.querySelector('.messenger-chat-body').innerHTML = ''; // Clear existing messages
     try {
@@ -448,8 +477,18 @@ async function getAllMessagesUsingGraphQL() {
                             }
                         } else {
                             // Received messages, decrypt them
+                            let unencryptedSk;
+                            
+                            if (selectedAccount.type === 'derived') {
+                                if (!unencryptedMnemonic) throw new Error("Mnemonic required for derived account signing.");
+                                // Derive the key pair using the account's index
+                                const keyPair = deriveKeyPairFromMnemonic(unencryptedMnemonic, selectedAccount.index);
+                                unencryptedSk = toHexString(keyPair.sk);
+                            } else if (selectedAccount.type === 'imported') {
+                                unencryptedSk = unencryptedImportedSks[selectedAccount.vk];
+                            }
                             const decryptedMessage = decrypt_nacl_box(
-                                toHexString(unencryptedPrivateKey),
+                                unencryptedSk,
                                 message.message
                             );
                             messages[otherAddress].thread.push({

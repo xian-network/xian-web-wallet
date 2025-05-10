@@ -5,6 +5,63 @@ function runningAsExtension() {
     }
 }
 
+// --- Convenience Wrappers (Keep old names for compatibility if needed, but point to new functions) ---
+
+// Wrapper for saving the encrypted seed
+function saveEncryptedSeed(encryptedSeed) {
+    createSecureCookie('encryptedSeed', encryptedSeed, 9999);
+}
+
+// Wrapper for reading the encrypted seed
+async function readEncryptedSeed() {
+    return await readFromStorage('encryptedSeed');
+}
+
+// Wrapper for removing the encrypted seed
+function removeEncryptedSeed() {
+    eraseSecureCookie('encryptedSeed');
+}
+
+// Wrapper for saving the accounts list (as JSON string)
+function saveAccounts(accountsArray) {
+    createSecureCookie('accounts', JSON.stringify(accountsArray), 9999);
+}
+
+// Wrapper for reading the accounts list (parses JSON string)
+async function readAccounts() {
+    const accountsJson = await readFromStorage('accounts');
+    try {
+        return accountsJson ? JSON.parse(accountsJson) : []; // Return empty array if null/undefined
+    } catch (e) {
+        console.error("Error parsing accounts JSON from storage:", e);
+        return []; // Return empty array on parsing error
+    }
+}
+
+// Wrapper for removing the accounts list
+function removeAccounts() {
+    eraseSecureCookie('accounts');
+}
+
+async function saveSelectedAccountVk(vk) {
+    if (vk) {
+        const savedAccountVk = await readFromStorage('selectedAccountVk');
+        if(!savedAccountVk) createSecureCookie('selectedAccountVk', vk, 9999);
+    } else {
+        // If vk is null/undefined, remove the key
+        eraseSecureCookie('selectedAccountVk');
+    }
+}
+
+async function readSelectedAccountVk() {
+    return await readFromStorage('selectedAccountVk'); // Returns null if not set
+}
+
+function removeSelectedAccountVk() {
+    eraseSecureCookie('selectedAccountVk');
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - -- - - - - - 
 
 function createSecureCookie(name, value, days) {
     if (runningAsExtension()) {
