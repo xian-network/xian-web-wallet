@@ -1,0 +1,66 @@
+<div class="title-container">
+    <h1 class="app-box-title">Swap</h1>
+</div>
+<div class="app-box-form" style="flex-grow: 1;display: flex;flex-direction: column;justify-content: center;">
+    <div class="alert alert-danger" role="alert" id="swapError" style="display: none;"></div>
+    <div class="alert alert-success" role="alert" id="swapSuccess" style="display: none;"></div>
+   
+    <div id="swap-form" style="display: flex;flex-direction: column;align-items: center;">
+        <div style="width: 100%;max-width: 400px;">
+            <!-- From -->
+            <div class="form-group" style="width: 100%;">
+                <label for="swap-from">From</label>
+                <select class="form-control" id="swap-from" style="width: 100%;">
+                    <option value="XIAN">XIAN</option>
+                    <option value="ETH">ETH</option>
+                </select>
+            </div>
+            <!-- Amount -->
+            <div class="form-group" style="width: 100%;">
+                <label for="swap-amount">Amount</label>
+                <input type="number" class="form-control" id="swap-amount" placeholder="Amount" style="width: 100%;">
+            </div>
+            <!-- To -->
+            <div class="form-group" style="width: 100%;">
+                <label for="swap-to">To</label>
+                <select class="form-control" id="swap-to" style="width: 100%;">
+                    <option value="XIAN">XIAN</option>
+                    <option value="ETH">ETH</option>
+                </select>
+            </div>
+            <!-- Estimated Amount -->
+            <div class="form-group" style="width: 100%;">
+                <label for="swap-estimated-amount">Received Amount</label>
+                <input type="text" class="form-control" id="swap-estimated-amount" placeholder="Estimated Amount" style="width: 100%;">
+            </div>
+            
+            <!-- Max Slippage -->
+            <div class="form-group" style="width: 100%;">
+                <label for="swap-max-slippage">Max Slippage (%)</label>
+                <div class="input-group" style="align-items: center; gap: 10px;">
+                    <input type="range" class="form-control" id="swap-max-slippage" min="0" max="50" value="5" oninput="document.getElementById('slippage-percent').value = this.value">
+                    <div><output id="slippage-percent">5</output>%</div>
+                </div>
+            </div>
+
+            <!-- Router -->
+            <div class="form-group" style="width: 100%;">
+                <label for="swap-router">DEX</label>
+                <select class="form-control" id="swap-router" style="width: 100%;">
+                    <option value="SNAKexchange">SNAKexchange</option>
+                </select>
+            </div>
+            
+            <!-- Fee -->
+            <div class="form-group" style="width: 100%;">
+                <p>Fee: <span id="swap-fee">0.0</span> XIAN</p>
+            </div>
+
+            <div id="wallet-actions" class="btn-group">
+                <button class="btn btn-primary" id="btn-swap" style="margin-top: 10px;width: 10rem;max-width: 100%;">Exchange</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="templates/page_js/swap.js"></script>

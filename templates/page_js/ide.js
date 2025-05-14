@@ -638,7 +638,8 @@ function refreshTabList() {
         }
 
         let closeTab = document.createElement('i');
-        closeTab.className = 'fas fa-times';
+        closeTab.className = 'icon';
+        closeTab.dataset.lucide = 'x';
 
         closeTab.addEventListener('click', function (event) {
             event.stopPropagation(); // Prevent click event from propagating to the tab itself
@@ -670,10 +671,11 @@ function refreshTabList() {
     });
     let addTabButton = document.createElement('div');
     addTabButton.className = 'add-tab-button';
-    addTabButton.innerHTML = '<i class="fas fa-plus"></i>';
+    addTabButton.innerHTML = '<i class="icon" data-lucide="plus"></i>';
     addTabButton.addEventListener('click', showDropdown);
 
     document.getElementById('tabs-editor').appendChild(addTabButton);
+    lucide.createIcons();
 }
 
 // Clicking anywhere outside the dropdown should close it

@@ -46,7 +46,7 @@ function createPostElement(post) {
             </a>
             <p class="card-text"><small class="text-muted">${new Date(post.created_utc * 1000).toLocaleString()}</small></p>
             <p class="card-text">${postText}...</p>
-            <a href="https://www.reddit.com${post.permalink}" target="_blank" class="btn btn-primary btn-sm">Read more on Reddit</a>
+            <a href="https://www.reddit.com${post.permalink}" target="_blank" class="btn btn-primary">Read more on Reddit</a>
         </div>
     `;
     return postElement;

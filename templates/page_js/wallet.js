@@ -26,7 +26,6 @@ async function getNFTData(nftKey) {
 }
 
 async function loadNFTPage() {
-    document.getElementById("wallet-refresh-all").querySelector("i").classList.add("fa-spin");
 
     let nftList = document.getElementById("wallet-nfts");
     nftList.innerHTML = `<div class="title-container">
@@ -107,8 +106,6 @@ async function loadNFTPage() {
 
 
 function loadWalletPage() {
-    document.getElementById("wallet-refresh-all").querySelector("i").classList.add("fa-spin");
-
     // Start by reading the publicKey
     readSecureCookie("publicKey")
         .then((publicKey) => {
@@ -117,16 +114,16 @@ function loadWalletPage() {
             tokenList.innerHTML = `<div class="title-container">
 
                 <div class="create-token-link" style="font-size:1rem">
-                    <i class="fas fa-coins" title="Create Token"></i> Create Token
+                    <i class="icon" data-lucide="badge-plus" title="Create Token"></i> Create Token
                 </div>
                 <h2 class="token-list-title">Tokens</h2>
                 <div class="cogwheel-icon add-token-link" style="font-size:1rem">
-                    <i class="fas fa-plus-circle" title="Add Token"></i> Add Token
+                    <i class="icon" data-lucide="plus" title="Add Token"></i> Add Token
                 </div>
             </div>`;
-
+             lucide.createIcons();
             // Spinner for loading tokens
-            tokenList.innerHTML += `<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading tokens...</div>`;
+            tokenList.innerHTML += `<div class="loading-spinner"><i class="icon" data-lucide="sync-alt"></i> Loading tokens...</div>`;
 
 
             // Fetch information for each token with error handling for each promise
@@ -155,16 +152,17 @@ function loadWalletPage() {
                                 </div>
                                 <div class="token-balance"><span id="${tokenInfo.contract}Balance">0</span>&nbsp;<span>${tokenInfo.symbol}</span></div>
                                 <div class="token-actions">
-                                                                    ${tokenInfo.contract === "currency" ? "" : `<button class="btn remove-btn" data-contract="${tokenInfo.contract}" title="Remove Token"><i class="fas fa-minus-circle" title="Remove Token"></i></button>`}
-                                    <button class="btn send-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="fas fa-paper-plane"></i> Send</button>
-                                    <button class="btn receive-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="fas fa-download"></i> Receive</button>
+                                                                    ${tokenInfo.contract === "currency" ? "" : `<button class="btn remove-btn" data-contract="${tokenInfo.contract}" title="Remove Token"><i class="icon" data-lucide="trash" title="Remove Token"></i></button>`}
+                                    <button class="btn send-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="icon" data-lucide="send"></i> Send</button>
+                                    <button class="btn receive-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="icon" data-lucide="download"></i> Receive</button>
                                 </div>
                             </div>`;
                             refreshBalance(tokenInfo.contract);
                         }
                     });
-                    tokenList.innerHTML = tokenList.innerHTML.replace('<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading tokens...</div>', '');
+                    tokenList.innerHTML = tokenList.innerHTML.replace('<div class="loading-spinner"><i class="icon" data-lucide="sync-alt"></i> Loading tokens...</div>', '');
                     setupTokenEventListeners();  // Setup event listeners after tokens are loaded
+                    lucide.createIcons();
                 });
             
         })
@@ -185,7 +183,7 @@ function loadWalletPage() {
                         <div class="activity-timestamp">`+tx["timestamp"]+`</div>
                     </div>
                     <div class="activity-actions">
-                        <a href="`+EXPLORER+`/tx/`+tx["hash"]+`" target="_blank"><i class="fas fa-eye"></i> View</a>
+                        <a href="`+EXPLORER+`/tx/`+tx["hash"]+`" target="_blank"><i class="icon" data-lucide="eye"></i> View</a>
                     </div>
                 </div>`;
             });
@@ -197,8 +195,8 @@ function loadWalletPage() {
                     </div>
                 </div>`;
             }
-            
-            document.getElementById("wallet-refresh-all").querySelector("i").classList.remove("fa-spin");
+
+            lucide.createIcons();
         });
         
 }

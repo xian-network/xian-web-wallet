@@ -1,5 +1,5 @@
 :root {
-    --accent: #00f7e0;
+    --accent: #06e6cb;
     --bg-dark: #0d0d0d;
     --card-bg: #111111;
     --text-light: #ffffff;
@@ -23,7 +23,7 @@ body {
     font-weight: 500;
 }
 a{
-    color: #00f7e0;
+    color: #06e6cb;
     text-decoration: none;
 }
 
@@ -99,7 +99,7 @@ a{
 }
 
 .form-group a {
-    color: #00f7e0;
+    color: #06e6cb;
     font-weight: 600;
     text-decoration: none;
 }
@@ -117,7 +117,7 @@ a{
 }
 
 a:hover{
-    color: #00f7e0;
+    color: #06e6cb;
     text-decoration: underline;
 }
 .governance-sub-title{
@@ -131,7 +131,7 @@ a:hover{
     left: 0;
     font-size: 1.25rem;
     margin-bottom: 20px;
-    color:#00f7e0;
+    color:#06e6cb;
     cursor: pointer;
 }
 .explorer-url{
@@ -316,8 +316,9 @@ a:hover{
 .title-container {
     display: flex;
     justify-content: center; /* Center the title */
-    align-items: center; /* Align items vertically */
-    position: relative; /* Needed to position the cogwheel icon */
+    align-items: stretch;
+    position: relative;
+    gap: 0.5rem;
 }
 
 .token-title-container {
@@ -436,7 +437,7 @@ a:hover{
     color: #155724 !important;
 }
 .toast a{
-    color: #00f7e0 !important;
+    color: #06e6cb !important;
 }
 .toast.bg-danger{
     color: #721c24!important;
@@ -498,7 +499,7 @@ a:hover{
     font-size: 1.25rem;
     margin-bottom: 20px;
     cursor: pointer;
-    color: #00f7e0;
+    color: #06e6cb;
 }
 
 .cogwheel-icon:hover, .ide-icon:hover {
@@ -554,7 +555,7 @@ a:hover{
 /* Optional: Enhance visibility for clickable actions */
 .activity-actions a:hover {
     text-decoration: underline;
-    color: #00f7e0;
+    color: #06e6cb;
 }
 .wallet-tabs {
     display: flex;
@@ -577,13 +578,13 @@ a:hover{
   .wallet-tabs a:hover,
   .wallet-tabs a:focus {
     background: rgba(0, 247, 224, 0.08);
-    color: #00f7e0;
+    color: #06e6cb;
   }
   
   /* Active tab style */
   .wallet-tabs a.active {
     background: rgba(0, 247, 224, 0.12);
-    color: #00f7e0;
+    color: #06e6cb;
     box-shadow: 0 0 6px rgba(0, 247, 224, 0.2);
     font-weight: bold;
   }
@@ -594,7 +595,7 @@ a:hover{
     text-overflow: ellipsis;
     white-space: nowrap;
     cursor: pointer;
-    color: #00f7e0;
+    color: #06e6cb;
     display: block;
 }
 
@@ -607,7 +608,7 @@ a:hover{
     text-overflow: ellipsis;
     white-space: nowrap;
     cursor: pointer;
-    color: #00f7e0;
+    color: #06e6cb;
     display: block;
 }
 #yourAddressReceive:hover {
@@ -661,7 +662,7 @@ a:hover{
     font-size: 1.25rem;
     margin-bottom: 20px;
     cursor: pointer;
-    color: #00f7e0;
+    color: #06e6cb;
 }
 
 .token-name span, .token-symbol span, .token-balance span {
@@ -788,7 +789,7 @@ a:hover{
     position: absolute;
     height: 1.5rem;
     width: .1875rem;
-    background: #00f7e0;
+    background: #06e6cb;
     z-index: 10;
     margin-left: -10px;
 }
@@ -1049,4 +1050,7 @@ a:hover{
         border-top-right-radius: 10px;
         border-bottom-right-radius: 10px;
     }
+}
+.side-nav .icon {
+  margin-right: 0.5rem;
 }

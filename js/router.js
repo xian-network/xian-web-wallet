@@ -180,6 +180,7 @@ function changePage(page, some_data = null, send_response = null) {
       .then((response) => response.text())
       .then((htmlContent) => insertHTMLAndExecuteScripts(app_box, htmlContent))
       .then(() => {
+        lucide.createIcons();
         if (page === "send-token")
           document.getElementById("tokenName").innerHTML = some_data;
         else if (page === "request-transaction") {

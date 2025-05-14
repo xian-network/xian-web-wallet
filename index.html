@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="css/style.css?v=1">
     <link rel="stylesheet" href="css/custom.css?v=133723">
     <link rel="stylesheet" href="css/lint.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
@@ -24,7 +23,7 @@
         <div class="container-fluid">
             <div class="navbar-brand" href="index.html">
                 
-                <div class="app-name"><img src="assets/xian-white.svg" alt="Xian Connect Logo" class="app-logo"><h2>Xian Wallet</h2></div>
+                <div class="app-name"><img src="assets/xian-white.svg" alt="Xian Connect Logo" class="app-logo"><h2></h2></div>
                 <div class="online-status" id="onlineStatus">Node Status <div class='grey-circle' title='Node Status is Unknown'></div></div>
             </div>
         </div>
@@ -34,34 +33,33 @@
         <div class="wrap-app">
             <div class="side-nav" id="side-nav" style="display: none;">
                 <div class="side-nav-item" id="side-change-page-wallet">
-                    <i class="fas fa-wallet"  title="Wallet"></i>
+                    <i class="icon" data-lucide="home" title="Wallet"></i>
                     Wallet
                 </div>
                 <div class="side-nav-item" id="side-change-page-ide">
-                    <i class="fas fa-code"  title="IDE"></i>
+                    <i class="icon" data-lucide="code" title="IDE"></i>
                     IDE
                 </div>
                 
                 <div class="side-nav-item" id="side-change-page-messenger">
-                    <i class="fas fa-envelope"  title="Messenger"></i>
+                    <i class="icon" data-lucide="message-square" title="Messenger"></i>
                     Messenger
                 </div>
                 <div class="side-nav-item" id="side-change-page-ecosystem-news" style="margin-top: auto;">
-                    <i class="fas fa-newspaper"  title="Ecosystem News"></i>
+                    <i class="icon" data-lucide="newspaper" title="Ecosystem News"></i>
                     Chain News
                 </div>
                 <div class="side-nav-item" id="side-change-page-insights" style="display: none;">
-                    <i class="fas fa-link"  title="Insights"></i>
+                    <i class="icon" data-lucide="bar-chart-2" title="Insights"></i>
                     Insights
                 </div>
                 <div class="side-nav-item" id="side-change-page-settings" >
-                    <i class="fas fa-cog
-                    "  title="Settings"></i>
+                    <i class="icon" data-lucide="settings" title="Settings"></i>
                     Settings
                 </div>
                 
                 <div class="side-nav-item" id="side-lock-wallet">
-                    <i class="fas fa-lock"  title="Logout"></i>
+                    <i class="icon" data-lucide="lock" title="Lock Wallet"></i>
                     Logout
                 </div>
             </div>
@@ -91,11 +89,13 @@ display: flex;max-width: 100%; width: 100%;flex-direction: column;;
     <script src="js/cookietoolz.js"></script>
     <script src="js/placeholder.min.js"></script>
     <script src="js/xian.js?v=132337"></script>
+    <script src="js/providers/lucide.js"></script>
     <script src="js/router.js?v=13377"></script>
     <script src="js/helpers.js"></script>
     <script src="js/providers/codemirror.js"></script>
     <script src="js/providers/python.js"></script>
     <script src="js/providers/lint.js"></script>
+    
     <script src="js/index.js?v=122"></script>
     <script src="js/extension.js"></script>
     <script src="js/tx-result-manager.js"></script>

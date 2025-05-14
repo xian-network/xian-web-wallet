@@ -8,7 +8,7 @@
         </div>
         <div class="wallet-info-address">
             <span id="walletAddress"></span>
-            <a href="#" id="wallet-copy-address" title="Copy Address"><i class="far fa-copy"></i></a>
+            <a href="#" id="wallet-copy-address" title="Copy Address"><i class="icon" data-lucide="copy"></i></a>
         </div>
     </div>
     <div class="wallet-tabs">
@@ -25,15 +25,15 @@
     <div id="local-activity" style="display: none; flex-grow: 1;flex-flow: column nowrap;overflow: auto;">
         <div class="title-container">
             <h2 class="token-list-title">Local Activity</h2>
-            <i class="fas fa-trash cogwheel-icon" id="wallet-clear-local-activity" title="Clear Local Activity"></i>
+            <i data-lucide="trash" class="icon"  id="wallet-clear-local-activity" title="Clear Local Activity"></i>
         </div>
         <div id="local-activity-list">
             No activity yet.  
         </div>
     </div>
     <div style="display:flex;justify-content: space-between;" id="wallet-adv-btns">
-        <a href="#" id="wallet-refresh-all"><i class="fas fa-sync-alt"></i> Refresh All</a>
-        <a href="#" class="advanced-tx-link" id="wallet-send-adv-tx"><i class="fas fa-paper-plane"></i> Advanced Transaction</a>
+        <a href="#" id="wallet-refresh-all"><i data-lucide="refresh-ccw" class="icon"></i> Refresh All</a>
+        <a href="#" class="advanced-tx-link" id="wallet-send-adv-tx"><i data-lucide="send" class="icon"></i> Advanced Transaction</a>
     </div>
 </div>
 <script src="templates/page_js/wallet.js"></script>
