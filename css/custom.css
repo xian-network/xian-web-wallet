@@ -1,3 +1,12 @@
+:root {
+    --accent: #00f7e0;
+    --bg-dark: #0d0d0d;
+    --card-bg: #111111;
+    --text-light: #ffffff;
+    --font: 'Roboto Mono', monospace;
+    --radius: 10px;
+  }
+
 html{
     height: 100%;
     
@@ -7,18 +16,18 @@ body {
     margin: 0;
     background-color: #fff;
     font-family: 'Roboto Mono', sans-serif;
-    color: #202020;
+    color: var(--bg-dark);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-smoothing: antialiased;
     font-weight: 500;
 }
 a{
-    color: #06e6cb;
+    color: #00f7e0;
     text-decoration: none;
 }
 
-.btn{color: #202020;}
+.btn{color: var(--bg-dark);}
 
 .top-0 {
     top: 0;
@@ -90,7 +99,7 @@ a{
 }
 
 .form-group a {
-    color: #06e6cb;
+    color: #00f7e0;
     font-weight: 600;
     text-decoration: none;
 }
@@ -108,7 +117,7 @@ a{
 }
 
 a:hover{
-    color: #06e6cb;
+    color: #00f7e0;
     text-decoration: underline;
 }
 .governance-sub-title{
@@ -122,7 +131,7 @@ a:hover{
     left: 0;
     font-size: 1.25rem;
     margin-bottom: 20px;
-    color:#06e6cb;
+    color:#00f7e0;
     cursor: pointer;
 }
 .explorer-url{
@@ -136,25 +145,25 @@ a:hover{
     bottom: 1rem;
     right: 1rem;
     z-index: 1050; /* Ensures the toggler stays above most elements */
-    border: 1px solid #ced4da;
+    border: 1px solid rgba(255, 255, 255, 0.08);;;
     background: #fff;
-    color: #202020;
+    color: var(--bg-dark);
 }
 .dark-mode .dark-mode-toggler {
-    border: 1px solid #8a8b8e;
-    background: #202020;
+    border: 1px solid rgba(255, 255, 255, 0.08);;
+    background: var(--bg-dark);
     color: #ffffff;
 }
 
 /* Dark mode specific styles */
 .dark-mode {
-    background-color: #202020; /* Dark background */
+    background-color: var(--bg-dark); /* Dark background */
     color: #ffffff; /* Bright text */
 }
 
 .dark-mode .app-box {
-    background-color: #202020; /* Darker background */
-    border: 1px solid #8a8b8e; /* Darker border */
+    background-color: var(--bg-dark); /* Darker background */
+    border: 1px solid rgba(255, 255, 255, 0.08);; /* Darker border */
 }
 
 
@@ -264,9 +273,9 @@ a:hover{
     flex-direction: column;
     gap: 10px;
     padding: 20px;
-    border-radius: 8px;
+    border-radius: var(--radius);
     width: auto;
-    border: 1px solid #ced4da;
+    border: 1px solid rgba(255, 255, 255, 0.08);;;
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
     background-color: #fff;
@@ -285,16 +294,16 @@ a:hover{
 }
 
 .dark-mode .side-nav {
-    border: 1px solid #8a8b8e;
-    background-color: #202020;
+    border: 1px solid rgba(255, 255, 255, 0.08);;
+    background-color: var(--bg-dark);
 }
 
 .app-box {
     padding: 20px;
-    border-radius: 8px;
+    border-radius: var(--radius);
     background-color: #fff;
     width: 100%;
-    border: 1px solid #ced4da;
+    border: 1px solid rgba(255, 255, 255, 0.08);;;
     overflow: auto;
 }
 
@@ -357,7 +366,22 @@ a:hover{
     }
     
 }
-
+.remove-btn{
+    background: rgba(255, 77, 77, 0.1);
+    background-color: transparent!important;
+    color: #ff4d4d;
+    border: 1px solid rgba(255, 77, 77, 0.25);
+    border-radius: 8px;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+.remove-btn:hover{
+        background: rgba(255, 77, 77, 0.2);
+        border-color: #ff4d4d;
+        color: #fff;
+     
+}
 .kwarg-group{
     display: flex;
     gap: 10px;
@@ -412,7 +436,7 @@ a:hover{
     color: #155724 !important;
 }
 .toast a{
-    color: #06e6cb !important;
+    color: #00f7e0 !important;
 }
 .toast.bg-danger{
     color: #721c24!important;
@@ -438,25 +462,24 @@ a:hover{
     top: 0;
     width: 100%;
     z-index: 1030; /* Ensure it stays above other content */
-    border-bottom: 1px solid #ced4da;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);;;
 }
 .dark-mode .navbar {
-    background-color: #202020;
-    border-bottom: 1px solid #8a8b8e;
+    background-color: var(--bg-dark);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);;
 }
 
 .dark-mode .token-list {
 }
 .dark-mode .token-item {
-    border: 1px solid #8a8b8e;
 }
 .dark-mode input, .dark-mode select, .dark-mode textarea {
-    background-color: #202020;
+    background-color: var(--bg-dark);
     color: #ffffff;
-    border: 1px solid #8a8b8e;
+    border: 1px solid rgba(255, 255, 255, 0.08);;
 }
 .dark-mode input:focus, .dark-mode select:focus, .dark-mode textarea:focus {
-    background-color: #202020;
+    background-color: var(--bg-dark);
     color: #ffffff;
 }
 .stamp-rate{margin-top: 10px;}
@@ -475,7 +498,7 @@ a:hover{
     font-size: 1.25rem;
     margin-bottom: 20px;
     cursor: pointer;
-    color: #06e6cb;
+    color: #00f7e0;
 }
 
 .cogwheel-icon:hover, .ide-icon:hover {
@@ -495,12 +518,12 @@ a:hover{
 .activity-item {
     display: flex;
     flex-direction: column; /* Stacks the details and actions on top of each other */
-    border-radius: 5px;
+    border-radius: var(--radius);
     overflow: hidden; /* Ensures the content fits within the borders */
-    border: 1px solid #ced4da;
+    border: 1px solid rgba(255, 255, 255, 0.08);;;
 }
 .dark-mode .activity-item {
-    border: 1px solid #8a8b8e;
+    border: 1px solid rgba(255, 255, 255, 0.08);;
 }
 
 .activity-details, .activity-actions {
@@ -519,7 +542,7 @@ a:hover{
 
 .activity-actions {
     justify-content: flex-end; /* Aligns actions to the right */
-    border-top: 1px solid #dee2e6; /* Adds a separator between details and actions */
+    border: 1px solid rgba(255, 255, 255, 0.08);;
 }
 
 .activity-actions a {
@@ -531,47 +554,47 @@ a:hover{
 /* Optional: Enhance visibility for clickable actions */
 .activity-actions a:hover {
     text-decoration: underline;
-    color: #06e6cb;
+    color: #00f7e0;
 }
-
 .wallet-tabs {
     display: flex;
-    gap: 10px; /* Space between tabs */
+    gap: 10px;
     padding-top: 20px;
-    justify-content: center; /* Aligns tabs to the center */
-}
-
-.wallet-tabs a {
+    justify-content: center;
+  }
+  
+  .wallet-tabs a {
     text-decoration: none;
-    color: #06e6cb; /* Primary color for consistency */
+    color: rgba(255, 255, 255, 0.7);
     padding: 10px 20px;
-    border: 1px solid transparent; /* Ensures the layout doesn't shift when border is added on hover or focus */
-    border-radius: 5px 5px 0 0; /* Rounded corners at the top */
-    transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
-}
-
-.wallet-tabs a:hover, .wallet-tabs a:focus {
-
-}
-
-/* Active tab style */
-.wallet-tabs a.active {
-    border-color: #ced4da #ced4da transparent; /* Borders on the sides and top, transparent at the bottom */
-    
-    border-bottom: 1px solid #ced4da;
-    border-top: 0px;
-    border-left:0px;
-    border-right:0px;
-    margin-bottom: -1px; /* Aligns the active tab with the content box */
-}
-
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.95rem;
+  }
+  
+  /* Hover effect */
+  .wallet-tabs a:hover,
+  .wallet-tabs a:focus {
+    background: rgba(0, 247, 224, 0.08);
+    color: #00f7e0;
+  }
+  
+  /* Active tab style */
+  .wallet-tabs a.active {
+    background: rgba(0, 247, 224, 0.12);
+    color: #00f7e0;
+    box-shadow: 0 0 6px rgba(0, 247, 224, 0.2);
+    font-weight: bold;
+  }
+  
 
 #walletAddress {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     cursor: pointer;
-    color: #06e6cb;
+    color: #00f7e0;
     display: block;
 }
 
@@ -584,7 +607,7 @@ a:hover{
     text-overflow: ellipsis;
     white-space: nowrap;
     cursor: pointer;
-    color: #06e6cb;
+    color: #00f7e0;
     display: block;
 }
 #yourAddressReceive:hover {
@@ -592,13 +615,11 @@ a:hover{
 }
 
 .btn-group>.btn-group:not(:last-child)>.btn, .btn-group>.btn:not(:last-child):not(.dropdown-toggle) {
-    border-top-right-radius: .25rem!important;
-    border-bottom-right-radius: .25rem!important;
+    
 }
 
 .btn-group>.btn-group:not(:first-child)>.btn, .btn-group>.btn:not(:first-child):not(.dropdown-toggle) {
-    border-top-left-radius: .25rem!important;
-    border-bottom-left-radius: .25rem!important;
+    
 }
 
 .token-list {
@@ -609,14 +630,20 @@ a:hover{
 .token-item:last-child {
     margin-bottom: 0;
 }
+.token-item:hover {
+    box-shadow: 0 0 16px rgba(0, 247, 224, 0.05);
+  }
 
 .token-item {
     display: flex;
     flex-direction: column;
     padding: 10px;
     margin-bottom: 10px;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
+    border-radius: var(--radius);
+    background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 12px rgba(0, 247, 224, 0.02);
+  transition: box-shadow 0.2s ease;
     
 }
 #validator-state{
@@ -634,7 +661,7 @@ a:hover{
     font-size: 1.25rem;
     margin-bottom: 20px;
     cursor: pointer;
-    color: #06e6cb;
+    color: #00f7e0;
 }
 
 .token-name span, .token-symbol span, .token-balance span {
@@ -644,6 +671,10 @@ a:hover{
 .token-balance{
     display: flex;
     align-items: center;
+    font-weight: 600;
+    color: #e8fefe; /* Soft near-white cyan */
+    font-size: 1rem;
+    letter-spacing: 0.3px;
 }
 
 .token-details {
@@ -685,7 +716,7 @@ a:hover{
 }
 
 .github-link a {
-    color: #202020; /* Dark color for light mode */
+    color: var(--bg-dark); /* Dark color for light mode */
     font-weight: bold;
     text-decoration: none;
     display: inline-flex;
@@ -707,11 +738,11 @@ a:hover{
 
 .dropdown-content{
     background-color: #fff;
-    border: 1px solid #ced4da;
+    border: 1px solid rgba(255, 255, 255, 0.08);;;
 }
 .dark-mode .dropdown-content{
-    background-color: #202020;
-    border: 1px solid #8a8b8e;
+    background-color: var(--bg-dark);
+    border: 1px solid rgba(255, 255, 255, 0.08);;
 }
 .governance-section-buttons{
     display: flex;
@@ -757,15 +788,16 @@ a:hover{
     position: absolute;
     height: 1.5rem;
     width: .1875rem;
-    background: #06e6cb;
+    background: #00f7e0;
     z-index: 10;
     margin-left: -10px;
 }
 
 .wallet-info-card{
     padding: 20px;
-    border-radius: 5px;
-    border: 1px solid #8a8b8e;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 12px rgba(0, 247, 224, 0.02);
     overflow: auto;
     width: 100%;
     max-width: fit-content;
@@ -774,7 +806,7 @@ a:hover{
 .wallet-info-title{
     position: absolute;
     margin-top: -32.5px;
-    background: #202020;
+    background: var(--bg-dark);
     padding-left: 0.5rem;
     padding-right: 0.5rem;
 }
@@ -791,11 +823,11 @@ a:hover{
     display: flex
 ;
     max-width: 300px;
-    border-top: 1px solid #8a8b8e;
-    border-left: 1px solid #8a8b8e;
-    border-bottom: 1px solid #8a8b8e;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
     padding: 10px;
     overflow-y: auto;
     height: 100%;
@@ -833,8 +865,8 @@ a:hover{
     gap: 10px;
     align-items: center;
     padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #8a8b8e;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255, 255, 255, 0.08);;
     cursor: pointer;
     transition: box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
@@ -873,9 +905,9 @@ a:hover{
 
 
 .messenger-chat-wrapper {
-    border: 1px solid #8a8b8e;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.08);;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
     padding: 10px;
     display: flex
 ;
@@ -888,7 +920,7 @@ a:hover{
     font-weight: bold;
     text-align: center;
     padding-bottom: 10px;
-    border-bottom: 1px solid #8a8b8e;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);;
 }
 
 .messenger-chat-header h5{
@@ -945,8 +977,8 @@ a:hover{
 .messenger-chat-item-content {
     max-width: 70%;
     padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #8a8b8e;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255, 255, 255, 0.08);;
     font-size: 0.9rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -959,15 +991,15 @@ a:hover{
 .messenger-chat-footer {
     display: flex;
     gap: 10px;
-    border-top: 1px solid #8a8b8e;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);;
     padding-top: 10px;
 }
 
 .messenger-chat-footer input {
     flex: 1;
     padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #8a8b8e;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255, 255, 255, 0.08);;
     font-size: 1rem;
     outline: none;
     transition: border-color 0.3s ease-in-out;
@@ -980,9 +1012,9 @@ a:hover{
 .messenger-chat-footer button {
     padding: 10px 20px;
     background-color: #93e8e1;
-    color: #202020;
+    color: var(--bg-dark);
     border: none;
-    border-radius: 5px;
+    border-radius: var(--radius);
     cursor: pointer;
     transition: background-color 0.3s ease-in-out;
 }
@@ -998,7 +1030,7 @@ a:hover{
         max-width: unset;
         height: auto;
         border-right: none;
-        border-bottom: 1px solid #ced4da;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);;;
     }
 
     .messenger-chat {
@@ -1009,12 +1041,12 @@ a:hover{
         gap: 20px;
     }
     .messenger-chat-wrapper {
-        border-top-left-radius: 5px;
-        border-bottom-left-radius: 5px;
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
     }
     .messenger-inbox{
-        border-right: 1px solid #8a8b8e;
-        border-top-right-radius: 5px;
-        border-bottom-right-radius: 5px;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
     }
 }
