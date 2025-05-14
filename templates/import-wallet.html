@@ -1,24 +1,65 @@
-<div style="max-width: 30rem;margin:auto;display: flex; flex-direction: column; justify-content: center;height:100%">
-<h1 class="app-box-title">Import a Wallet</h1>
-<p class="app-box-description">To import a wallet, please enter your private key and a password. This password will be used to encrypt your private key. Make sure to remember it, as it <b>cannot be recovered</b>.</p>
-<div class="app-box-form">
-    <div class="alert alert-danger" role="alert" id="importWalletError" style="display: none;"></div>
-    <div class="form-group">
-        <label for="privateKey">Private Key</label>
-        <input type="text" class="form-control" id="import_privateKey" placeholder="Enter your private key" required>
+<main class="onboard-card" aria-label="Import wallet">
+
+  <header>
+    <h1 class="app-box-title">Import your wallet</h1>
+    <p class="onboard-step">Step&nbsp;2&nbsp;/&nbsp;2</p>
+  </header>
+
+  <p class="app-box-description">
+    Paste your <strong>private key</strong> (or seed) and set a password to encrypt it.
+    <span class="note-danger">If you forget the password, it can’t be recovered.</span>
+  </p>
+
+  <form id="importWalletForm" class="form-stack">
+
+    <!-- error banner -->
+    <div id="importWalletError"
+         class="alert alert-danger alert--hidden"
+         role="alert" aria-live="polite"></div>
+
+    <!-- private key -->
+    <label for="import_privateKey">Private&nbsp;key</label>
+    <input id="import_privateKey"
+              class="form-control"
+                placeholder="Paste your private key here"
+              rows="1" required />
+
+    <!-- pwd -->
+    <label for="import_password">Password</label>
+    <div>
+       <input id="import_password" type="password"
+              class="form-control"
+              placeholder="Enter password" required
+              autocomplete="new-password">
+       
     </div>
-    <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" class="form-control" id="import_password" placeholder="Enter a password" required>
+
+    <!-- confirm -->
+    <label for="import_confirmPassword">Confirm&nbsp;password</label>
+    <div>
+       <input id="import_confirmPassword" type="password"
+              class="form-control"
+              placeholder="Re-enter password" required
+              autocomplete="new-password">
     </div>
-    <div class="form-group">
-        <label for="confirmPassword">Confirm Password</label>
-        <input type="password" class="form-control" id="import_confirmPassword" placeholder="Confirm your password" required>
-    </div>
+
+    <!-- actions -->
     <div class="btn-group">
-        <button class="btn btn-primary" id="btn-import-wallet-import-wallet">Import Wallet</button>
-        <button class="btn btn-secondary" id="btn-import-wallet-back">Back</button>
+      <button id="btn-import-wallet-import-wallet"
+              class="btn btn-primary"
+              type="submit">
+        <i data-lucide="upload"></i>
+        Import&nbsp;wallet
+      </button>
+
+      <button id="btn-import-wallet-back"
+              class="btn btn-secondary"
+              type="button">
+        <i data-lucide="arrow-left"></i>
+        Back
+      </button>
     </div>
-</div>
-</div>
+  </form>
+</main>
+
 <script src="templates/page_js/import-wallet.js"></script>

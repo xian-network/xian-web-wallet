@@ -27,7 +27,26 @@ function inputValidation() {
     }
 }
 function createWallet() {
-    let password = document.getElementById('password').value;
+    // Input validation
+    let password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
+    const createWalletError = document.getElementById('createWalletError');
+    if (password.value.length < 6) {
+        createWalletError.innerHTML = 'Password must be at least 6 characters long!';
+        createWalletError.style.display = 'block';
+        return;
+    }
+    if (password.value !== confirmPassword.value) {
+        createWalletError.innerHTML = 'Passwords do not match!';
+        createWalletError.style.display = 'block';
+        return;
+    }
+    if (password.value === '') {
+        createWalletError.innerHTML = 'Password cannot be empty!';
+        createWalletError.style.display = 'block';
+        return;
+    }
+
 
     let keyPair = createKeyPair(password);
     let public_key = keyPair.publicKey;

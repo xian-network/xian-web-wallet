@@ -1,19 +1,61 @@
-<div style="max-width: 30rem;margin:auto;display: flex; flex-direction: column; justify-content: center;height:100%">
-<h1 class="app-box-title">Create a Wallet</h1>
-<p class="app-box-description">To create a wallet, please enter a password. This password will be used to encrypt your private key. Make sure to remember it, as it <b>cannot be recovered</b>. After creating a wallet, remember to export your private key in the settings for backup.</p>
-<div class="app-box-form">
-    <div class="alert alert-danger" role="alert" id="createWalletError" style="display: none;"></div>
-    <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" class="form-control" id="password" placeholder="Enter a password" required>
+<main class="onboard-card" aria-label="Create wallet">
+
+  <header>
+    <h1 class="app-box-title">Create your wallet</h1>
+    <p class="onboard-step">Step&nbsp;2&nbsp;/&nbsp;2</p>
+  </header>
+
+  <!-- description -->
+  <p class="app-box-description">
+     Choose a password to <strong>encrypt your private key</strong>.
+     <span class="note-danger">If you forget it, we can’t recover it.</span>
+  </p>
+
+  <!-- form -->
+  <form id="createWalletForm" class="form-stack">
+
+    <!-- error banner -->
+    <div id="createWalletError" class="alert alert-danger alert--hidden"
+         role="alert" aria-live="polite"></div>
+
+    <label for="password">Password</label>
+    <div>
+       <input  id="password" type="password" class="form-control"
+               placeholder="Enter password" required
+               autocomplete="new-password" aria-describedby="pwdHint">
+       
     </div>
-    <div class="form-group">
-        <label for="confirmPassword">Confirm Password</label>
-        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password" required>
+
+    <label for="confirmPassword">Confirm password</label>
+    <div>
+       <input  id="confirmPassword" type="password" class="form-control"
+               placeholder="Re-enter password" required
+               autocomplete="new-password">
     </div>
+
+    <small id="pwdHint" class="form-hint">
+      Minimum 8 chars · numbers &amp; symbols recommended
+    </small>
+
+    <!-- actions -->
     <div class="btn-group">
-        <button class="btn btn-primary" id="btn-create-wallet-create">Create Wallet</button>
-        <button class="btn btn-secondary" id="btn-create-wallet-back">Back</button>
+       <button id="btn-create-wallet-create"
+               class="btn btn-primary" type="submit">
+           <i data-lucide="key-round"></i>
+           Create&nbsp;wallet
+       </button>
+
+       <button id="btn-create-wallet-back"
+               class="btn btn-secondary" type="button">
+           <i data-lucide="arrow-left"></i>
+           Back
+       </button>
     </div>
-</div>
+  </form>
+
+  <p class="backup-reminder">
+      After creation, export your private key in&nbsp;<em>Settings → Backup</em>.
+  </p>
+</main>
+
 <script src="templates/page_js/create-wallet.js"></script>
