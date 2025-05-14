@@ -432,15 +432,38 @@ a:hover{
     border-radius: 50%;
     background-color: #28bdaa;
 }
-.toast.bg-success{
-    color: #155724 !important;
-}
 .toast a{
     color: #06e6cb !important;
 }
-.toast.bg-danger{
-    color: #721c24!important;
+/*──────────────────────────────────────────────────────────────
+  Brand overrides for Bootstrap 5 toasts
+  (works for both ‘bg-*’ and ‘text-bg-*’ helper combos)
+  ──────────────────────────────────────────────────────────────*/
+
+/* SUCCESS  – mint / cyan -------------------------------------*/
+.toast.bg-success,
+.toast.text-bg-success{
+  --bs-bg-opacity: 1;                                 /* keep opacity var */
+  background-color: rgba(0, 242, 213, .15) !important; /* soft mint tint   */
+  color:            #00f2d5            !important;     /* brand text       */
+  border: 1px solid rgba(0, 242, 213, .40) !important; /* subtle outline   */
 }
+
+/* DANGER  – brand red ---------------------------------------*/
+.toast.bg-danger,
+.toast.text-bg-danger{
+  --bs-bg-opacity: 1;
+  background-color: rgba(255, 77, 79, .15) !important;
+  color:            #ff4d4f            !important;
+  border: 1px solid rgba(255, 77, 79, .40) !important;
+}
+
+/* optional: tweak the close button so it matches the text ----*/
+.toast .btn-close{
+  filter: invert(68%) sepia(7%) saturate( 750%) hue-rotate(140deg);
+  /* quick CSS-filter hack that makes the × adopt surrounding text colour */
+}
+
 .mt-1px{
     margin-top: 1px;
 }
@@ -737,7 +760,6 @@ a:hover{
   background:none; border:0; padding:0; cursor:pointer;
   color:var(--mint-400);
 }
-.alert--hidden{ display:none; }
 
 .onboard-step{ font-size:.825rem; color:var(--grey-400); }
 .note-danger{ color:var(--red-400); font-weight:600; }
@@ -1116,4 +1138,58 @@ a:hover{
 }
 .side-nav .icon {
   margin-right: 0.5rem;
+}
+
+/* ==== Wallet UX overrides ===================== */
+
+/* shared alert skeleton ------------------------------------------------ */
+.alert {
+  /* layout */
+  align-items:center;
+  gap:.75rem;
+
+  /* spacing + type */
+  padding:.75rem 1rem;
+  font-size:.875rem;
+  line-height:1.4;
+
+  /* skin */
+  border:1px solid transparent;
+  border-radius:var(--r,10px);       /* falls back to 10 px if you don’t have --r */
+}
+
+/* danger variant ------------------------------------------------------- */
+.alert-danger{
+  --danger-h: 0;    /* hue   */
+  --danger-s: 84%;  /* sat   */
+  --danger-l: 58%;  /* light */
+
+  /* subtle tinted background */
+  background: hsl(var(--danger-h) var(--danger-s) 20% / .15);
+  /* soft border */
+  border-color:hsl(var(--danger-h) var(--danger-s) var(--danger-l) / .35);
+  /* text colour */
+  color:hsl(var(--danger-h) var(--danger-s) var(--danger-l));
+
+}
+
+
+/* accessibility: make sure screen readers announce immediately */
+.alert[role="alert"]{ aria-live:assertive; }
+
+
+/* success variant ------------------------------------------------------ */
+.alert-success{
+  --success-h: 174;  /* hue for mint/turquoise brand colour */
+  --success-s: 100%; /* saturation */
+  --success-l: 46%;  /* lightness  → tweak if your mint is lighter/darker */
+
+  background: hsl(var(--success-h) var(--success-s) 18% / .15);
+  border-color:hsl(var(--success-h) var(--success-s) var(--success-l) / .35);
+  color:hsl(var(--success-h) var(--success-s) var(--success-l));
+
+}
+
+.alert--hidden{
+  display:none;
 }
