@@ -663,6 +663,9 @@ a:hover{
     margin-bottom: 20px;
     cursor: pointer;
     color: #06e6cb;
+    display: flex
+;
+    gap: 10px;
 }
 
 .token-name span, .token-symbol span, .token-balance span {
@@ -781,8 +784,21 @@ a:hover{
     }
 }
 
-
-
+.add-token-link{
+    display: flex
+;
+    gap: 10px;
+}
+#wallet-refresh-all{
+    display: flex
+;
+    gap: 10px;
+}
+.advanced-tx-link{
+    display: flex
+;
+    gap: 10px;
+}
 .active-side-nav:before {
     content: "";
     display: block;
