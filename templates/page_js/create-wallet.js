@@ -26,27 +26,30 @@ function inputValidation() {
         }
     }
 }
-function createWallet() {
-    // Input validation
-    let password = document.getElementById('password');
-    const confirmPassword = document.getElementById('confirmPassword');
-    const createWalletError = document.getElementById('createWalletError');
-    if (password.value.length < 6) {
-        createWalletError.innerHTML = 'Password must be at least 6 characters long!';
-        createWalletError.style.display = 'block';
-        return;
-    }
-    if (password.value !== confirmPassword.value) {
-        createWalletError.innerHTML = 'Passwords do not match!';
-        createWalletError.style.display = 'block';
-        return;
-    }
-    if (password.value === '') {
-        createWalletError.innerHTML = 'Password cannot be empty!';
-        createWalletError.style.display = 'block';
-        return;
-    }
 
+/* ----- added: quick synchronous form check ----- */
+function isFormValid () {
+    const pwd  = document.getElementById('password').value;
+    const pwd2 = document.getElementById('confirmPassword').value;
+    const err  = document.getElementById('createWalletError');
+
+    if (pwd.length < 6) {
+        err.innerHTML = 'Password must be at least 6 characters long!';
+        err.style.display = 'block';
+        return false;
+    }
+    if (pwd !== pwd2) {
+        err.innerHTML = 'Passwords do not match!';
+        err.style.display = 'block';
+        return false;
+    }
+    err.style.display = 'none';
+    return true;
+}
+
+function createWallet() {
+     if (!isFormValid()) return;
+    let password = document.getElementById('password').value;
 
     let keyPair = createKeyPair(password);
     let public_key = keyPair.publicKey;
