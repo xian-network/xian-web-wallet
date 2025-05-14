@@ -793,7 +793,7 @@ a:hover{
 ;
     gap: 10px;
 }
-.advanced-tx-link{
+#wallet-send-adv-tx{
     display: flex
 ;
     gap: 10px;
