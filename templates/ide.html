@@ -100,15 +100,20 @@
     gap: 5px;
     }
     .dark-mode .tab-editor{
-        background-color: #494a50;
-        border: 1px solid #8a8b8e;
+        border-radius: var(--radius);
+        background: #121212;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 12px rgba(0, 247, 224, 0.02);
+        transition: box-shadow 0.2s ease;
         color: #e4e6eb;
     }
     .tab-editor.active{
         background-color: #fff;
     }
     .dark-mode .tab-editor.active{
-        background-color: #8a8b8e;
+        background-color: #0d0d0d;
+        border: 1px solid #8a8b8e;
+        color: #e4e6eb;
     }
     .add-tab-button{
         padding: 5px;
@@ -134,8 +139,11 @@
     gap: 10px;
     }
     .dark-mode .function-box{
-        background-color: #494a50;
-        border: 1px solid #8a8b8e;
+        border-radius: var(--radius);
+        background: #121212;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 12px rgba(0, 247, 224, 0.02);
+        transition: box-shadow 0.2s ease;
         color: #e4e6eb;
     }
     #function-boxes{

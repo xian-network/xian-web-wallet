@@ -641,31 +641,6 @@ function refreshTabList() {
         closeTab.className = 'icon';
         closeTab.dataset.lucide = 'x';
 
-        closeTab.addEventListener('click', function (event) {
-            event.stopPropagation(); // Prevent click event from propagating to the tab itself
-
-            // Prompt user if they want to remove the tab
-            if (!confirm('Are you sure you want to remove this file?')) {
-                return;
-            }
-
-            // If it's the last tab, don't allow removal
-            if (Object.keys(code_storage).length === 1) {
-                alert('Cannot remove last file!');
-                return;
-            }
-
-            // Retrieve the tab name from the parent element (tabElement)
-            let tabNameToRemove = tabElement.textContent.trim();
-
-            removeTab(tabNameToRemove);
-            tabElement.remove();
-
-            // Change current tab if the removed tab was active
-            if (tabNameToRemove === current_tab) {
-                changeTab(Object.keys(code_storage)[0]);
-            }
-        });
 
         tabElement.appendChild(closeTab);
     });
@@ -677,6 +652,28 @@ function refreshTabList() {
     document.getElementById('tabs-editor').appendChild(addTabButton);
     lucide.createIcons();
 }
+
+document.getElementById('tabs-editor').addEventListener('click', (e) => {
+  // Did the user click the X icon?  (works before *and* after Lucide replacement)
+  const icon = e.target.closest('svg[data-lucide="x"], i[data-lucide="x"]');
+  if (!icon) return;                 // click wasn’t on the close icon
+
+  e.stopPropagation();               // don’t switch tabs
+
+  const tabEl   = icon.closest('.tab-editor'); // parent <div class="tab-editor">
+  const tabName = tabEl.textContent.trim();    // file name text
+
+  if (!confirm(`Remove ${tabName}?`)) return;
+  if (Object.keys(code_storage).length === 1) {
+    return alert('Cannot remove last file!');
+  }
+
+  removeTab(tabName);
+  if (current_tab === tabName) {
+    changeTab(Object.keys(code_storage)[0]);
+  }
+  refreshTabList();                  // rebuild the list
+});
 
 // Clicking anywhere outside the dropdown should close it
 document.addEventListener('click', function (event) {
