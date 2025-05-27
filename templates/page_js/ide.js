@@ -154,22 +154,26 @@ class SimpleTest(unittest.TestCase):
         # Get the submission contract
         self.submission = self.client.get_contract('submission')
     
-    def test_example(self):
-        """Simple test example"""
-        # This is a basic test that always passes
-        self.assertEqual(1, 1)
-        
-        # Test currency balance
+    def test_currency_basic(self):
+        """Test basic currency operations"""
+        # Initial balance check
         self.assertEqual(self.currency.balance_of(account='sys'), 1_000_000)
+        self.assertEqual(self.currency.balance_of(account='user1'), 0)
         
         # Test currency transfer
         self.currency.transfer(amount=100, to='user1', signer='sys')
+        self.assertEqual(self.currency.balance_of(account='sys'), 999_900)
         self.assertEqual(self.currency.balance_of(account='user1'), 100)
         
-        # Test your submission contract
-        # Example:
-        # result = self.submission.some_method(param1='value1', signer='user1')
-        # self.assertEqual(result, expected_value)
+        # Test insufficient balance
+        with self.assertRaises(AssertionError):
+            self.currency.transfer(amount=2_000_000, to='user2', signer='sys')
+    
+    def test_submission_contract(self):
+        """Test your submission contract"""
+        # This is a placeholder test
+        # Replace with actual tests for your submission contract
+        self.assertEqual(self.submission.get(), 0)
 
 if __name__ == '__main__':
     unittest.main()
@@ -1094,40 +1098,93 @@ class MockContract:
         self.name = name
         self._state = {}
         
+        # Initialize default values based on contract name
+        if name == 'currency':
+            # Default balances for currency contract
+            self._state['balance:sys'] = 1_000_000
+            self._state['fee_percent'] = 1
+        elif name == 'submission':
+            # Default state for submission contract
+            self._state['value'] = 0
+        
     def get(self):
-        return self._state.get('value', 1)
+        return self._state.get('value', 0)
         
     def balance_of(self, account):
-        return self._state.get(f'balance:{account}', 1_000_000)
+        # Only return default for 'sys', all others start at 0
+        if account == 'sys' and f'balance:{account}' not in self._state:
+            return 1_000_000
+        return self._state.get(f'balance:{account}', 0)
         
     def allowance(self, owner, spender):
-        return self._state.get(f'allowance:{owner}:{spender}', 50)
+        return self._state.get(f'allowance:{owner}:{spender}', 0)
         
     def transfer(self, amount, to, signer):
-        self._state[f'balance:{signer}'] = self.balance_of(signer) - amount
+        # Check if sender has enough balance
+        current_balance = self.balance_of(signer)
+        if current_balance < amount:
+            raise AssertionError(f"Insufficient balance: {current_balance} < {amount}")
+            
+        # Update balances
+        self._state[f'balance:{signer}'] = current_balance - amount
         self._state[f'balance:{to}'] = self.balance_of(to) + amount
         return True
         
     def approve(self, amount, to, signer):
+        # Check if amount is valid
+        if amount < 0:
+            raise AssertionError(f"Invalid approval amount: {amount}")
+            
         self._state[f'allowance:{signer}:{to}'] = amount
         return True
         
     def transfer_from(self, amount, to, main_account, signer):
-        self._state[f'balance:{main_account}'] = self.balance_of(main_account) - amount
+        # Check allowance
+        current_allowance = self.allowance(main_account, signer)
+        if current_allowance < amount:
+            raise AssertionError(f"Insufficient allowance: {current_allowance} < {amount}")
+            
+        # Check balance
+        current_balance = self.balance_of(main_account)
+        if current_balance < amount:
+            raise AssertionError(f"Insufficient balance: {current_balance} < {amount}")
+            
+        # Update state
+        self._state[f'balance:{main_account}'] = current_balance - amount
         self._state[f'balance:{to}'] = self.balance_of(to) + amount
-        self._state[f'allowance:{main_account}:{signer}'] = self.allowance(main_account, signer) - amount
+        self._state[f'allowance:{main_account}:{signer}'] = current_allowance - amount
         return True
         
     def set_enabled(self, state, signer):
+        # Only sys can change enabled state
+        if signer != 'sys':
+            raise AssertionError(f"Only sys can set enabled state, got: {signer}")
+            
         self._state['enabled'] = state
         
     def set_contract_allowlist(self, contracts, signer):
+        # Only sys can set allowlist
+        if signer != 'sys':
+            raise AssertionError(f"Only sys can set contract allowlist, got: {signer}")
+            
         self._state['allowlist'] = contracts
         
     def set_fee_percent(self, pct, signer):
+        # Only sys can set fee percent
+        if signer != 'sys':
+            raise AssertionError(f"Only sys can set fee percent, got: {signer}")
+            
+        # Fee percent must be between 0 and 100
+        if pct < 0 or pct > 100:
+            raise AssertionError(f"Fee percent must be between 0 and 100, got: {pct}")
+            
         self._state['fee_percent'] = pct
         
     def mint_name(self, name, signer):
+        # Check if name already exists
+        if f'owner:{name}' in self._state:
+            raise AssertionError(f"Name already exists: {name}")
+            
         self._state[f'owner:{name}'] = signer
         return True
         
@@ -1135,6 +1192,14 @@ class MockContract:
         return self._state.get(f'owner:{name}') == address
         
     def list_name(self, name, price, signer):
+        # Check if signer is owner
+        if not self.is_owner(name, signer):
+            raise AssertionError(f"Only owner can list name, got: {signer}")
+            
+        # Check if already listed
+        if f'listing:{name}' in self._state:
+            raise AssertionError(f"Name already listed: {name}")
+            
         self._state[f'listing:{name}'] = {'seller': signer, 'price': price}
         return True
         
@@ -1143,12 +1208,23 @@ class MockContract:
         
     def buy_name(self, name, signer):
         listing = self.get_listing(name)
-        if listing:
-            self._state[f'owner:{name}'] = signer
-            self._state.pop(f'listing:{name}', None)
+        if not listing:
+            raise AssertionError(f"Name not listed: {name}")
+            
+        # Update ownership
+        self._state[f'owner:{name}'] = signer
+        self._state.pop(f'listing:{name}', None)
         return True
         
     def cancel_listing(self, name, signer):
+        listing = self.get_listing(name)
+        if not listing:
+            raise AssertionError(f"Name not listed: {name}")
+            
+        # Check if signer is seller
+        if listing['seller'] != signer:
+            raise AssertionError(f"Only seller can cancel listing, got: {signer}")
+            
         self._state.pop(f'listing:{name}', None)
         return True
 
