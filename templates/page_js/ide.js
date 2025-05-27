@@ -1100,29 +1100,34 @@ with open("${filename}", "w") as f:
 with open("current_test.py", "w") as f:
     f.write("""${testCode.replace(/"""/g, '\\"\\"\\"')}""")
 
-# Run the tests
-try:
-    import current_test
-    # Run the tests
-    test_runner = unittest.TextTestRunner(verbosity=2)
-    test_suite = unittest.defaultTestLoader.loadTestsFromModule(current_test)
-    test_result = test_runner.run(test_suite)
-    
-    # Get the output
-    output = sys.stdout.getvalue()
-    
-    # Add summary
-    if test_result.wasSuccessful():
-        output += "\\n✅ All tests passed!\\n"
-    else:
-        output += f"\\n❌ {len(test_result.failures) + len(test_result.errors)} tests failed.\\n"
-    
-    # Return the output
-    sys.stdout = sys.__stdout__  # Reset stdout
-    return output
-except Exception as e:
-    sys.stdout = sys.__stdout__  # Reset stdout
-    return f"Error running tests: {str(e)}"
+# Define a function to run the tests
+def run_tests():
+    try:
+        import current_test
+        # Run the tests
+        test_runner = unittest.TextTestRunner(verbosity=2)
+        test_suite = unittest.defaultTestLoader.loadTestsFromModule(current_test)
+        test_result = test_runner.run(test_suite)
+        
+        # Get the output
+        output = sys.stdout.getvalue()
+        
+        # Add summary
+        if test_result.wasSuccessful():
+            output += "\\n✅ All tests passed!\\n"
+        else:
+            output += f"\\n❌ {len(test_result.failures) + len(test_result.errors)} tests failed.\\n"
+        
+        # Return the output
+        sys.stdout = sys.__stdout__  # Reset stdout
+        return output
+    except Exception as e:
+        sys.stdout = sys.__stdout__  # Reset stdout
+        return f"Error running tests: {str(e)}"
+
+# Call the function and get the result
+result = run_tests()
+result  # Return the result to JavaScript
 `;
 
         // Run the script
