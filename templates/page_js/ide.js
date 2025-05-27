@@ -1032,6 +1032,37 @@ async function runTests() {
             return;
         }
         
+        // Load sample files if they don't exist
+        // First, load the sample currency code if it doesn't exist
+        if (!Object.keys(files).includes('currency.py') && !Object.keys(files).includes('currency')) {
+            testOutput.innerHTML += 'Loading sample currency file...\n';
+            try {
+                const response = await fetch('templates/page_js/sample_currency.js');
+                const text = await response.text();
+                const match = text.match(/const sampleCurrencyCode = `([\s\S]*?)`;/);
+                if (match && match[1]) {
+                    files['currency.py'] = match[1];
+                }
+            } catch (error) {
+                testOutput.innerHTML += `Error loading sample currency: ${error.message}\n`;
+            }
+        }
+        
+        // Then, load the sample submission code if it doesn't exist
+        if (!Object.keys(files).includes('submission.s.py') && !Object.keys(files).includes('submission.s')) {
+            testOutput.innerHTML += 'Loading sample submission file...\n';
+            try {
+                const response = await fetch('templates/page_js/sample_submission.js');
+                const text = await response.text();
+                const match = text.match(/const sampleSubmissionCode = `([\s\S]*?)`;/);
+                if (match && match[1]) {
+                    files['submission.s.py'] = match[1];
+                }
+            } catch (error) {
+                testOutput.innerHTML += `Error loading sample submission: ${error.message}\n`;
+            }
+        }
+        
         // For each test file, run the tests
         for (const testFile of testFiles) {
             testOutput.innerHTML += `\nRunning tests from ${testFile}...\n`;
