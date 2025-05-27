@@ -108,6 +108,269 @@ function addNewTokenTab() {
     });
 }
 
+function addNewTestTab() {
+    let dropdown = document.querySelector('.dropdown-content');
+    if (dropdown) {
+        dropdown.remove();
+    }
+
+    let tab_name = prompt('Enter test file name (should start with "test_"):');
+    if (tab_name === null) {
+        return;
+    }
+
+    if (!tab_name.startsWith('test_')) {
+        tab_name = 'test_' + tab_name;
+    }
+
+    if (Object.keys(code_storage).includes(tab_name)) {
+        alert('File already exists!');
+        return;
+    }
+
+    if (tab_name.trim() === '') {
+        alert('File name cannot be empty!');
+        return;
+    }
+
+    // Template for a test file
+    const testTemplate = `import unittest
+from contracting.client import ContractingClient
+import os, sys
+from contracting.stdlib.bridge.time import Timedelta
+
+script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+os.chdir(script_dir)
+
+class TestContract(unittest.TestCase):
+
+    def setUp(self):
+        self.c = ContractingClient()
+        self.c.raw_driver.flush_full()
+
+        # Deploy your contract
+        with open("submission.s.py") as f:
+            contract = f.read()
+            self.c.raw_driver.set_contract(name="submission", code=contract)
+
+    def test_example(self):
+        # Write your test here
+        self.assertEqual(1, 1)
+
+if __name__ == '__main__':
+    unittest.main()
+`;
+
+    addTab(tab_name, testTemplate);
+    changeTab(tab_name);
+    refreshTabList();
+}
+
+function loadSampleTestFile() {
+    let dropdown = document.querySelector('.dropdown-content');
+    if (dropdown) {
+        dropdown.remove();
+    }
+
+    // Load the sample test code
+    fetch('templates/page_js/sample_test.js')
+        .then(response => response.text())
+        .then(text => {
+            // Extract the sample test code from the file
+            const match = text.match(/const sampleTestCode = `([\s\S]*?)`;/);
+            if (match && match[1]) {
+                const sampleCode = match[1];
+                
+                // Create a new tab with the sample test code
+                let tab_name = 'test_marketplace';
+                
+                // Check if the file already exists
+                if (Object.keys(code_storage).includes(tab_name)) {
+                    // Append a number to make it unique
+                    let counter = 1;
+                    while (Object.keys(code_storage).includes(tab_name + counter)) {
+                        counter++;
+                    }
+                    tab_name = tab_name + counter;
+                }
+                
+                addTab(tab_name, sampleCode);
+                changeTab(tab_name);
+                refreshTabList();
+            } else {
+                alert('Error loading sample test code!');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading sample test:', error);
+            alert('Error loading sample test!');
+        });
+}
+
+function loadSampleContractFile() {
+    let dropdown = document.querySelector('.dropdown-content');
+    if (dropdown) {
+        dropdown.remove();
+    }
+
+    // Load the sample contract code
+    fetch('templates/page_js/sample_contract.js')
+        .then(response => response.text())
+        .then(text => {
+            // Extract the sample contract code from the file
+            const match = text.match(/const sampleContractCode = `([\s\S]*?)`;/);
+            if (match && match[1]) {
+                const sampleCode = match[1];
+                
+                // Create a new tab with the sample contract code
+                let tab_name = 'con_xns_marketplace';
+                
+                // Check if the file already exists
+                if (Object.keys(code_storage).includes(tab_name)) {
+                    // Append a number to make it unique
+                    let counter = 1;
+                    while (Object.keys(code_storage).includes(tab_name + counter)) {
+                        counter++;
+                    }
+                    tab_name = tab_name + counter;
+                }
+                
+                addTab(tab_name, sampleCode);
+                changeTab(tab_name);
+                refreshTabList();
+            } else {
+                alert('Error loading sample contract code!');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading sample contract:', error);
+            alert('Error loading sample contract!');
+        });
+}
+
+function loadSampleCurrencyFile() {
+    let dropdown = document.querySelector('.dropdown-content');
+    if (dropdown) {
+        dropdown.remove();
+    }
+
+    // Load the sample currency code
+    fetch('templates/page_js/sample_currency.js')
+        .then(response => response.text())
+        .then(text => {
+            // Extract the sample currency code from the file
+            const match = text.match(/const sampleCurrencyCode = `([\s\S]*?)`;/);
+            if (match && match[1]) {
+                const sampleCode = match[1];
+                
+                // Create a new tab with the sample currency code
+                let tab_name = 'currency';
+                
+                // Check if the file already exists
+                if (Object.keys(code_storage).includes(tab_name)) {
+                    // Append a number to make it unique
+                    let counter = 1;
+                    while (Object.keys(code_storage).includes(tab_name + counter)) {
+                        counter++;
+                    }
+                    tab_name = tab_name + counter;
+                }
+                
+                addTab(tab_name, sampleCode);
+                changeTab(tab_name);
+                refreshTabList();
+            } else {
+                alert('Error loading sample currency code!');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading sample currency:', error);
+            alert('Error loading sample currency!');
+        });
+}
+
+function loadSampleNameServiceFile() {
+    let dropdown = document.querySelector('.dropdown-content');
+    if (dropdown) {
+        dropdown.remove();
+    }
+
+    // Load the sample name service code
+    fetch('templates/page_js/sample_nameservice.js')
+        .then(response => response.text())
+        .then(text => {
+            // Extract the sample name service code from the file
+            const match = text.match(/const sampleNameServiceCode = `([\s\S]*?)`;/);
+            if (match && match[1]) {
+                const sampleCode = match[1];
+                
+                // Create a new tab with the sample name service code
+                let tab_name = 'con_nameservice';
+                
+                // Check if the file already exists
+                if (Object.keys(code_storage).includes(tab_name)) {
+                    // Append a number to make it unique
+                    let counter = 1;
+                    while (Object.keys(code_storage).includes(tab_name + counter)) {
+                        counter++;
+                    }
+                    tab_name = tab_name + counter;
+                }
+                
+                addTab(tab_name, sampleCode);
+                changeTab(tab_name);
+                refreshTabList();
+            } else {
+                alert('Error loading sample name service code!');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading sample name service:', error);
+            alert('Error loading sample name service!');
+        });
+}
+
+function loadSampleSubmissionFile() {
+    let dropdown = document.querySelector('.dropdown-content');
+    if (dropdown) {
+        dropdown.remove();
+    }
+
+    // Load the sample submission code
+    fetch('templates/page_js/sample_submission.js')
+        .then(response => response.text())
+        .then(text => {
+            // Extract the sample submission code from the file
+            const match = text.match(/const sampleSubmissionCode = `([\s\S]*?)`;/);
+            if (match && match[1]) {
+                const sampleCode = match[1];
+                
+                // Create a new tab with the sample submission code
+                let tab_name = 'submission.s';
+                
+                // Check if the file already exists
+                if (Object.keys(code_storage).includes(tab_name)) {
+                    // Append a number to make it unique
+                    let counter = 1;
+                    while (Object.keys(code_storage).includes(tab_name + counter)) {
+                        counter++;
+                    }
+                    tab_name = tab_name + counter;
+                }
+                
+                addTab(tab_name, sampleCode);
+                changeTab(tab_name);
+                refreshTabList();
+            } else {
+                alert('Error loading sample submission code!');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading sample submission:', error);
+            alert('Error loading sample submission!');
+        });
+}
+
 
 
 function loadContractFromExplorer() {
@@ -189,6 +452,36 @@ function showDropdown() {
     newTokenTab.addEventListener('click', addNewTokenTab);
     newTokenTab.style.cursor = 'pointer';
 
+    let newTestTab = document.createElement('div');
+    newTestTab.innerHTML = 'New Test File';
+    newTestTab.addEventListener('click', addNewTestTab);
+    newTestTab.style.cursor = 'pointer';
+
+    let loadSampleTest = document.createElement('div');
+    loadSampleTest.innerHTML = 'Load Sample Test';
+    loadSampleTest.addEventListener('click', loadSampleTestFile);
+    loadSampleTest.style.cursor = 'pointer';
+
+    let loadSampleContract = document.createElement('div');
+    loadSampleContract.innerHTML = 'Load Sample Contract';
+    loadSampleContract.addEventListener('click', loadSampleContractFile);
+    loadSampleContract.style.cursor = 'pointer';
+
+    let loadSampleCurrency = document.createElement('div');
+    loadSampleCurrency.innerHTML = 'Load Sample Currency';
+    loadSampleCurrency.addEventListener('click', loadSampleCurrencyFile);
+    loadSampleCurrency.style.cursor = 'pointer';
+
+    let loadSampleNameService = document.createElement('div');
+    loadSampleNameService.innerHTML = 'Load Sample Name Service';
+    loadSampleNameService.addEventListener('click', loadSampleNameServiceFile);
+    loadSampleNameService.style.cursor = 'pointer';
+
+    let loadSampleSubmission = document.createElement('div');
+    loadSampleSubmission.innerHTML = 'Load Sample Submission';
+    loadSampleSubmission.addEventListener('click', loadSampleSubmissionFile);
+    loadSampleSubmission.style.cursor = 'pointer';
+
     let loadContract = document.createElement('div');
     loadContract.innerHTML = 'Load Contract';
     loadContract.addEventListener('click', loadContractFromExplorer);
@@ -196,6 +489,12 @@ function showDropdown() {
 
     dropdown.appendChild(newTab);
     dropdown.appendChild(newTokenTab);
+    dropdown.appendChild(newTestTab);
+    dropdown.appendChild(loadSampleTest);
+    dropdown.appendChild(loadSampleContract);
+    dropdown.appendChild(loadSampleCurrency);
+    dropdown.appendChild(loadSampleNameService);
+    dropdown.appendChild(loadSampleSubmission);
     dropdown.appendChild(loadContract);
 }
 
@@ -692,4 +991,121 @@ editor.on('change', saveCode);
 
 refreshTabList();
 
+// Test runner functionality
+document.getElementById('btn-ide-run-tests').addEventListener('click', runTests);
+
+async function runTests() {
+    // Show the test results container
+    document.getElementById('test-results').style.display = 'block';
+    const testOutput = document.getElementById('test-output');
+    testOutput.innerHTML = 'Running tests...\n';
+    
+    // Save all files first
+    saveCode();
+    
+    try {
+        // Get all files from code_storage
+        const files = {};
+        Object.keys(code_storage).forEach(filename => {
+            // Skip read-only files
+            if (!filename.endsWith('(Read-Only)')) {
+                files[filename] = code_storage[filename];
+            }
+        });
+        
+        // Check if there are any test files (files that start with 'test_')
+        const testFiles = Object.keys(files).filter(filename => filename.startsWith('test_'));
+        
+        if (testFiles.length === 0) {
+            testOutput.innerHTML += 'No test files found. Test files should start with "test_".\n';
+            return;
+        }
+        
+        // For each test file, run the tests
+        for (const testFile of testFiles) {
+            testOutput.innerHTML += `\nRunning tests from ${testFile}...\n`;
+            
+            // Create a Python environment with the necessary imports
+            const testCode = files[testFile];
+            
+            // Find all other files that might be needed by the test
+            const otherFiles = {};
+            Object.keys(files).forEach(filename => {
+                if (filename !== testFile && !filename.endsWith('(Read-Only)')) {
+                    otherFiles[filename] = files[filename];
+                }
+            });
+            
+            // Run the test using pyodide
+            try {
+                const result = await runTestWithPyodide(testCode, otherFiles);
+                testOutput.innerHTML += result;
+            } catch (error) {
+                testOutput.innerHTML += `Error running tests: ${error.message}\n`;
+            }
+        }
+    } catch (error) {
+        testOutput.innerHTML += `Error: ${error.message}\n`;
+    }
+}
+
+async function runTestWithPyodide(testCode, otherFiles) {
+    try {
+        // Create a Python script that sets up the test environment
+        let setupScript = `
+import sys
+import io
+import unittest
+from js import console
+
+# Redirect stdout to capture test output
+sys.stdout = io.StringIO()
+
+# Create files needed for tests
+`;
+
+        // Add all the other files that might be needed
+        Object.keys(otherFiles).forEach(filename => {
+            setupScript += `
+with open("${filename}", "w") as f:
+    f.write("""${otherFiles[filename].replace(/"""/g, '\\"\\"\\"')}""")
+`;
+        });
+
+        // Add the test file
+        setupScript += `
+# Create the test file
+with open("current_test.py", "w") as f:
+    f.write("""${testCode.replace(/"""/g, '\\"\\"\\"')}""")
+
+# Run the tests
+try:
+    import current_test
+    # Run the tests
+    test_runner = unittest.TextTestRunner(verbosity=2)
+    test_suite = unittest.defaultTestLoader.loadTestsFromModule(current_test)
+    test_result = test_runner.run(test_suite)
+    
+    # Get the output
+    output = sys.stdout.getvalue()
+    
+    # Add summary
+    if test_result.wasSuccessful():
+        output += "\\n✅ All tests passed!\\n"
+    else:
+        output += f"\\n❌ {len(test_result.failures) + len(test_result.errors)} tests failed.\\n"
+    
+    print(output)
+except Exception as e:
+    print(f"Error running tests: {str(e)}")
+`;
+
+        // Run the script
+        const result = await pyodide.runPythonAsync(setupScript);
+        return result;
+    } catch (error) {
+        console.error('Error in runTestWithPyodide:', error);
+        return `Error: ${error.message}\n`;
+    }
+}
 

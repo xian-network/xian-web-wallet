@@ -26,6 +26,11 @@
         <div id="wallet-actions" class="btn-group">
             <button class="btn btn-primary" id="btn-ide-submit-contract">Start Deployment</button>
             <button class="btn btn-secondary" id="btn-ide-go-to-wallet" style="display:none">Back</button>
+            <button class="btn btn-info" id="btn-ide-run-tests">Run Tests</button>
+        </div>
+        <div id="test-results" class="test-results" style="display: none;">
+            <h3>Test Results</h3>
+            <div id="test-output"></div>
         </div>
     </div>
 </div>
@@ -154,6 +159,34 @@
     .function-args
     {
         flex:auto;
+    }
+    .test-results {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 10px;
+        background-color: #f8f9fa;
+        overflow: auto;
+        max-height: 400px;
+    }
+    .dark-mode .test-results {
+        background-color: #121212;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #e4e6eb;
+    }
+    .test-pass {
+        color: #28a745;
+    }
+    .test-fail {
+        color: #dc3545;
+    }
+    .test-error {
+        color: #ffc107;
+    }
+    #test-output {
+        font-family: monospace;
+        white-space: pre-wrap;
+        word-break: break-word;
     }
 </style>
 <script src="templates/page_js/ide.js"></script>
