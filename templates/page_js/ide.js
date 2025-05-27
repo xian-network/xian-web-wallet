@@ -1202,11 +1202,25 @@ def run_tests():
         # Get the output
         output = sys.stdout.getvalue()
         
-        # Add summary
+        # Add summary and details of failures
         if test_result.wasSuccessful():
             output += "\\n✅ All tests passed!\\n"
         else:
             output += f"\\n❌ {len(test_result.failures) + len(test_result.errors)} tests failed.\\n"
+            
+            # Add details of failures
+            if test_result.failures:
+                output += "\\nFAILURES:\\n"
+                for test, error in test_result.failures:
+                    output += f"\\n{test}\\n"
+                    output += f"{error}\\n"
+            
+            # Add details of errors
+            if test_result.errors:
+                output += "\\nERRORS:\\n"
+                for test, error in test_result.errors:
+                    output += f"\\n{test}\\n"
+                    output += f"{error}\\n"
         
         # Return the output
         sys.stdout = sys.__stdout__  # Reset stdout
