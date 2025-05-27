@@ -36,6 +36,12 @@ function changeTab(tab_name) {
         buildFunctionBoxes();
         document.getElementById('function-boxes').style.display = 'flex';
     }
+    else if (current_tab.startsWith('test_')) {
+        editor.setOption('readOnly', false);
+        editor.setOption('lint', false); // Disable linting for test files
+        document.getElementById('submission-form').style.display = 'block';
+        document.getElementById('function-boxes').style.display = 'none';
+    }
     else {
         editor.setOption('readOnly', false);
         editor.setOption('lint', true);
@@ -521,6 +527,11 @@ function showDropdown() {
 
 async function lintCode(code){   
     try{
+        // Skip linting for test files
+        if (current_tab && current_tab.startsWith('test_')) {
+            return [];
+        }
+        
         const result = await pyodide.runPythonAsync(`
 from xian_contracting_linter import lint_code
 lint_code("""${code}""")
