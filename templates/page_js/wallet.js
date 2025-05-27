@@ -315,7 +315,8 @@ document.getElementById('wallet-tokens-tab').addEventListener('click', function(
 });
 
 document.getElementById('local-activity-tab').addEventListener('click', function() {
-    changeWalletTab('local-activity');
+    // Create new tab with explorer
+    window.open(EXPLORER + '/addresses/' + publicKey, '_blank');
 });
 
 document.getElementById('wallet-nfts-tab').addEventListener('click', function() {

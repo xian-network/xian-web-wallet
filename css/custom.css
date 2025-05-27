@@ -597,8 +597,7 @@ a:hover{
   }
   
   /* Hover effect */
-  .wallet-tabs a:hover,
-  .wallet-tabs a:focus {
+  .wallet-tabs a:hover {
     background: rgba(0, 247, 224, 0.08);
     color: #06e6cb;
   }
@@ -942,8 +941,16 @@ a:hover{
         height: 0;
         overflow-y: auto;
 }
+@media screen and (max-width: 768px) {
+    .messenger-inbox-body {
+        min-height: 200px; /* Ensures the inbox has a minimum height */
+    }
+    
+}
 .messenger-inbox-item-active {
-    background-color: #494a50;
+    background-color: #0d0d0d;
+        border: 1px solid #8a8b8e!important;
+        color: #e4e6eb;
 }
 
 .messenger-inbox-item {
