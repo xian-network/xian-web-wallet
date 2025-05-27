@@ -142,26 +142,36 @@ function addNewTestTab() {
     // Template for a test file
     const testTemplate = `import unittest
 from contracting.client import ContractingClient
-import os, sys
-from contracting.stdlib.bridge.time import Timedelta
 
-script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
-os.chdir(script_dir)
-
-class TestContract(unittest.TestCase):
-
+class SimpleTest(unittest.TestCase):
     def setUp(self):
-        self.c = ContractingClient()
-        self.c.raw_driver.flush_full()
-
-        # Deploy your contract
+        # Create a new client
+        self.client = ContractingClient()
+        self.client.raw_driver.flush_full()
+        
+        # Load the submission contract
         with open("submission.s.py") as f:
             contract = f.read()
-            self.c.raw_driver.set_contract(name="submission", code=contract)
-
+            self.client.raw_driver.set_contract(name="submission", code=contract)
+        
+        # Load the currency contract
+        with open("currency.py") as f:
+            code = f.read()
+            self.client.submit(
+                code,
+                name='currency',
+                constructor_args={'vk': 'sys'}
+            )
+        
+        # Get the currency contract
+        self.currency = self.client.get_contract('currency')
+    
     def test_example(self):
         # Write your test here
         self.assertEqual(1, 1)
+        
+        # Example: Test currency balance
+        self.assertEqual(self.currency.balance_of(account='sys'), 1_000_000)
 
 if __name__ == '__main__':
     unittest.main()
@@ -463,31 +473,6 @@ function showDropdown() {
     newTestTab.addEventListener('click', addNewTestTab);
     newTestTab.style.cursor = 'pointer';
 
-    let loadSampleTest = document.createElement('div');
-    loadSampleTest.innerHTML = 'Load Sample Test';
-    loadSampleTest.addEventListener('click', loadSampleTestFile);
-    loadSampleTest.style.cursor = 'pointer';
-
-    let loadSampleContract = document.createElement('div');
-    loadSampleContract.innerHTML = 'Load Sample Contract';
-    loadSampleContract.addEventListener('click', loadSampleContractFile);
-    loadSampleContract.style.cursor = 'pointer';
-
-    let loadSampleCurrency = document.createElement('div');
-    loadSampleCurrency.innerHTML = 'Load Sample Currency';
-    loadSampleCurrency.addEventListener('click', loadSampleCurrencyFile);
-    loadSampleCurrency.style.cursor = 'pointer';
-
-    let loadSampleNameService = document.createElement('div');
-    loadSampleNameService.innerHTML = 'Load Sample Name Service';
-    loadSampleNameService.addEventListener('click', loadSampleNameServiceFile);
-    loadSampleNameService.style.cursor = 'pointer';
-
-    let loadSampleSubmission = document.createElement('div');
-    loadSampleSubmission.innerHTML = 'Load Sample Submission';
-    loadSampleSubmission.addEventListener('click', loadSampleSubmissionFile);
-    loadSampleSubmission.style.cursor = 'pointer';
-
     let loadContract = document.createElement('div');
     loadContract.innerHTML = 'Load Contract';
     loadContract.addEventListener('click', loadContractFromExplorer);
@@ -496,11 +481,6 @@ function showDropdown() {
     dropdown.appendChild(newTab);
     dropdown.appendChild(newTokenTab);
     dropdown.appendChild(newTestTab);
-    dropdown.appendChild(loadSampleTest);
-    dropdown.appendChild(loadSampleContract);
-    dropdown.appendChild(loadSampleCurrency);
-    dropdown.appendChild(loadSampleNameService);
-    dropdown.appendChild(loadSampleSubmission);
     dropdown.appendChild(loadContract);
 }
 
@@ -1137,9 +1117,12 @@ try:
     else:
         output += f"\\n❌ {len(test_result.failures) + len(test_result.errors)} tests failed.\\n"
     
-    print(output)
+    # Return the output
+    sys.stdout = sys.__stdout__  # Reset stdout
+    return output
 except Exception as e:
-    print(f"Error running tests: {str(e)}")
+    sys.stdout = sys.__stdout__  # Reset stdout
+    return f"Error running tests: {str(e)}"
 `;
 
         // Run the script
