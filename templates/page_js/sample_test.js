@@ -9,25 +9,15 @@ class SimpleTest(unittest.TestCase):
         self.client = ContractingClient()
         self.client.raw_driver.flush_full()
         
-        # Load the submission contract
-        with open("submission.s.py") as f:
-            contract = f.read()
-            self.client.raw_driver.set_contract(name="submission", code=contract)
-        
-        # Load the currency contract
-        with open("currency.py") as f:
-            code = f.read()
-            self.client.submit(
-                code,
-                name='currency',
-                constructor_args={'vk': 'sys'}
-            )
-        
         # Get the currency contract
         self.currency = self.client.get_contract('currency')
+        
+        # Get the submission contract
+        self.submission = self.client.get_contract('submission')
     
     def test_currency_balance(self):
-        # Test that the currency contract works
+        """Test basic currency operations"""
+        # Initial balance check
         self.assertEqual(self.currency.balance_of(account='sys'), 1_000_000)
         
         # Transfer some currency
@@ -38,6 +28,7 @@ class SimpleTest(unittest.TestCase):
         self.assertEqual(self.currency.balance_of(account='user1'), 100)
     
     def test_currency_approval(self):
+        """Test currency approval and transfer_from"""
         # Test the approval functionality
         self.currency.approve(amount=50, to='user2', signer='sys')
         
@@ -51,6 +42,16 @@ class SimpleTest(unittest.TestCase):
         self.assertEqual(self.currency.balance_of(account='sys'), 999_970)
         self.assertEqual(self.currency.balance_of(account='user3'), 30)
         self.assertEqual(self.currency.allowance(owner='sys', spender='user2'), 20)
+        
+    def test_submission_contract(self):
+        """Test your submission contract here"""
+        # Add tests for your submission contract
+        # For example:
+        # result = self.submission.some_method(param1='value1', signer='user1')
+        # self.assertEqual(result, expected_value)
+        
+        # This is a placeholder test that always passes
+        self.assertTrue(True)
 
 if __name__ == '__main__':
     unittest.main()
