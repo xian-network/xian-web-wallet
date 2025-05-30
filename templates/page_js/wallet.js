@@ -1,5 +1,38 @@
 var token_list = JSON.parse(localStorage.getItem("token_list")) || ["currency"];
 
+async function syncTokenList() {
+    try {
+        const response = await fetch("https://snakexchange.org/scripts/tokenlist.txt");
+        const text = await response.text();
+        const lines = text.trim().split('\n');
+
+        // Extract contracts
+        const contracts = lines.map(line => line.split(";")[2]).filter(Boolean);
+
+        let storedTokens = JSON.parse(localStorage.getItem("token_list")) || ["currency"];
+        let removedTokens = JSON.parse(localStorage.getItem("removed_token_list")) || [];
+        let updated = false;
+
+        contracts.forEach(contract => {
+            if (!storedTokens.includes(contract) && !removedTokens.includes(contract)) {
+                storedTokens.push(contract);
+                updated = true;
+            }
+        });
+
+        if (updated) {
+            localStorage.setItem("token_list", JSON.stringify(storedTokens));
+        }
+
+        // Reflect updated list globally
+        token_list = storedTokens;
+    } catch (e) {
+        console.error("Failed to sync token list:", e);
+    }
+}
+
+
+
 async function getNFTData(nftKey) {
     let graphQLEndpoint = RPC + "/graphql";
     let nftData = await fetch(graphQLEndpoint, {
@@ -284,10 +317,19 @@ function receiveTokenScreen() {
 function removeToken(contract) {
     let confirmation = confirm("Are you sure you want to remove this token?");
     if (!confirmation) return;
+
     token_list = token_list.filter((token) => token !== contract);
     localStorage.setItem("token_list", JSON.stringify(token_list));
+
+    let removedTokens = JSON.parse(localStorage.getItem("removed_token_list")) || [];
+    if (!removedTokens.includes(contract)) {
+        removedTokens.push(contract);
+        localStorage.setItem("removed_token_list", JSON.stringify(removedTokens));
+    }
+
     loadWalletPage();
-  }
+}
+
 
 
   function refreshBalance(contract) {
@@ -344,5 +386,4 @@ document.getElementById('wallet-copy-address').addEventListener('click', functio
 document.getElementById('wallet-send-adv-tx').addEventListener('click', function() {
     changePage('send-advanced-transaction');
 });
-
-loadWalletPage();
+syncTokenList().then(loadWalletPage);

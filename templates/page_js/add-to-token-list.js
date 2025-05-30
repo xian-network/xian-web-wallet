@@ -32,12 +32,21 @@ function addToken() {
           }
 
           if (!token_list.includes(contractNameAddToken)) {
-              token_list.push(contractNameAddToken);
-              localStorage.setItem("token_list", JSON.stringify(token_list));
-              successMsg.style.display = "block";
-              successMsg.innerHTML = "Token added successfully!";
-              btnAddToken.innerHTML = "Add Token";
-          } else {
+            token_list.push(contractNameAddToken);
+            localStorage.setItem("token_list", JSON.stringify(token_list));
+        
+            // ✅ Also remove it from the blacklist if it was blacklisted
+            let removedTokens = JSON.parse(localStorage.getItem("removed_token_list")) || [];
+            if (removedTokens.includes(contractNameAddToken)) {
+                removedTokens = removedTokens.filter(c => c !== contractNameAddToken);
+                localStorage.setItem("removed_token_list", JSON.stringify(removedTokens));
+            }
+        
+            successMsg.style.display = "block";
+            successMsg.innerHTML = "Token added successfully!";
+            btnAddToken.innerHTML = "Add Token";
+        }
+        else {
               errorMsg.style.display = "block";
               errorMsg.innerHTML = "Token already exists!";
               btnAddToken.innerHTML = "Add Token";
