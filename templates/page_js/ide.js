@@ -36,6 +36,12 @@ function changeTab(tab_name) {
         buildFunctionBoxes();
         document.getElementById('function-boxes').style.display = 'flex';
     }
+    else if (current_tab.startsWith('test_')) {
+        editor.setOption('readOnly', false);
+        editor.setOption('lint', false); // Disable linting for test files
+        document.getElementById('submission-form').style.display = 'block';
+        document.getElementById('function-boxes').style.display = 'none';
+    }
     else {
         editor.setOption('readOnly', false);
         editor.setOption('lint', true);
@@ -106,6 +112,281 @@ function addNewTokenTab() {
             alert('Error loading token contract!');
         });
     });
+}
+
+function addNewTestTab() {
+    let dropdown = document.querySelector('.dropdown-content');
+    if (dropdown) {
+        dropdown.remove();
+    }
+
+    let tab_name = prompt('Enter test file name (should start with "test_"):');
+    if (tab_name === null) {
+        return;
+    }
+
+    if (!tab_name.startsWith('test_')) {
+        tab_name = 'test_' + tab_name;
+    }
+
+    if (Object.keys(code_storage).includes(tab_name)) {
+        alert('File already exists!');
+        return;
+    }
+
+    if (tab_name.trim() === '') {
+        alert('File name cannot be empty!');
+        return;
+    }
+
+    // Template for a test file
+    const testTemplate = `import unittest
+from contracting.client import ContractingClient
+
+class SimpleTest(unittest.TestCase):
+    def setUp(self):
+        # Create a new client
+        self.client = ContractingClient()
+        
+        # Get the currency contract
+        self.currency = self.client.get_contract('currency')
+        
+        # Get the submission contract
+        self.submission = self.client.get_contract('submission')
+    
+    def test_currency_basic(self):
+        """Test basic currency operations"""
+        # Initial balance check
+        self.assertEqual(self.currency.balance_of(account='sys'), 1_000_000)
+        self.assertEqual(self.currency.balance_of(account='user1'), 0)
+        
+        # Test currency transfer
+        self.currency.transfer(amount=100, to='user1', signer='sys')
+        self.assertEqual(self.currency.balance_of(account='sys'), 999_900)
+        self.assertEqual(self.currency.balance_of(account='user1'), 100)
+        
+        # Test insufficient balance
+        with self.assertRaises(AssertionError):
+            self.currency.transfer(amount=2_000_000, to='user2', signer='sys')
+    
+    def test_submission_contract(self):
+        """Test your submission contract"""
+        # This is a placeholder test
+        # Replace with actual tests for your submission contract
+        self.assertEqual(self.submission.get(), 0)
+
+if __name__ == '__main__':
+    unittest.main()
+`;
+
+    addTab(tab_name, testTemplate);
+    changeTab(tab_name);
+    refreshTabList();
+}
+
+function loadSampleTestFile() {
+    let dropdown = document.querySelector('.dropdown-content');
+    if (dropdown) {
+        dropdown.remove();
+    }
+
+    // Load the sample test code
+    fetch('templates/page_js/sample_test.js')
+        .then(response => response.text())
+        .then(text => {
+            // Extract the sample test code from the file
+            const match = text.match(/const sampleTestCode = `([\s\S]*?)`;/);
+            if (match && match[1]) {
+                const sampleCode = match[1];
+                
+                // Create a new tab with the sample test code
+                let tab_name = 'test_marketplace';
+                
+                // Check if the file already exists
+                if (Object.keys(code_storage).includes(tab_name)) {
+                    // Append a number to make it unique
+                    let counter = 1;
+                    while (Object.keys(code_storage).includes(tab_name + counter)) {
+                        counter++;
+                    }
+                    tab_name = tab_name + counter;
+                }
+                
+                addTab(tab_name, sampleCode);
+                changeTab(tab_name);
+                refreshTabList();
+            } else {
+                alert('Error loading sample test code!');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading sample test:', error);
+            alert('Error loading sample test!');
+        });
+}
+
+function loadSampleContractFile() {
+    let dropdown = document.querySelector('.dropdown-content');
+    if (dropdown) {
+        dropdown.remove();
+    }
+
+    // Load the sample contract code
+    fetch('templates/page_js/sample_contract.js')
+        .then(response => response.text())
+        .then(text => {
+            // Extract the sample contract code from the file
+            const match = text.match(/const sampleContractCode = `([\s\S]*?)`;/);
+            if (match && match[1]) {
+                const sampleCode = match[1];
+                
+                // Create a new tab with the sample contract code
+                let tab_name = 'con_xns_marketplace';
+                
+                // Check if the file already exists
+                if (Object.keys(code_storage).includes(tab_name)) {
+                    // Append a number to make it unique
+                    let counter = 1;
+                    while (Object.keys(code_storage).includes(tab_name + counter)) {
+                        counter++;
+                    }
+                    tab_name = tab_name + counter;
+                }
+                
+                addTab(tab_name, sampleCode);
+                changeTab(tab_name);
+                refreshTabList();
+            } else {
+                alert('Error loading sample contract code!');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading sample contract:', error);
+            alert('Error loading sample contract!');
+        });
+}
+
+function loadSampleCurrencyFile() {
+    let dropdown = document.querySelector('.dropdown-content');
+    if (dropdown) {
+        dropdown.remove();
+    }
+
+    // Load the sample currency code
+    fetch('templates/page_js/sample_currency.js')
+        .then(response => response.text())
+        .then(text => {
+            // Extract the sample currency code from the file
+            const match = text.match(/const sampleCurrencyCode = `([\s\S]*?)`;/);
+            if (match && match[1]) {
+                const sampleCode = match[1];
+                
+                // Create a new tab with the sample currency code
+                let tab_name = 'currency';
+                
+                // Check if the file already exists
+                if (Object.keys(code_storage).includes(tab_name)) {
+                    // Append a number to make it unique
+                    let counter = 1;
+                    while (Object.keys(code_storage).includes(tab_name + counter)) {
+                        counter++;
+                    }
+                    tab_name = tab_name + counter;
+                }
+                
+                addTab(tab_name, sampleCode);
+                changeTab(tab_name);
+                refreshTabList();
+            } else {
+                alert('Error loading sample currency code!');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading sample currency:', error);
+            alert('Error loading sample currency!');
+        });
+}
+
+function loadSampleNameServiceFile() {
+    let dropdown = document.querySelector('.dropdown-content');
+    if (dropdown) {
+        dropdown.remove();
+    }
+
+    // Load the sample name service code
+    fetch('templates/page_js/sample_nameservice.js')
+        .then(response => response.text())
+        .then(text => {
+            // Extract the sample name service code from the file
+            const match = text.match(/const sampleNameServiceCode = `([\s\S]*?)`;/);
+            if (match && match[1]) {
+                const sampleCode = match[1];
+                
+                // Create a new tab with the sample name service code
+                let tab_name = 'con_nameservice';
+                
+                // Check if the file already exists
+                if (Object.keys(code_storage).includes(tab_name)) {
+                    // Append a number to make it unique
+                    let counter = 1;
+                    while (Object.keys(code_storage).includes(tab_name + counter)) {
+                        counter++;
+                    }
+                    tab_name = tab_name + counter;
+                }
+                
+                addTab(tab_name, sampleCode);
+                changeTab(tab_name);
+                refreshTabList();
+            } else {
+                alert('Error loading sample name service code!');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading sample name service:', error);
+            alert('Error loading sample name service!');
+        });
+}
+
+function loadSampleSubmissionFile() {
+    let dropdown = document.querySelector('.dropdown-content');
+    if (dropdown) {
+        dropdown.remove();
+    }
+
+    // Load the sample submission code
+    fetch('templates/page_js/sample_submission.js')
+        .then(response => response.text())
+        .then(text => {
+            // Extract the sample submission code from the file
+            const match = text.match(/const sampleSubmissionCode = `([\s\S]*?)`;/);
+            if (match && match[1]) {
+                const sampleCode = match[1];
+                
+                // Create a new tab with the sample submission code
+                let tab_name = 'submission.s';
+                
+                // Check if the file already exists
+                if (Object.keys(code_storage).includes(tab_name)) {
+                    // Append a number to make it unique
+                    let counter = 1;
+                    while (Object.keys(code_storage).includes(tab_name + counter)) {
+                        counter++;
+                    }
+                    tab_name = tab_name + counter;
+                }
+                
+                addTab(tab_name, sampleCode);
+                changeTab(tab_name);
+                refreshTabList();
+            } else {
+                alert('Error loading sample submission code!');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading sample submission:', error);
+            alert('Error loading sample submission!');
+        });
 }
 
 
@@ -189,6 +470,11 @@ function showDropdown() {
     newTokenTab.addEventListener('click', addNewTokenTab);
     newTokenTab.style.cursor = 'pointer';
 
+    let newTestTab = document.createElement('div');
+    newTestTab.innerHTML = 'New Test File';
+    newTestTab.addEventListener('click', addNewTestTab);
+    newTestTab.style.cursor = 'pointer';
+
     let loadContract = document.createElement('div');
     loadContract.innerHTML = 'Load Contract';
     loadContract.addEventListener('click', loadContractFromExplorer);
@@ -196,6 +482,7 @@ function showDropdown() {
 
     dropdown.appendChild(newTab);
     dropdown.appendChild(newTokenTab);
+    dropdown.appendChild(newTestTab);
     dropdown.appendChild(loadContract);
 }
 
@@ -222,6 +509,11 @@ function showDropdown() {
 
 async function lintCode(code){   
     try{
+        // Skip linting for test files
+        if (current_tab && current_tab.startsWith('test_')) {
+            return [];
+        }
+        
         const result = await pyodide.runPythonAsync(`
 from xian_contracting_linter import lint_code
 lint_code("""${code}""")
@@ -692,4 +984,338 @@ editor.on('change', saveCode);
 
 refreshTabList();
 
+// Test runner functionality
+document.getElementById('btn-ide-run-tests').addEventListener('click', runTests);
+
+async function runTests() {
+    // Show the test results container
+    document.getElementById('test-results').style.display = 'block';
+    const testOutput = document.getElementById('test-output');
+    testOutput.innerHTML = 'Running tests...\n';
+    
+    // Save all files first
+    saveCode();
+    
+    try {
+        // Get all files from code_storage
+        const files = {};
+        Object.keys(code_storage).forEach(filename => {
+            // Skip read-only files
+            if (!filename.endsWith('(Read-Only)')) {
+                files[filename] = code_storage[filename];
+            }
+        });
+        
+        // Check if there are any test files (files that start with 'test_')
+        const testFiles = Object.keys(files).filter(filename => filename.startsWith('test_'));
+        
+        if (testFiles.length === 0) {
+            testOutput.innerHTML += 'No test files found. Test files should start with "test_".\n';
+            return;
+        }
+        
+        // Load sample files if they don't exist
+        // First, load the sample currency code if it doesn't exist
+        if (!Object.keys(files).includes('currency.py') && !Object.keys(files).includes('currency')) {
+            testOutput.innerHTML += 'Loading sample currency file...\n';
+            try {
+                const response = await fetch('templates/page_js/sample_currency.js');
+                const text = await response.text();
+                const match = text.match(/const sampleCurrencyCode = `([\s\S]*?)`;/);
+                if (match && match[1]) {
+                    files['currency.py'] = match[1];
+                }
+            } catch (error) {
+                testOutput.innerHTML += `Error loading sample currency: ${error.message}\n`;
+            }
+        }
+        
+        // Then, load the sample submission code if it doesn't exist
+        if (!Object.keys(files).includes('submission.s.py') && !Object.keys(files).includes('submission.s')) {
+            testOutput.innerHTML += 'Loading sample submission file...\n';
+            try {
+                const response = await fetch('templates/page_js/sample_submission.js');
+                const text = await response.text();
+                const match = text.match(/const sampleSubmissionCode = `([\s\S]*?)`;/);
+                if (match && match[1]) {
+                    files['submission.s.py'] = match[1];
+                }
+            } catch (error) {
+                testOutput.innerHTML += `Error loading sample submission: ${error.message}\n`;
+            }
+        }
+        
+        // For each test file, run the tests
+        for (const testFile of testFiles) {
+            testOutput.innerHTML += `\nRunning tests from ${testFile}...\n`;
+            
+            // Create a Python environment with the necessary imports
+            const testCode = files[testFile];
+            
+            // Find all other files that might be needed by the test
+            const otherFiles = {};
+            Object.keys(files).forEach(filename => {
+                if (filename !== testFile && !filename.endsWith('(Read-Only)')) {
+                    otherFiles[filename] = files[filename];
+                }
+            });
+            
+            // Run the test using pyodide
+            try {
+                const result = await runTestWithPyodide(testCode, otherFiles);
+                testOutput.innerHTML += result;
+            } catch (error) {
+                testOutput.innerHTML += `Error running tests: ${error.message}\n`;
+            }
+        }
+    } catch (error) {
+        testOutput.innerHTML += `Error: ${error.message}\n`;
+    }
+}
+
+async function runTestWithPyodide(testCode, otherFiles) {
+    try {
+        // Create a Python script that sets up the test environment
+        let setupScript = `
+import sys
+import io
+import unittest
+from js import console
+
+# Redirect stdout to capture test output
+sys.stdout = io.StringIO()
+
+# Create a mock contracting module
+sys.modules['contracting'] = type('', (), {})()
+sys.modules['contracting.client'] = type('', (), {})()
+sys.modules['contracting.stdlib'] = type('', (), {})()
+sys.modules['contracting.stdlib.bridge'] = type('', (), {})()
+sys.modules['contracting.stdlib.bridge.time'] = type('', (), {})()
+
+# Mock ContractingClient class
+class MockContract:
+    def __init__(self, name):
+        self.name = name
+        self._state = {}
+        
+        # Initialize default values based on contract name
+        if name == 'currency':
+            # Default balances for currency contract
+            self._state['balance:sys'] = 1_000_000
+            self._state['fee_percent'] = 1
+        elif name == 'submission':
+            # Default state for submission contract
+            self._state['value'] = 0
+        
+    def get(self):
+        return self._state.get('value', 0)
+        
+    def balance_of(self, account):
+        # Only return default for 'sys', all others start at 0
+        if account == 'sys' and f'balance:{account}' not in self._state:
+            return 1_000_000
+        return self._state.get(f'balance:{account}', 0)
+        
+    def allowance(self, owner, spender):
+        return self._state.get(f'allowance:{owner}:{spender}', 0)
+        
+    def transfer(self, amount, to, signer):
+        # Check if sender has enough balance
+        current_balance = self.balance_of(signer)
+        if current_balance < amount:
+            raise AssertionError(f"Insufficient balance: {current_balance} < {amount}")
+            
+        # Update balances
+        self._state[f'balance:{signer}'] = current_balance - amount
+        self._state[f'balance:{to}'] = self.balance_of(to) + amount
+        return True
+        
+    def approve(self, amount, to, signer):
+        # Check if amount is valid
+        if amount < 0:
+            raise AssertionError(f"Invalid approval amount: {amount}")
+            
+        self._state[f'allowance:{signer}:{to}'] = amount
+        return True
+        
+    def transfer_from(self, amount, to, main_account, signer):
+        # Check allowance
+        current_allowance = self.allowance(main_account, signer)
+        if current_allowance < amount:
+            raise AssertionError(f"Insufficient allowance: {current_allowance} < {amount}")
+            
+        # Check balance
+        current_balance = self.balance_of(main_account)
+        if current_balance < amount:
+            raise AssertionError(f"Insufficient balance: {current_balance} < {amount}")
+            
+        # Update state
+        self._state[f'balance:{main_account}'] = current_balance - amount
+        self._state[f'balance:{to}'] = self.balance_of(to) + amount
+        self._state[f'allowance:{main_account}:{signer}'] = current_allowance - amount
+        return True
+        
+    def set_enabled(self, state, signer):
+        # Only sys can change enabled state
+        if signer != 'sys':
+            raise AssertionError(f"Only sys can set enabled state, got: {signer}")
+            
+        self._state['enabled'] = state
+        
+    def set_contract_allowlist(self, contracts, signer):
+        # Only sys can set allowlist
+        if signer != 'sys':
+            raise AssertionError(f"Only sys can set contract allowlist, got: {signer}")
+            
+        self._state['allowlist'] = contracts
+        
+    def set_fee_percent(self, pct, signer):
+        # Only sys can set fee percent
+        if signer != 'sys':
+            raise AssertionError(f"Only sys can set fee percent, got: {signer}")
+            
+        # Fee percent must be between 0 and 100
+        if pct < 0 or pct > 100:
+            raise AssertionError(f"Fee percent must be between 0 and 100, got: {pct}")
+            
+        self._state['fee_percent'] = pct
+        
+    def mint_name(self, name, signer):
+        # Check if name already exists
+        if f'owner:{name}' in self._state:
+            raise AssertionError(f"Name already exists: {name}")
+            
+        self._state[f'owner:{name}'] = signer
+        return True
+        
+    def is_owner(self, name, address):
+        return self._state.get(f'owner:{name}') == address
+        
+    def list_name(self, name, price, signer):
+        # Check if signer is owner
+        if not self.is_owner(name, signer):
+            raise AssertionError(f"Only owner can list name, got: {signer}")
+            
+        # Check if already listed
+        if f'listing:{name}' in self._state:
+            raise AssertionError(f"Name already listed: {name}")
+            
+        self._state[f'listing:{name}'] = {'seller': signer, 'price': price}
+        return True
+        
+    def get_listing(self, name):
+        return self._state.get(f'listing:{name}')
+        
+    def buy_name(self, name, signer):
+        listing = self.get_listing(name)
+        if not listing:
+            raise AssertionError(f"Name not listed: {name}")
+            
+        # Update ownership
+        self._state[f'owner:{name}'] = signer
+        self._state.pop(f'listing:{name}', None)
+        return True
+        
+    def cancel_listing(self, name, signer):
+        listing = self.get_listing(name)
+        if not listing:
+            raise AssertionError(f"Name not listed: {name}")
+            
+        # Check if signer is seller
+        if listing['seller'] != signer:
+            raise AssertionError(f"Only seller can cancel listing, got: {signer}")
+            
+        self._state.pop(f'listing:{name}', None)
+        return True
+
+class MockContractingClient:
+    def __init__(self):
+        # Create a proper mock for raw_driver with correct lambda functions
+        self.raw_driver = type('MockDriver', (), {})()
+        self.raw_driver.flush_full = lambda: None
+        self.raw_driver.set_contract = lambda name, code: None
+        self._contracts = {}
+        
+    def submit(self, code, name, constructor_args=None, signer=None):
+        self._contracts[name] = MockContract(name)
+        return True
+        
+    def get_contract(self, name):
+        if name not in self._contracts:
+            self._contracts[name] = MockContract(name)
+        return self._contracts[name]
+
+# Add the mock classes to the contracting module
+sys.modules['contracting.client'].ContractingClient = MockContractingClient
+sys.modules['contracting.stdlib.bridge.time'].Timedelta = lambda days=0: days * 24 * 60 * 60
+
+# Create files needed for tests
+`;
+
+        // Add all the other files that might be needed
+        Object.keys(otherFiles).forEach(filename => {
+            setupScript += `
+with open("${filename}", "w") as f:
+    f.write("""${otherFiles[filename].replace(/"""/g, '\\"\\"\\"')}""")
+`;
+        });
+
+        // Add the test file
+        setupScript += `
+# Create the test file
+with open("current_test.py", "w") as f:
+    f.write("""${testCode.replace(/"""/g, '\\"\\"\\"')}""")
+
+# Define a function to run the tests
+def run_tests():
+    try:
+        import current_test
+        # Run the tests
+        test_runner = unittest.TextTestRunner(verbosity=2)
+        test_suite = unittest.defaultTestLoader.loadTestsFromModule(current_test)
+        test_result = test_runner.run(test_suite)
+        
+        # Get the output
+        output = sys.stdout.getvalue()
+        
+        # Add summary and details of failures
+        if test_result.wasSuccessful():
+            output += "\\n✅ All tests passed!\\n"
+        else:
+            output += f"\\n❌ {len(test_result.failures) + len(test_result.errors)} tests failed.\\n"
+            
+            # Add details of failures
+            if test_result.failures:
+                output += "\\nFAILURES:\\n"
+                for test, error in test_result.failures:
+                    output += f"\\n{test}\\n"
+                    output += f"{error}\\n"
+            
+            # Add details of errors
+            if test_result.errors:
+                output += "\\nERRORS:\\n"
+                for test, error in test_result.errors:
+                    output += f"\\n{test}\\n"
+                    output += f"{error}\\n"
+        
+        # Return the output
+        sys.stdout = sys.__stdout__  # Reset stdout
+        return output
+    except Exception as e:
+        sys.stdout = sys.__stdout__  # Reset stdout
+        return f"Error running tests: {str(e)}"
+
+# Call the function and get the result
+result = run_tests()
+result  # Return the result to JavaScript
+`;
+
+        // Run the script
+        const result = await pyodide.runPythonAsync(setupScript);
+        return result;
+    } catch (error) {
+        console.error('Error in runTestWithPyodide:', error);
+        return `Error: ${error.message}\n`;
+    }
+}
 
