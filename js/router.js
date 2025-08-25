@@ -27,16 +27,39 @@ function createExternalWindow(page, some_data = null, send_response = null) {
       .then((response) => response.text())
       .then((htmlContent) => {
         if (!externalWindow || externalWindow.closed) {
-          externalWindow = window.open("index-external.html", "", "width=400,height=600" + popup_params(400, 600));
-          externalWindow.onload = () => {
-            externalWindow.postMessage({
-              type: "HTML",
-              html: htmlContent
-            }, "*");
-            sendInitialState();
-            sendPageSpecificMessage(page, some_data);
+          externalWindow = window.open("index-external.html", "", "width=400,height=600," + popup_params(400, 600));
+          
+          let contentSent = false;
+          
+          // Use a more reliable approach to detect when window is ready
+          const waitForWindow = () => {
+            if (contentSent) return; // Prevent duplicate execution
+            
+            try {
+              if (externalWindow.document && externalWindow.document.readyState === 'complete') {
+                contentSent = true;
+                externalWindow.postMessage({
+                  type: "HTML",
+                  html: htmlContent
+                }, "*");
+                sendInitialState();
+                sendPageSpecificMessage(page, some_data);
+              } else {
+                setTimeout(waitForWindow, 50);
+              }
+            } catch (e) {
+              // Window might not be accessible yet
+              setTimeout(waitForWindow, 50);
+            }
           };
+          
+          // Start checking immediately and also set onload as fallback
+          setTimeout(waitForWindow, 100);
+          externalWindow.onload = waitForWindow;
+          
         } else {
+          // Reusing existing window
+          externalWindow.focus();
           externalWindow.postMessage({
             type: "HTML",
             html: htmlContent
@@ -55,22 +78,26 @@ function createExternalWindow(page, some_data = null, send_response = null) {
   };
 
   const sendPageSpecificMessage = (page, some_data) => {
-    const callbackKey = 'callback_' + (callbackId++);
-    callbacks[callbackKey] = send_response;
-    let type = "";
-    if (page === "request-transaction") {
-      type = "REQUEST_TRANSACTION";
-    } else if (page === "request-signature") {
-      type = "REQUEST_SIGNATURE";
+    if (send_response) {
+      const callbackKey = 'callback_' + (callbackId++);
+      callbacks[callbackKey] = send_response;
+      let type = "";
+      if (page === "request-transaction") {
+        type = "REQUEST_TRANSACTION";
+      } else if (page === "request-signature") {
+        type = "REQUEST_SIGNATURE";
+      }
+      else if (page === "request-token") {
+        type = "REQUEST_TOKEN";
+      }
+      if (type) {
+        externalWindow.postMessage({
+          type: type,
+          data: JSON.parse(JSON.stringify(some_data)),
+          callbackKey: callbackKey
+        }, "*");
+      }
     }
-    else if (page === "request-token") {
-      type = "REQUEST_TOKEN";
-    }
-    externalWindow.postMessage({
-      type: type,
-      data: JSON.parse(JSON.stringify(some_data)),
-      callbackKey: callbackKey
-    }, "*");
   };
 
   switch (page) {
