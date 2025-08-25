@@ -162,7 +162,28 @@ function createExternalWindow(page, some_data = null, send_response = null) {
     } catch (error) {
       console.error('Error loading external window:', error);
       // Fallback to original method
-      fallbackLoadHtml(htmlPath, page, some_data);
+      fetch(htmlPath)
+        .then((response) => response.text())
+        .then((htmlContent) => {
+          if (!externalWindow || externalWindow.closed) {
+            externalWindow = window.open("index-external.html", "", "width=400,height=600," + popup_params(400, 600));
+            externalWindow.onload = () => {
+              externalWindow.postMessage({
+                type: "HTML",
+                html: htmlContent
+              }, "*");
+              sendInitialState();
+              sendPageSpecificMessage(page, some_data);
+            };
+          } else {
+            externalWindow.postMessage({
+              type: "HTML",
+              html: htmlContent
+            }, "*");
+            sendInitialState();
+            sendPageSpecificMessage(page, some_data);
+          }
+        });
     }
   };
 

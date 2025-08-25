@@ -90,14 +90,24 @@ class PerformanceMonitor {
     // Monitor main thread blocking
     monitorMainThreadBlocking() {
         let lastTime = performance.now();
-        let blockingThreshold = 16; // 16ms = 60fps threshold
+        let blockingThreshold = 50; // 50ms threshold to avoid false positives
+        let consecutiveBlocks = 0;
+        let maxConsecutiveWarnings = 3;
 
         const checkBlocking = () => {
             const currentTime = performance.now();
             const timeDiff = currentTime - lastTime;
             
             if (timeDiff > blockingThreshold) {
-                console.warn(`🚨 Main thread blocked for ${timeDiff.toFixed(2)}ms`);
+                consecutiveBlocks++;
+                if (consecutiveBlocks <= maxConsecutiveWarnings) {
+                    console.warn(`🚨 Main thread blocked for ${timeDiff.toFixed(2)}ms`);
+                }
+                if (consecutiveBlocks === maxConsecutiveWarnings) {
+                    console.warn('🚨 Suppressing further blocking warnings to prevent spam');
+                }
+            } else {
+                consecutiveBlocks = 0; // Reset counter when blocking stops
             }
             
             lastTime = currentTime;
@@ -156,13 +166,24 @@ async function measureWindowCreation(windowType, creationFunction) {
     return await performanceMonitor.measureAsync(`Window Creation: ${windowType}`, creationFunction);
 }
 
-// Start monitoring main thread blocking on load
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+// Only start monitoring if explicitly enabled via URL parameter or localStorage
+function shouldEnableMonitoring() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('debug') === 'performance' || 
+           localStorage.getItem('enablePerformanceMonitoring') === 'true';
+}
+
+// Start monitoring main thread blocking only if enabled
+if (shouldEnableMonitoring()) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🔍 Performance monitoring enabled');
+            performanceMonitor.monitorMainThreadBlocking();
+        });
+    } else {
+        console.log('🔍 Performance monitoring enabled');
         performanceMonitor.monitorMainThreadBlocking();
-    });
-} else {
-    performanceMonitor.monitorMainThreadBlocking();
+    }
 }
 
 // Expose global functions for debugging
