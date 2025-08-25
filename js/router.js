@@ -27,8 +27,13 @@ function createExternalWindow(page, some_data = null, send_response = null) {
       .then((response) => response.text())
       .then((htmlContent) => {
         if (!externalWindow || externalWindow.closed) {
-          externalWindow = window.open("index-external.html", "", "width=400,height=600" + popup_params(400, 600));
+          externalWindow = window.open("index-external.html", "", "width=400,height=600," + popup_params(400, 600));
+          
+          let loaded = false;
           externalWindow.onload = () => {
+            if (loaded) return; // Prevent duplicate onload execution
+            loaded = true;
+            
             externalWindow.postMessage({
               type: "HTML",
               html: htmlContent
@@ -37,6 +42,8 @@ function createExternalWindow(page, some_data = null, send_response = null) {
             sendPageSpecificMessage(page, some_data);
           };
         } else {
+          // Reusing existing window
+          externalWindow.focus();
           externalWindow.postMessage({
             type: "HTML",
             html: htmlContent
@@ -55,22 +62,26 @@ function createExternalWindow(page, some_data = null, send_response = null) {
   };
 
   const sendPageSpecificMessage = (page, some_data) => {
-    const callbackKey = 'callback_' + (callbackId++);
-    callbacks[callbackKey] = send_response;
-    let type = "";
-    if (page === "request-transaction") {
-      type = "REQUEST_TRANSACTION";
-    } else if (page === "request-signature") {
-      type = "REQUEST_SIGNATURE";
+    if (send_response) {
+      const callbackKey = 'callback_' + (callbackId++);
+      callbacks[callbackKey] = send_response;
+      let type = "";
+      if (page === "request-transaction") {
+        type = "REQUEST_TRANSACTION";
+      } else if (page === "request-signature") {
+        type = "REQUEST_SIGNATURE";
+      }
+      else if (page === "request-token") {
+        type = "REQUEST_TOKEN";
+      }
+      if (type) {
+        externalWindow.postMessage({
+          type: type,
+          data: JSON.parse(JSON.stringify(some_data)),
+          callbackKey: callbackKey
+        }, "*");
+      }
     }
-    else if (page === "request-token") {
-      type = "REQUEST_TOKEN";
-    }
-    externalWindow.postMessage({
-      type: type,
-      data: JSON.parse(JSON.stringify(some_data)),
-      callbackKey: callbackKey
-    }, "*");
   };
 
   switch (page) {
@@ -92,7 +103,10 @@ window.addEventListener("message", (event) => {
   if (event.data.type === "REQUEST_TRANSACTION") {
     const some_data = event.data.data;
     const callbackKey = event.data.callbackKey;
-    callbacks[callbackKey](event.data.data);
+    if (callbacks[callbackKey] && typeof callbacks[callbackKey] === 'function') {
+      callbacks[callbackKey](event.data.data);
+      delete callbacks[callbackKey];
+    }
     tx_history = JSON.parse(localStorage.getItem("tx_history")) || [];
     if (app_page == "wallet"){
       changePage("wallet");
@@ -101,13 +115,19 @@ window.addEventListener("message", (event) => {
   if (event.data.type === "REQUEST_SIGNATURE") {
     const some_data = event.data.data;
     const callbackKey = event.data.callbackKey;
-    callbacks[callbackKey](event.data.data);
+    if (callbacks[callbackKey] && typeof callbacks[callbackKey] === 'function') {
+      callbacks[callbackKey](event.data.data);
+      delete callbacks[callbackKey];
+    }
     toast('success', 'Successfully signed message');
   }
   if (event.data.type === "REQUEST_TOKEN") {
     const some_data = event.data.data;
     const callbackKey = event.data.callbackKey;
-    callbacks[callbackKey](event.data.data);
+    if (callbacks[callbackKey] && typeof callbacks[callbackKey] === 'function') {
+      callbacks[callbackKey](event.data.data);
+      delete callbacks[callbackKey];
+    }
     token_list = JSON.parse(localStorage.getItem("token_list")) || ["currency"];
     if (app_page == "wallet"){
       changePage("settings");

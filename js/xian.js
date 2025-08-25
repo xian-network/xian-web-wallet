@@ -128,6 +128,26 @@ function signTransaction(transaction, privateKey) {
   });
 }
 
+// Enhanced async version that uses worker when available
+async function signTransactionEnhanced(transaction, privateKey) {
+    try {
+        const [publicKey, nonce] = await Promise.all([readSecureCookie("publicKey"), getNonce()]);
+        
+        // Try to use crypto worker for better performance
+        if (typeof signTransactionAsync === 'function') {
+            return await signTransactionAsync(transaction, privateKey, publicKey, nonce);
+        } else {
+            // Fallback to original implementation
+            transaction.payload.nonce = nonce;
+            transaction.payload.sender = publicKey;
+            return signTransaction(transaction, privateKey);
+        }
+    } catch (error) {
+        console.error('Error in enhanced transaction signing:', error);
+        throw error;
+    }
+}
+
 async function broadcastTransaction(signedTransaction) {
   // Broadcast the transaction as hex
   signedTransaction = signedTransaction[0];

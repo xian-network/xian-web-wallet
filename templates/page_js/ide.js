@@ -222,12 +222,24 @@ function showDropdown() {
 
 async function lintCode(code){   
     try{
-        const result = await pyodide.runPythonAsync(`
+        // Try to initialize and use the worker-based linting
+        if (typeof initializePyodideWorker !== 'undefined') {
+            const workerManager = await initializePyodideWorker();
+            if (workerManager) {
+                return await workerManager.lintCode(code);
+            }
+        }
+        
+        // Fallback to main thread if worker is not available
+        if (typeof pyodide !== 'undefined' && pyodide) {
+            const result = await pyodide.runPythonAsync(`
 from xian_contracting_linter import lint_code
 lint_code("""${code}""")
 `);   
-        let lintinfo = result.toJs();
-        return lintinfo;    
+            return result.toJs();
+        }
+        
+        return [];    
     } catch (error) {
         console.error('Error linting code:', error.message);
         return [];
