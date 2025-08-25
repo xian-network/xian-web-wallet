@@ -13,11 +13,28 @@ window.addEventListener("message", (event) => {
     if (event.data.type === "REQUEST_TRANSACTION") {
       const some_data = event.data.data;
       callbackKey = event.data.callbackKey;
-      document.getElementById("requestTransactionContract").innerHTML = some_data["data"]["contract"];
-      document.getElementById("requestTransactionFunction").innerHTML = some_data["data"]["method"];
-      document.getElementById("requestTransactionParams").innerHTML = JSON.stringify(some_data["data"]["kwargs"]);
-      document.getElementById("requestTransactionStampLimit").innerHTML = some_data["data"]["stampLimit"];
-      document.getElementById("requestTransactionChainId").innerHTML = some_data["data"]["chainId"];
+      
+      // Wait for DOM to be ready before accessing elements
+      const updateTransactionElements = () => {
+        const contractEl = document.getElementById("requestTransactionContract");
+        const functionEl = document.getElementById("requestTransactionFunction");
+        const paramsEl = document.getElementById("requestTransactionParams");
+        const stampLimitEl = document.getElementById("requestTransactionStampLimit");
+        const chainIdEl = document.getElementById("requestTransactionChainId");
+        
+        if (contractEl && functionEl && paramsEl && stampLimitEl && chainIdEl) {
+          contractEl.innerHTML = some_data["data"]["contract"];
+          functionEl.innerHTML = some_data["data"]["method"];
+          paramsEl.innerHTML = JSON.stringify(some_data["data"]["kwargs"]);
+          stampLimitEl.innerHTML = some_data["data"]["stampLimit"];
+          chainIdEl.innerHTML = some_data["data"]["chainId"];
+        } else {
+          // Retry after a short delay if elements not found
+          setTimeout(updateTransactionElements, 100);
+        }
+      };
+      
+      updateTransactionElements();
     }
     if (event.data.type === "REQUEST_SIGNATURE") {
       const some_data = event.data.data;

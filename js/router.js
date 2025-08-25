@@ -63,7 +63,9 @@ function waitForWindowReady(window) {
 // Helper function to send all messages in batch
 function sendBatchMessages(window, htmlContent, page, some_data, send_response) {
   const callbackKey = 'callback_' + (callbackId++);
-  callbacks[callbackKey] = send_response;
+  if (send_response) {
+    callbacks[callbackKey] = send_response;
+  }
 
   // Prepare all messages
   const messages = [
@@ -82,21 +84,27 @@ function sendBatchMessages(window, htmlContent, page, some_data, send_response) 
   if (page === "request-transaction") {
     pageMessage = {
       type: "REQUEST_TRANSACTION",
-      data: JSON.parse(JSON.stringify(some_data)),
-      callbackKey: callbackKey
+      data: JSON.parse(JSON.stringify(some_data))
     };
+    if (send_response) {
+      pageMessage.callbackKey = callbackKey;
+    }
   } else if (page === "request-signature") {
     pageMessage = {
       type: "REQUEST_SIGNATURE",
-      data: JSON.parse(JSON.stringify(some_data)),
-      callbackKey: callbackKey
+      data: JSON.parse(JSON.stringify(some_data))
     };
+    if (send_response) {
+      pageMessage.callbackKey = callbackKey;
+    }
   } else if (page === "request-token") {
     pageMessage = {
       type: "REQUEST_TOKEN",
-      data: JSON.parse(JSON.stringify(some_data)),
-      callbackKey: callbackKey
+      data: JSON.parse(JSON.stringify(some_data))
     };
+    if (send_response) {
+      pageMessage.callbackKey = callbackKey;
+    }
   }
 
   if (pageMessage) {
@@ -157,7 +165,7 @@ function createExternalWindow(page, some_data = null, send_response = null) {
       }
 
       // Send all messages in batch for better performance
-      sendBatchMessages(externalWindow, htmlContent, page, some_data, send_response);
+      sendBatchMessages(externalWindow, htmlContent, page, some_data, send_response || null);
       
     } catch (error) {
       console.error('Error loading external window:', error);
@@ -232,7 +240,10 @@ window.addEventListener("message", (event) => {
   if (event.data.type === "REQUEST_TRANSACTION") {
     const some_data = event.data.data;
     const callbackKey = event.data.callbackKey;
-    callbacks[callbackKey](event.data.data);
+    if (callbacks[callbackKey] && typeof callbacks[callbackKey] === 'function') {
+      callbacks[callbackKey](event.data.data);
+      delete callbacks[callbackKey];
+    }
     tx_history = JSON.parse(localStorage.getItem("tx_history")) || [];
     if (app_page == "wallet"){
       changePage("wallet");
@@ -241,13 +252,19 @@ window.addEventListener("message", (event) => {
   if (event.data.type === "REQUEST_SIGNATURE") {
     const some_data = event.data.data;
     const callbackKey = event.data.callbackKey;
-    callbacks[callbackKey](event.data.data);
+    if (callbacks[callbackKey] && typeof callbacks[callbackKey] === 'function') {
+      callbacks[callbackKey](event.data.data);
+      delete callbacks[callbackKey];
+    }
     toast('success', 'Successfully signed message');
   }
   if (event.data.type === "REQUEST_TOKEN") {
     const some_data = event.data.data;
     const callbackKey = event.data.callbackKey;
-    callbacks[callbackKey](event.data.data);
+    if (callbacks[callbackKey] && typeof callbacks[callbackKey] === 'function') {
+      callbacks[callbackKey](event.data.data);
+      delete callbacks[callbackKey];
+    }
     token_list = JSON.parse(localStorage.getItem("token_list")) || ["currency"];
     if (app_page == "wallet"){
       changePage("settings");
