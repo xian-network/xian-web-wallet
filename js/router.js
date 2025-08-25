@@ -21,30 +21,149 @@ function popup_params(width, height) {
   return 'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top + ',scrollbars=1';
 }   
 
-function createExternalWindow(page, some_data = null, send_response = null) {
-  const loadHtmlAndScripts = (htmlPath) => {
-    fetch(htmlPath)
-      .then((response) => response.text())
-      .then((htmlContent) => {
-        if (!externalWindow || externalWindow.closed) {
-          externalWindow = window.open("index-external.html", "", "width=400,height=600" + popup_params(400, 600));
-          externalWindow.onload = () => {
-            externalWindow.postMessage({
-              type: "HTML",
-              html: htmlContent
-            }, "*");
-            sendInitialState();
-            sendPageSpecificMessage(page, some_data);
-          };
+// Helper function to wait for external window to be ready
+function waitForWindowReady(window) {
+  return new Promise((resolve, reject) => {
+    if (!window) {
+      reject(new Error('Window is null'));
+      return;
+    }
+
+    // Set a timeout to prevent infinite waiting
+    const timeout = setTimeout(() => {
+      reject(new Error('Window ready timeout'));
+    }, 10000); // 10 second timeout
+
+    // Check if window is already loaded
+    if (window.document && window.document.readyState === 'complete') {
+      clearTimeout(timeout);
+      resolve();
+      return;
+    }
+
+    // Wait for window to load
+    const checkReady = () => {
+      try {
+        if (window.document && window.document.readyState === 'complete') {
+          clearTimeout(timeout);
+          resolve();
         } else {
+          setTimeout(checkReady, 50); // Check every 50ms
+        }
+      } catch (error) {
+        // Window might not be accessible yet
+        setTimeout(checkReady, 50);
+      }
+    };
+
+    checkReady();
+  });
+}
+
+// Helper function to send all messages in batch
+function sendBatchMessages(window, htmlContent, page, some_data, send_response) {
+  const callbackKey = 'callback_' + (callbackId++);
+  callbacks[callbackKey] = send_response;
+
+  // Prepare all messages
+  const messages = [
+    {
+      type: "HTML",
+      html: htmlContent
+    },
+    {
+      type: "INITIAL_STATE",
+      state: { publicKey, unencryptedPrivateKey, locked, tx_history }
+    }
+  ];
+
+  // Add page-specific message
+  let pageMessage = null;
+  if (page === "request-transaction") {
+    pageMessage = {
+      type: "REQUEST_TRANSACTION",
+      data: JSON.parse(JSON.stringify(some_data)),
+      callbackKey: callbackKey
+    };
+  } else if (page === "request-signature") {
+    pageMessage = {
+      type: "REQUEST_SIGNATURE",
+      data: JSON.parse(JSON.stringify(some_data)),
+      callbackKey: callbackKey
+    };
+  } else if (page === "request-token") {
+    pageMessage = {
+      type: "REQUEST_TOKEN",
+      data: JSON.parse(JSON.stringify(some_data)),
+      callbackKey: callbackKey
+    };
+  }
+
+  if (pageMessage) {
+    messages.push(pageMessage);
+  }
+
+  // Send all messages with minimal delay
+  messages.forEach((message, index) => {
+    setTimeout(() => {
+      window.postMessage(message, "*");
+    }, index * 10); // 10ms delay between messages
+  });
+}
+
+// Fallback function for when optimization fails
+function fallbackLoadHtml(htmlPath, page, some_data) {
+  fetch(htmlPath)
+    .then((response) => response.text())
+    .then((htmlContent) => {
+      if (!externalWindow || externalWindow.closed) {
+        externalWindow = window.open("index-external.html", "", "width=400,height=600," + popup_params(400, 600));
+        externalWindow.onload = () => {
           externalWindow.postMessage({
             type: "HTML",
             html: htmlContent
           }, "*");
           sendInitialState();
           sendPageSpecificMessage(page, some_data);
-        }
-      });
+        };
+      } else {
+        externalWindow.postMessage({
+          type: "HTML",
+          html: htmlContent
+        }, "*");
+        sendInitialState();
+        sendPageSpecificMessage(page, some_data);
+      }
+    })
+    .catch(error => {
+      console.error('Fallback loading failed:', error);
+    });
+}
+
+function createExternalWindow(page, some_data = null, send_response = null) {
+  const loadHtmlAndScripts = async (htmlPath) => {
+    try {
+      // Use template cache for faster loading
+      const htmlContent = typeof templateCache !== 'undefined' 
+        ? await templateCache.getTemplate(htmlPath)
+        : await fetch(htmlPath).then(response => response.text());
+
+      // Create or reuse window
+      if (!externalWindow || externalWindow.closed) {
+        externalWindow = window.open("index-external.html", "", "width=400,height=600," + popup_params(400, 600));
+        
+        // Use a more reliable method to detect when window is ready
+        await waitForWindowReady(externalWindow);
+      }
+
+      // Send all messages in batch for better performance
+      sendBatchMessages(externalWindow, htmlContent, page, some_data, send_response);
+      
+    } catch (error) {
+      console.error('Error loading external window:', error);
+      // Fallback to original method
+      fallbackLoadHtml(htmlPath, page, some_data);
+    }
   };
 
   const sendInitialState = () => {
@@ -175,69 +294,84 @@ function changePage(page, some_data = null, send_response = null) {
   sendEventGA("page_view", {engagement_time_msec: 100, page_title: page, page_location: page});
   app_page = page;
   sideNavActive();
-  const loadHtmlAndScripts = (htmlPath) => {
-    fetch(htmlPath)
-      .then((response) => response.text())
-      .then((htmlContent) => insertHTMLAndExecuteScripts(app_box, htmlContent))
-      .then(() => {
-        lucide.createIcons();
-        if (page === "send-token")
-          document.getElementById("tokenName").innerHTML = some_data;
-        else if (page === "request-transaction") {
-          document.getElementById("requestTransactionContract").innerHTML =
-            some_data["data"]["contract"];
-          document.getElementById("requestTransactionFunction").innerHTML =
-            some_data["data"]["method"];
-          document.getElementById("requestTransactionParams").innerHTML =
-            JSON.stringify(some_data["data"]["kwargs"]);
-          document.getElementById("requestTransactionStampLimit").innerHTML =
-            some_data["data"]["stampLimit"];
-            sendResponse = send_response;
-        }
-        else if(page === "request-signature"){
-          document.getElementById("requestSignatureMessage").innerHTML = some_data["data"]["message"];
+  const loadHtmlAndScripts = async (htmlPath) => {
+    try {
+      // Use template cache for faster loading
+      const htmlContent = typeof templateCache !== 'undefined' 
+        ? await templateCache.getTemplate(htmlPath)
+        : await fetch(htmlPath).then(response => response.text());
+      
+      await insertHTMLAndExecuteScripts(app_box, htmlContent);
+      
+      // Post-processing after HTML is loaded
+      lucide.createIcons();
+      if (page === "send-token")
+        document.getElementById("tokenName").innerHTML = some_data;
+      else if (page === "request-transaction") {
+        document.getElementById("requestTransactionContract").innerHTML =
+          some_data["data"]["contract"];
+        document.getElementById("requestTransactionFunction").innerHTML =
+          some_data["data"]["method"];
+        document.getElementById("requestTransactionParams").innerHTML =
+          JSON.stringify(some_data["data"]["kwargs"]);
+        document.getElementById("requestTransactionStampLimit").innerHTML =
+          some_data["data"]["stampLimit"];
           sendResponse = send_response;
-        }
-        else if (page === "request-token") {
-          document.getElementById("requestTokenMessage").innerHTML = some_data;
-          sendResponse = send_response;
-        }
-        else if (page === "password-input" || page === "create-wallet" || page === "import-wallet" || page === "get-started") {
-          document.getElementsByClassName("side-nav")[0].style.display = "none";
-          if (window.innerWidth > 768) {
-            document.getElementsByClassName("app-box")[0].style.borderTopLeftRadius = "8px";
-            document.getElementsByClassName("app-box")[0].style.borderBottomLeftRadius = "8px";
-           
-          }
-          else{
-            document.getElementsByClassName("app-box")[0].style.borderTopLeftRadius = "8px";
-            document.getElementsByClassName("app-box")[0].style.borderTopRightRadius = "8px";
-          }
-          document.getElementsByClassName("app-box")[0].style.borderLeftWidth = "1px";
+      }
+      else if(page === "request-signature"){
+        document.getElementById("requestSignatureMessage").innerHTML = some_data["data"]["message"];
+        sendResponse = send_response;
+      }
+      else if (page === "request-token") {
+        document.getElementById("requestTokenMessage").innerHTML = some_data;
+        sendResponse = send_response;
+      }
+      else if (page === "password-input" || page === "create-wallet" || page === "import-wallet" || page === "get-started") {
+        document.getElementsByClassName("side-nav")[0].style.display = "none";
+        if (window.innerWidth > 768) {
+          document.getElementsByClassName("app-box")[0].style.borderTopLeftRadius = "8px";
+          document.getElementsByClassName("app-box")[0].style.borderBottomLeftRadius = "8px";
+         
         }
         else{
-          document.getElementsByClassName("side-nav")[0].style.display = "flex";
-          if (window.innerWidth > 768) {
-            document.getElementsByClassName("app-box")[0].style.borderLeftWidth = "0px";
-           
-            document.getElementsByClassName("app-box")[0].style.borderTopLeftRadius = "0px";
-            document.getElementsByClassName("app-box")[0].style.borderTopRightRadius = "8px";
-            document.getElementsByClassName("app-box")[0].style.borderBottomLeftRadius = "0px";
-            document.getElementsByClassName("side-nav")[0].style.borderBottomLeftRadius = "8px";
-            document.getElementsByClassName("side-nav")[0].style.borderTopRightRadius = "0px";
-            document.getElementsByClassName("side-nav")[0].style.borderBottomWidth = "1px";
-          }
-          else{
-            document.getElementsByClassName("app-box")[0].style.borderTopLeftRadius = "0px";
-            document.getElementsByClassName("app-box")[0].style.borderTopRightRadius = "0px";
-            document.getElementsByClassName("app-box")[0].style.borderBottomLeftRadius = "8px";
-            document.getElementsByClassName("app-box")[0].style.borderLeftWidth = "1px";
-            document.getElementsByClassName("side-nav")[0].style.borderTopRightRadius = "8px";
-            document.getElementsByClassName("side-nav")[0].style.borderBottomLeftRadius = "0px";
-            document.getElementsByClassName("side-nav")[0].style.borderBottomWidth = "0px";
-          }
+          document.getElementsByClassName("app-box")[0].style.borderTopLeftRadius = "8px";
+          document.getElementsByClassName("app-box")[0].style.borderTopRightRadius = "8px";
         }
-      });
+        document.getElementsByClassName("app-box")[0].style.borderLeftWidth = "1px";
+      }
+      else{
+        document.getElementsByClassName("side-nav")[0].style.display = "flex";
+        if (window.innerWidth > 768) {
+          document.getElementsByClassName("app-box")[0].style.borderLeftWidth = "0px";
+         
+          document.getElementsByClassName("app-box")[0].style.borderTopLeftRadius = "0px";
+          document.getElementsByClassName("app-box")[0].style.borderTopRightRadius = "8px";
+          document.getElementsByClassName("app-box")[0].style.borderBottomLeftRadius = "0px";
+          document.getElementsByClassName("side-nav")[0].style.borderBottomLeftRadius = "8px";
+          document.getElementsByClassName("side-nav")[0].style.borderTopRightRadius = "0px";
+          document.getElementsByClassName("side-nav")[0].style.borderBottomWidth = "1px";
+        }
+        else{
+          document.getElementsByClassName("app-box")[0].style.borderTopLeftRadius = "0px";
+          document.getElementsByClassName("app-box")[0].style.borderTopRightRadius = "0px";
+          document.getElementsByClassName("app-box")[0].style.borderBottomLeftRadius = "8px";
+          document.getElementsByClassName("app-box")[0].style.borderLeftWidth = "1px";
+          document.getElementsByClassName("side-nav")[0].style.borderTopRightRadius = "8px";
+          document.getElementsByClassName("side-nav")[0].style.borderBottomLeftRadius = "0px";
+          document.getElementsByClassName("side-nav")[0].style.borderBottomWidth = "0px";
+        }
+      }
+    } catch (error) {
+      console.error('Error loading page:', error);
+      // Fallback to original fetch method
+      fetch(htmlPath)
+        .then((response) => response.text())
+        .then((htmlContent) => insertHTMLAndExecuteScripts(app_box, htmlContent))
+        .then(() => {
+          lucide.createIcons();
+          // Add the same post-processing logic here if needed
+        });
+    }
   };
 
   switch (app_page) {
