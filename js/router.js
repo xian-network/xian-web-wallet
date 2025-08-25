@@ -29,34 +29,18 @@ function createExternalWindow(page, some_data = null, send_response = null) {
         if (!externalWindow || externalWindow.closed) {
           externalWindow = window.open("index-external.html", "", "width=400,height=600," + popup_params(400, 600));
           
-          let contentSent = false;
-          
-          // Use a more reliable approach to detect when window is ready
-          const waitForWindow = () => {
-            if (contentSent) return; // Prevent duplicate execution
+          let loaded = false;
+          externalWindow.onload = () => {
+            if (loaded) return; // Prevent duplicate onload execution
+            loaded = true;
             
-            try {
-              if (externalWindow.document && externalWindow.document.readyState === 'complete') {
-                contentSent = true;
-                externalWindow.postMessage({
-                  type: "HTML",
-                  html: htmlContent
-                }, "*");
-                sendInitialState();
-                sendPageSpecificMessage(page, some_data);
-              } else {
-                setTimeout(waitForWindow, 50);
-              }
-            } catch (e) {
-              // Window might not be accessible yet
-              setTimeout(waitForWindow, 50);
-            }
+            externalWindow.postMessage({
+              type: "HTML",
+              html: htmlContent
+            }, "*");
+            sendInitialState();
+            sendPageSpecificMessage(page, some_data);
           };
-          
-          // Start checking immediately and also set onload as fallback
-          setTimeout(waitForWindow, 100);
-          externalWindow.onload = waitForWindow;
-          
         } else {
           // Reusing existing window
           externalWindow.focus();
