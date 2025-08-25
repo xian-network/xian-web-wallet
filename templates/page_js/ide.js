@@ -222,9 +222,12 @@ function showDropdown() {
 
 async function lintCode(code){   
     try{
-        // Use the worker-based linting if available
-        if (typeof pyodideWorkerManager !== 'undefined' && pyodideWorkerManager) {
-            return await pyodideWorkerManager.lintCode(code);
+        // Try to initialize and use the worker-based linting
+        if (typeof initializePyodideWorker !== 'undefined') {
+            const workerManager = await initializePyodideWorker();
+            if (workerManager) {
+                return await workerManager.lintCode(code);
+            }
         }
         
         // Fallback to main thread if worker is not available
