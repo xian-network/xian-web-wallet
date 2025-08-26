@@ -1,18 +1,37 @@
 var customRPCs = localStorage.getItem('customRPCs') ? JSON.parse(localStorage.getItem('customRPCs')) : [];
 
 function removeWallet(){
-    let confirm_delete = confirm("Are you sure you want to remove the wallet?");
+    let confirm_delete = confirm("Are you sure you want to remove the active wallet?");
     if (!confirm_delete) {
         return;
     }
-    // Removes the wallet
-    eraseSecureCookie('publicKey');
-    eraseSecureCookie('encryptedPrivateKey');
-    unencryptedPrivateKey = null;
-    locked = true;
-    localStorage.removeItem('tx_history');
-    tx_history = [];
-    changePage('get-started');
+    // Multi-wallet aware removal
+    (async () => {
+        const currentPk = await readSecureCookie('publicKey');
+        if (typeof WalletManager !== 'undefined' && currentPk){
+            try { WalletManager.removeWallet(currentPk); } catch(e) {}
+        }
+        eraseSecureCookie('publicKey');
+        eraseSecureCookie('encryptedPrivateKey');
+        unencryptedPrivateKey = null;
+        locked = true;
+        localStorage.removeItem('tx_history');
+        tx_history = [];
+        // Try switch to another wallet if present
+        if (typeof WalletManager !== 'undefined'){
+            try {
+                const list = await WalletManager.getWallets();
+                if (list.length > 0){
+                    const ok = await WalletManager.setActiveWallet(list[0].publicKey);
+                    if (ok){
+                        changePage('password-input');
+                        return;
+                    }
+                }
+            } catch(e) {}
+        }
+        changePage('get-started');
+    })();
 }
 
 function saveSettings() {
@@ -118,6 +137,14 @@ document.getElementById('add_rpc_button').addEventListener('click', function() {
 
 document.getElementById('remove_rpc_button').addEventListener('click', function() {
     removeCustomRPC();
+});
+
+// Quick add wallet actions
+document.getElementById('btn-add-create-wallet')?.addEventListener('click', function(){
+    changePage('create-wallet');
+});
+document.getElementById('btn-add-import-wallet')?.addEventListener('click', function(){
+    changePage('import-wallet');
 });
 
 function addCustomRPC() {
@@ -239,7 +266,76 @@ function loadSettingsPage() {
     // Get the wallet version from the manifest file (two directories up) and set it in the settings page
     let manifest = JSON.parse(readTextFile('../../manifest.json'));
     document.getElementById('version').innerHTML = manifest.version;
-    
+    // Populate wallets list
+    (async () => {
+        if (typeof WalletManager === 'undefined') return;
+        const container = document.getElementById('walletList');
+        if (!container) return;
+        const wallets = await WalletManager.getWallets();
+        const active = await WalletManager.getActivePublicKey();
+        container.innerHTML = '';
+        wallets.forEach(w => {
+            const row = document.createElement('div');
+            row.className = 'wallet-row';
+            row.style.display = 'flex';
+            row.style.alignItems = 'center';
+            row.style.gap = '.5rem';
+            row.style.marginBottom = '.25rem';
+
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'selectedWallet';
+            radio.value = w.publicKey;
+            radio.checked = (w.publicKey === active);
+            radio.addEventListener('change', async () => {
+                const ok = await WalletManager.setActiveWallet(w.publicKey);
+                if (ok) {
+                    changePage('password-input');
+                }
+            });
+
+            const label = document.createElement('div');
+            label.style.flex = '1';
+            label.style.wordBreak = 'break-all';
+            label.textContent = (w.label ? (w.label + ' • ') : '') + w.publicKey;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'btn btn-danger';
+            removeBtn.innerHTML = '<i class="icon" data-lucide="trash-2"></i>';
+            removeBtn.addEventListener('click', async () => {
+                const confirm_delete = confirm('Remove this wallet from this device?');
+                if (!confirm_delete) return;
+                await WalletManager.removeWallet(w.publicKey);
+                if (w.publicKey === active){
+                    // If removing active, also clear active cookies
+                    eraseSecureCookie('publicKey');
+                    eraseSecureCookie('encryptedPrivateKey');
+                    unencryptedPrivateKey = null;
+                    locked = true;
+                }
+                loadSettingsPage();
+            });
+
+            row.appendChild(radio);
+            row.appendChild(label);
+            row.appendChild(removeBtn);
+            container.appendChild(row);
+        });
+        if (window.lucide && window.lucide.createIcons) { window.lucide.createIcons(); }
+    })();
 }
 
 loadSettingsPage();
+
+// Handle label set for selected wallet
+document.getElementById('set_wallet_label')?.addEventListener('click', async function(){
+    if (typeof WalletManager === 'undefined') return;
+    const radios = document.querySelectorAll('input[name="selectedWallet"]');
+    let selected = null;
+    radios.forEach(r => { if (r.checked) selected = r.value; });
+    if (!selected) return;
+    const labelInput = document.getElementById('walletLabelInput');
+    const label = labelInput ? labelInput.value : '';
+    WalletManager.setLabel(selected, label);
+    loadSettingsPage();
+});

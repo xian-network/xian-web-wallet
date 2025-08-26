@@ -366,10 +366,20 @@ document.addEventListener("DOMContentLoaded", (event) => {
       CHAIN_ID = chain_id;
   });
 
+  // Backwards-compat: if we have active cookies but wallet list empty, register it
   Promise.all([
     readSecureCookie("publicKey"),
     readSecureCookie("encryptedPrivateKey"),
   ]).then((values) => {
+  try {
+    if (typeof WalletManager !== 'undefined'){
+      const listRaw = localStorage.getItem('wallets');
+      const list = listRaw ? JSON.parse(listRaw) : [];
+      if (values[0] && values[1] && (!Array.isArray(list) || list.length === 0)){
+        WalletManager.addOrUpdateWallet(values[0], values[1]);
+      }
+    }
+  } catch(e) {}
   if (
     values[0] &&
     values[1] &&
