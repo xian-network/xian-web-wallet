@@ -57,24 +57,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!root || !overlay || !closeBtn || !container) return;
     container.innerHTML = '';
     try {
-      // Lightweight QR: simple canvas generator
-      const size = 192;
-      const canvas = document.createElement('canvas');
-      canvas.width = size; canvas.height = size;
-      const ctx = canvas.getContext('2d');
-      // Fallback minimal QR-like pattern: not a real QR if generator missing
-      // Prefer a proper QR encoder if available in future
-      ctx.fillStyle = '#0b1716'; ctx.fillRect(0,0,size,size);
-      ctx.fillStyle = '#e8fefe';
-      for (let y=0; y<32; y++){
-        for (let x=0; x<32; x++){
-          const seed = (x*73856093 ^ y*19349663 ^ address.length*83492791) >>> 0;
-          if ((seed & 3) === 0) ctx.fillRect(x*6, y*6, 4, 4);
-        }
+      if (window.QRCode) {
+        new QRCode(container, {
+          text: address,
+          width: 192,
+          height: 192,
+          colorDark : "#e8fefe",
+          colorLight : "#0b1716",
+          correctLevel : QRCode.CorrectLevel.M
+        });
+      } else {
+        container.textContent = 'QR library not loaded';
       }
-      container.appendChild(canvas);
     } catch(e) {
-      container.textContent = 'QR unavailable';
+      container.textContent = 'QR generation error';
     }
     if (out) out.textContent = address;
     root.classList.remove('hidden');
