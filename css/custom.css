@@ -450,6 +450,23 @@ a:hover{
     width: 100%;
     margin-right: 0;
 }
+.xian-price {
+    font-size: .85rem;
+    color: #e8fefe;
+    background: rgba(0, 247, 224, 0.08);
+    border: 1px solid rgba(0, 247, 224, 0.25);
+    border-radius: 8px;
+    padding: 4px 8px;
+    margin-right: 10px;
+    white-space: nowrap;
+}
+.xian-price .change { font-weight: 700; }
+.dark-mode .xian-price[data-change="up"] .change { color: #00f2d5; }
+.dark-mode .xian-price[data-change="down"] .change { color: #ff4d4f; }
+.xian-price .label { opacity: .8; margin-left: 4px; font-size: .75rem; }
+@media screen and (max-width: 450px) {
+    .xian-price { display: none; }
+}
 .online-circle {
     width: 10px;
     height: 10px;
