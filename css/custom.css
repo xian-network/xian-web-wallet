@@ -224,6 +224,13 @@ a:hover{
     padding-top: 80px !important;
     padding: 20px;
 }
+/* Ensure content clears the fixed navbar when it wraps on smaller screens */
+@media (max-width: 992px) {
+    .app-container { padding-top: 96px !important; }
+}
+@media (max-width: 576px) {
+    .app-container { padding-top: 112px !important; }
+}
 
 .token-icon {
     width: 32px; /* Adjust based on your icon's size */
@@ -460,7 +467,7 @@ body:not(.dark-mode) .nav-actions .icon-btn:hover{ box-shadow:0 6px 20px rgba(0,
 /* Navbar dropdown menu */
 .nav-dropdown{ position:relative; }
 .nav-menu.hidden{ display:none; }
-.nav-menu{ position:absolute; right:0; top:calc(100% + .4rem); min-width: 240px; display:flex; flex-direction:column; gap:.25rem; padding:.5rem; border-radius:12px; z-index:1200; background:rgba(17,17,17,.96); border:1px solid rgba(255,255,255,.12); box-shadow:0 20px 50px rgba(0,0,0,.6); backdrop-filter: blur(10px) saturate(140%); }
+.nav-menu{ position:absolute; right:0; top:calc(100% + .4rem); min-width: 240px; display:flex; flex-direction:column; gap:.25rem; padding:.5rem; border-radius:12px; z-index:1700; background:rgba(17,17,17,.96); border:1px solid rgba(255,255,255,.12); box-shadow:0 20px 50px rgba(0,0,0,.6); backdrop-filter: blur(10px) saturate(140%); }
 .menu-item{ display:flex; align-items:center; gap:.6rem; padding:.6rem .7rem; border-radius:9px; font-size:.95rem; color:#e5eef0; background:transparent; border:0; width:100%; text-align:left; -webkit-appearance:none; appearance:none; }
 .menu-item:hover{ cursor:pointer; }
 .dark-mode .menu-item:hover{ background:rgba(0,247,224,.08); color:#06e6cb; }
@@ -484,8 +491,8 @@ body:not(.dark-mode) .menu-switch input:checked + .slider{ background:linear-gra
 
 /* Privacy indicator */
 .privacy-indicator.hidden{ display:none; }
-.privacy-indicator{ display:flex; align-items:center; gap:.35rem; padding:.25rem .45rem; border-radius:999px; font-size:.8rem; }
-.dark-mode .privacy-indicator{ color:#cbd5e1; background:rgba(167,139,250,.14); border:1px solid rgba(167,139,250,.35); }
+.privacy-indicator{ display:flex; align-items:center; gap:.35rem; padding:.25rem .45rem; border-radius:999px; font-size:.8rem; position:relative; z-index:1000; margin-right:auto; }
+.dark-mode .privacy-indicator{ color:#cbd5e1; background:rgba(167,139,250,.14); border:1px solid rgba(167,139,250,.35);margin-right:3vw }
 body:not(.dark-mode) .privacy-indicator{ color:#1f2937; background:rgba(167,139,250,.14); border:1px solid rgba(167,139,250,.35); }
 
 /* Command Palette */
@@ -573,7 +580,8 @@ body:not(.dark-mode) .privacy-indicator{ color:#1f2937; background:rgba(167,139,
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 1030; /* Ensure it stays above other content */
+    z-index: 1100; /* Keep above app content and FAB, below modals/cmdk */
+    min-height: 64px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);;;
 }
 .dark-mode .navbar {
@@ -1344,6 +1352,13 @@ body:not(.dark-mode) .navbar { background:#fff; border-bottom:1px solid rgba(0,0
 
 /* Privacy Mode */
 .privacy-mode .privacy-blur{ filter: blur(6px); transition: filter .2s ease; }
+/* Ensure sensitive elements are blurred on navigation when privacy mode is on */
+.privacy-mode #walletAddress,
+.privacy-mode #yourAddressReceive,
+.privacy-mode .token-balance,
+.privacy-mode .messenger-inbox-item-content p{
+    filter: blur(6px);
+}
 .menu-badge{ margin-left:auto; font-size:.75rem; opacity:.7; }
 .dark-mode .navbar {
     background-color: rgba(17, 17, 17, 0.6);
