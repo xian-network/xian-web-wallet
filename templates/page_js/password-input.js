@@ -22,18 +22,35 @@ function unlockWallet() {
 }
 
 function removeWallet(){
-    let confirm_delete = confirm("Are you sure you want to remove the wallet?");
+    let confirm_delete = confirm("Are you sure you want to remove the active wallet?");
     if (!confirm_delete) {
         return;
     }
-    // Removes the wallet
-    eraseSecureCookie('publicKey');
-    eraseSecureCookie('encryptedPrivateKey');
-    unencryptedPrivateKey = null;
-    locked = true;
-    localStorage.removeItem('tx_history');
-    tx_history = [];
-    changePage('get-started');
+    (async () => {
+        const currentPk = await readSecureCookie('publicKey');
+        if (typeof WalletManager !== 'undefined' && currentPk){
+            try { WalletManager.removeWallet(currentPk); } catch(e) {}
+        }
+        eraseSecureCookie('publicKey');
+        eraseSecureCookie('encryptedPrivateKey');
+        unencryptedPrivateKey = null;
+        locked = true;
+        localStorage.removeItem('tx_history');
+        tx_history = [];
+        if (typeof WalletManager !== 'undefined'){
+            try {
+                const list = await WalletManager.getWallets();
+                if (list.length > 0){
+                    const ok = await WalletManager.setActiveWallet(list[0].publicKey);
+                    if (ok){
+                        changePage('password-input');
+                        return;
+                    }
+                }
+            } catch(e) {}
+        }
+        changePage('get-started');
+    })();
 }
 
 document.getElementById('btn-password-input-unlock-wallet').addEventListener('click', function() {

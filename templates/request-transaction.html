@@ -1,36 +1,44 @@
 <h1 class="app-box-title">Transaction Request</h1>
 <p class="app-box-description">You have received a transaction request from a website.</p>
+<style>
+.tx-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px}
+.tx-meta{display:grid;grid-template-columns:minmax(120px,180px) 1fr;row-gap:.5rem;column-gap:1rem}
+.tx-label{color:#9fb7b5;font-weight:600;letter-spacing:.03em}
+.tx-value{color:#e8fefe;word-break:break-all}
+#requestTransactionParamsList{margin-top:.25rem}
+#requestTransactionParamsList ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.5rem}
+#requestTransactionParamsList li{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.6rem .7rem}
+#requestTransactionParamsList .kv-key{color:#06e6cb;font-weight:700}
+#requestTransactionParamsList .kv-value{white-space:pre-wrap;word-break:break-word;color:#e8fefe;margin:.125rem 0 0}
+#requestTransactionParamsRaw{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.6rem;color:#e8fefe}
+.app-box-form details summary{cursor:pointer;color:#cfe7e5}
+#failure-alert{border-color:rgba(255,77,79,.45)!important;background:rgba(255,77,79,.12)!important;color:#ffb3b5!important}
+</style>
 <div id="failure-alert" class="alert alert-danger d-none">
     <strong>This transaction will most likely fail!</strong>
     <p>The outcome of this transaction is: <span id="failure-reason"></span></p>
 </div>
-<div class="app-box-form">
-    <div class="form-group">
-        <label for="requestTransactionContract">Contract</label>
-        <p id="requestTransactionContract"></p>
+<div class="app-box-form tx-card">
+    <div class="tx-meta" style="margin-bottom:.75rem;">
+        <div class="tx-label">Contract</div>
+        <div class="tx-value" id="requestTransactionContract"></div>
+        <div class="tx-label">Function</div>
+        <div class="tx-value" id="requestTransactionFunction" style="text-overflow:ellipsis;overflow:hidden;"></div>
+        <div class="tx-label">Chain ID</div>
+        <div class="tx-value" id="requestTransactionChainId"></div>
+        <div class="tx-label">Transaction Fee</div>
+        <div class="tx-value"><span id="stamp_line">Calculating..</span><span id="stamp_line_finished" style="display:none;"> <span id="requestTransactionStampLimit"></span> Stamps (<span id="requestTransactionStampLimitXian"></span> Xian)</span></div>
     </div>
-    <div class="form-group">
-        <label for="requestTransactionFunction">Function</label>
-        <p id="requestTransactionFunction" style="text-overflow: ellipsis;
-    overflow: hidden;"></p>
-    </div>
-    <div class="form-group">
+    <div class="form-group" style="margin-top:.25rem;">
         <label for="requestTransactionParams">Parameters</label>
-        <details> 
-            <summary>Show/Hide Parameters</summary>
-            <p id="requestTransactionParams" style="word-break: break-all;"></p>
+        <div id="requestTransactionParamsList"></div>
+        <details style="margin-top:.5rem;"> 
+            <summary>Show raw JSON</summary>
+            <p id="requestTransactionParams" style="display:none;"></p>
+            <pre id="requestTransactionParamsRaw"></pre>
         </details>
     </div>
-    <div class="form-group">
-        <label for="requestTransactionChainId">Chain ID</label>
-        <p id="requestTransactionChainId"></p>
-    </div>
-    <div class="form-group">
-        <label for="requestTransactionStampLimit">Transaction Fee</label>
-        <p id="stamp_line">Calculating..</p>
-        <p id="stamp_line_finished" style="display: none;"><span id="requestTransactionStampLimit"></span> Stamps (<span id="requestTransactionStampLimitXian"></span> Xian)</p>
-    </div>
-    <div class="btn-group">
+    <div class="btn-group" style="margin-top:1rem;">
         <button class="btn btn-primary" id="request-transaction-accept">Accept</button>
         <button class="btn btn-secondary" id="request-transaction-reject">Reject</button>
     </div>
