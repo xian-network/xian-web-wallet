@@ -455,6 +455,7 @@ a:hover{
     width: 100%;
     margin-right: 0;
 }
+/* Navigation actions */
 .nav-actions .icon-btn{ display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:9px; cursor:pointer; transition:transform .12s ease, box-shadow .2s ease, border-color .2s ease; }
 .nav-actions .icon-btn:hover{ transform:translateY(-1px); }
 .dark-mode .nav-actions .icon-btn{ border:1px solid rgba(255,255,255,.12); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); color:#e8fefe; }
@@ -522,6 +523,26 @@ body:not(.dark-mode) .privacy-indicator{ color:#1f2937; background:rgba(167,139,
 .fab-menu{ display:flex; flex-direction:column; gap:.4rem; }
 .fab-item{ display:inline-flex; align-items:center; gap:.45rem; padding:.45rem .6rem; background:rgba(17,17,17,.85); color:#d8e4e4; border:1px solid rgba(255,255,255,.12); border-radius:9px; backdrop-filter: blur(8px); }
 .fab-item:hover{ color:#06e6cb; border-color:rgba(6,230,203,.35); }
+
+/* Xian price badge */
+.xian-price {
+    font-size: .85rem;
+    color: #e8fefe;
+    background: rgba(0, 247, 224, 0.08);
+    border: 1px solid rgba(0, 247, 224, 0.25);
+    border-radius: 8px;
+    padding: 4px 8px;
+    margin-right: 10px;
+    white-space: nowrap;
+}
+.xian-price .change { font-weight: 700; }
+.dark-mode .xian-price[data-change="up"] .change { color: #00f2d5; }
+.dark-mode .xian-price[data-change="down"] .change { color: #ff4d4f; }
+.xian-price .label { opacity: .8; margin-left: 4px; font-size: .75rem; }
+@media screen and (max-width: 450px) {
+    .xian-price { display: none; }
+}
+
 .online-circle {
     width: 10px;
     height: 10px;
