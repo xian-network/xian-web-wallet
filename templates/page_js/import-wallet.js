@@ -33,6 +33,10 @@ function importWallet() {
     // Save the public key and the encrypted private key
     createSecureCookie('publicKey', public_key, 9999);
     createSecureCookie('encryptedPrivateKey', encryptedPrivateKey, 9999);
+    // Register in the wallet manager and persist per-wallet encrypted key
+    if (typeof WalletManager !== 'undefined') {
+        try { WalletManager.addOrUpdateWallet(public_key, encryptedPrivateKey); } catch(e) {}
+    }
     
     // Save the unencrypted private key to the global variable
     unencryptedPrivateKey = _unencryptedPrivateKey;

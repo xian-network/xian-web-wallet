@@ -296,11 +296,9 @@ function changeWalletTab(tab) {
     }
 }
 
-function clearLocalActivity() {
-    let confirm_clear = confirm("Are you sure you want to clear the local activity?");
-    if (!confirm_clear) {
-        return;
-    }
+async function clearLocalActivity() {
+    const confirm_clear = await (window.showConfirmModal ? showConfirmModal("Are you sure you want to clear the local activity?", 'Confirm') : Promise.resolve(confirm("Are you sure you want to clear the local activity?")));
+    if (!confirm_clear) return;
     localStorage.removeItem('tx_history');
     tx_history = [];
     loadWalletPage();
@@ -314,8 +312,8 @@ function receiveTokenScreen() {
     changePage('receive-token');
 }
 
-function removeToken(contract) {
-    let confirmation = confirm("Are you sure you want to remove this token?");
+async function removeToken(contract) {
+    const confirmation = await (window.showConfirmModal ? showConfirmModal("Are you sure you want to remove this token?", 'Remove Token') : Promise.resolve(confirm("Are you sure you want to remove this token?")));
     if (!confirmation) return;
 
     token_list = token_list.filter((token) => token !== contract);
