@@ -39,7 +39,6 @@ window.addEventListener("message", (event) => {
             paramsListEl.innerHTML = '';
             const ul = document.createElement('ul');
             ul.style.margin = '0';
-            ul.style.paddingLeft = '1rem';
             Object.keys(kwargs).forEach(key => {
               const li = document.createElement('li');
               let value = kwargs[key];

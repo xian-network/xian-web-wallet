@@ -524,24 +524,6 @@ body:not(.dark-mode) .privacy-indicator{ color:#1f2937; background:rgba(167,139,
 .fab-item{ display:inline-flex; align-items:center; gap:.45rem; padding:.45rem .6rem; background:rgba(17,17,17,.85); color:#d8e4e4; border:1px solid rgba(255,255,255,.12); border-radius:9px; backdrop-filter: blur(8px); }
 .fab-item:hover{ color:#06e6cb; border-color:rgba(6,230,203,.35); }
 
-/* Xian price badge */
-.xian-price {
-    font-size: .85rem;
-    color: #e8fefe;
-    background: rgba(0, 247, 224, 0.08);
-    border: 1px solid rgba(0, 247, 224, 0.25);
-    border-radius: 8px;
-    padding: 4px 8px;
-    margin-right: 10px;
-    white-space: nowrap;
-}
-.xian-price .change { font-weight: 700; }
-.dark-mode .xian-price[data-change="up"] .change { color: #00f2d5; }
-.dark-mode .xian-price[data-change="down"] .change { color: #ff4d4f; }
-.xian-price .label { opacity: .8; margin-left: 4px; font-size: .75rem; }
-@media screen and (max-width: 450px) {
-    .xian-price { display: none; }
-}
 
 .online-circle {
     width: 10px;
