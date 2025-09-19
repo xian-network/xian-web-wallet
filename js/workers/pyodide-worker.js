@@ -25,7 +25,7 @@ async function initializePyodide() {
             // Install custom linter package
             await pyodide.runPythonAsync(`
                 import micropip
-                await micropip.install(['/python3-dist/xian_contracting_linter-0.2.14-py3-none-any.whl'])
+                await micropip.install(['/python3-dist/xian_contracting_linter-0.2.15-py3-none-any.whl'])
             `);
             
             isInitialized = true;
