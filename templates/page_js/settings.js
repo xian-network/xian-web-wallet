@@ -275,10 +275,10 @@ function loadSettingsPage() {
         const active = await WalletManager.getActivePublicKey();
         container.innerHTML = '';
         wallets.forEach(w => {
-            const row = document.createElement('div');
-            row.className = 'wallet-row';
+            const card = document.createElement('div');
+            card.className = 'wallet-card';
             if (w.publicKey === active) {
-                row.classList.add('active');
+                card.classList.add('active');
             }
 
             const radio = document.createElement('input');
@@ -294,23 +294,81 @@ function loadSettingsPage() {
             });
 
             const walletInfo = document.createElement('div');
-            walletInfo.className = 'wallet-info';
+            walletInfo.className = 'wallet-info-improved';
 
-            if (w.label) {
-                const labelDiv = document.createElement('div');
-                labelDiv.className = 'wallet-label';
-                labelDiv.textContent = w.label;
-                walletInfo.appendChild(labelDiv);
+            // Create editable label
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'wallet-label-editable';
+            labelDiv.contentEditable = false;
+            labelDiv.textContent = w.label || 'Click to add label';
+            if (!w.label) {
+                labelDiv.classList.add('wallet-label-placeholder');
             }
+            
+            // Add inline editing functionality
+            labelDiv.addEventListener('click', () => {
+                if (labelDiv.classList.contains('editing')) return;
+                
+                labelDiv.classList.add('editing');
+                labelDiv.contentEditable = true;
+                labelDiv.classList.remove('wallet-label-placeholder');
+                
+                if (!w.label) {
+                    labelDiv.textContent = '';
+                }
+                
+                labelDiv.focus();
+                
+                // Select all text
+                const range = document.createRange();
+                range.selectNodeContents(labelDiv);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+            });
+            
+            labelDiv.addEventListener('blur', async () => {
+                labelDiv.classList.remove('editing');
+                labelDiv.contentEditable = false;
+                
+                const newLabel = labelDiv.textContent.trim();
+                if (newLabel && newLabel !== w.label) {
+                    // Save the label
+                    await WalletManager.setWalletLabel(w.publicKey, newLabel);
+                    w.label = newLabel;
+                } else if (!newLabel) {
+                    // Reset to placeholder
+                    labelDiv.textContent = 'Click to add label';
+                    labelDiv.classList.add('wallet-label-placeholder');
+                }
+            });
+            
+            labelDiv.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    labelDiv.blur();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    labelDiv.textContent = w.label || 'Click to add label';
+                    if (!w.label) {
+                        labelDiv.classList.add('wallet-label-placeholder');
+                    }
+                    labelDiv.blur();
+                }
+            });
 
             const addressDiv = document.createElement('div');
-            addressDiv.className = 'wallet-address';
+            addressDiv.className = 'wallet-address-compact';
             addressDiv.textContent = w.publicKey;
+            addressDiv.title = w.publicKey; // Show full address on hover
+
+            walletInfo.appendChild(labelDiv);
             walletInfo.appendChild(addressDiv);
 
             const removeBtn = document.createElement('button');
-            removeBtn.className = 'btn btn-danger';
+            removeBtn.className = 'btn btn-remove';
             removeBtn.innerHTML = '<i class="icon" data-lucide="trash-2"></i>';
+            removeBtn.title = 'Remove wallet';
             removeBtn.addEventListener('click', async () => {
                 const confirm_delete = confirm('Remove this wallet from this device?');
                 if (!confirm_delete) return;
@@ -325,10 +383,10 @@ function loadSettingsPage() {
                 loadSettingsPage();
             });
 
-            row.appendChild(radio);
-            row.appendChild(walletInfo);
-            row.appendChild(removeBtn);
-            container.appendChild(row);
+            card.appendChild(radio);
+            card.appendChild(walletInfo);
+            card.appendChild(removeBtn);
+            container.appendChild(card);
         });
         if (window.lucide && window.lucide.createIcons) { window.lucide.createIcons(); }
     })();
@@ -336,15 +394,4 @@ function loadSettingsPage() {
 
 loadSettingsPage();
 
-// Handle label set for selected wallet
-document.getElementById('set_wallet_label')?.addEventListener('click', async function(){
-    if (typeof WalletManager === 'undefined') return;
-    const radios = document.querySelectorAll('input[name="selectedWallet"]');
-    let selected = null;
-    radios.forEach(r => { if (r.checked) selected = r.value; });
-    if (!selected) return;
-    const labelInput = document.getElementById('walletLabelInput');
-    const label = labelInput ? labelInput.value : '';
-    WalletManager.setLabel(selected, label);
-    loadSettingsPage();
-});
+// Inline label editing is now handled directly in the wallet card creation above
