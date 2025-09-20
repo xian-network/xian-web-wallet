@@ -15,6 +15,7 @@ function removeWallet(){
         eraseSecureCookie('encryptedPrivateKey');
         unencryptedPrivateKey = null;
         locked = true;
+        updateNavActionsVisibility();
         localStorage.removeItem('tx_history');
         tx_history = [];
         // Try switch to another wallet if present
@@ -379,6 +380,7 @@ function loadSettingsPage() {
                     eraseSecureCookie('encryptedPrivateKey');
                     unencryptedPrivateKey = null;
                     locked = true;
+                    updateNavActionsVisibility();
                 }
                 
                 // If the removed wallet was active, switch to another if available

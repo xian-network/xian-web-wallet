@@ -68,6 +68,7 @@ function createWallet() {
     unencryptedPrivateKey = _unencryptedPrivateKey;
     publicKey = public_key;
     locked = false;
+    updateNavActionsVisibility();
     changePage('wallet');
 
 }

@@ -11,6 +11,19 @@ var pageContext = null;
 var callbacks = {};
 var callbackId = 0;
 
+function updateNavActionsVisibility() {
+  setTimeout(() => {
+    const navActions = document.querySelector('.nav-actions');
+    if (navActions) {
+      if (locked) {
+        navActions.classList.add('wallet-locked');
+      } else {
+        navActions.classList.remove('wallet-locked');
+      }
+    }
+  }, 10); // Small delay to ensure DOM is updated
+}
+
 function popup_params(width, height) {
   var a = typeof window.screenX != 'undefined' ? window.screenX : window.screenLeft;
   var i = typeof window.screenY != 'undefined' ? window.screenY : window.screenTop;
@@ -202,6 +215,7 @@ function changePage(page, some_data = null, send_response = null, context = null
       .then((htmlContent) => insertHTMLAndExecuteScripts(app_box, htmlContent))
       .then(() => {
         lucide.createIcons();
+        updateNavActionsVisibility(); // Call after DOM is updated
         if (page === "send-token")
           document.getElementById("tokenName").innerHTML = some_data;
         else if (page === "request-transaction") {

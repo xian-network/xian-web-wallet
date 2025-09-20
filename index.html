@@ -21,14 +21,13 @@
 </head>
 <body class="dark-mode">
     <nav class="navbar">
-        <div class="container-fluid">
-            <div class="navbar-brand" href="index.html">
+          <div class="navbar-brand" href="index.html">
 
                 <div class="brand-left" style="display:flex;align-items:center;gap:1rem;">
                     <div class="app-name"><img src="assets/xian-white.svg" alt="Xian Connect Logo" class="app-logo"><h2></h2></div>
                     <div class="online-status" id="onlineStatus">Node Status <div class='grey-circle' title='Node Status is Unknown'></div></div>
                 </div>
-                <div class="nav-actions" style="display:flex;gap:.5rem;align-items:center;">
+                <div class="nav-actions">
                     <div id="privacyIndicator" class="privacy-indicator hidden" title="Privacy Mode">
                         <i class="icon" data-lucide="eye-off"></i>
                         <span>Privacy</span>
@@ -53,7 +52,6 @@
                 
                
             </div>
-        </div>
     </nav>
     
     <div class="app-container">
@@ -169,6 +167,14 @@ display: flex;max-width: 100%; width: 100%;flex-direction: column;;
     <script src="js/wallet-manager.js?v=1"></script>
     <script src="js/providers/lucide.js"></script>
     <script src="js/router.js?v=13377"></script>
+    <script>
+        // Initialize nav-actions visibility based on wallet lock state
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof updateNavActionsVisibility === 'function') {
+                updateNavActionsVisibility();
+            }
+        });
+    </script>
     <script src="js/helpers.js"></script>
     <script src="js/providers/codemirror.js"></script>
     <script src="js/providers/python.js"></script>

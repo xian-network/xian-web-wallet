@@ -456,6 +456,8 @@ a:hover{
     margin-right: 0;
 }
 /* Navigation actions */
+.nav-actions{ display:flex; gap:.5rem; align-items:center; }
+.nav-actions.wallet-locked{ display:none !important; }
 .nav-actions .icon-btn{ display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:9px; cursor:pointer; transition:transform .12s ease, box-shadow .2s ease, border-color .2s ease; }
 .nav-actions .icon-btn:hover{ transform:translateY(-1px); }
 .dark-mode .nav-actions .icon-btn{ border:1px solid rgba(255,255,255,.12); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); color:#e8fefe; }
@@ -846,12 +848,6 @@ body:not(.dark-mode) .privacy-indicator{ color:#1f2937; background:rgba(167,139,
 .field-with-icon input{
   padding-right:3rem;      /* room for eye icon */
 }
-.icon-btn{
-  position:absolute; top:50%; right:.75rem; translate:0 -50%;
-  background:none; border:0; padding:0; cursor:pointer;
-  color:var(--mint-400);
-}
-
 .onboard-step{ font-size:.825rem; color:var(--grey-400); }
 .note-danger{ color:var(--red-400); font-weight:600; }
 .backup-reminder{ margin-top:1rem; font-size:.8rem; color:var(--grey-400); }

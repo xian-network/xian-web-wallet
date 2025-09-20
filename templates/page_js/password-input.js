@@ -17,6 +17,7 @@ function unlockWallet() {
         unencryptedPrivateKey = _unencryptedPrivateKey;
         publicKey = public_key;
         locked = false;
+        updateNavActionsVisibility();
         changePage('wallet');
     });
 }
@@ -35,6 +36,7 @@ function removeWallet(){
         eraseSecureCookie('encryptedPrivateKey');
         unencryptedPrivateKey = null;
         locked = true;
+        updateNavActionsVisibility();
         localStorage.removeItem('tx_history');
         tx_history = [];
         if (typeof WalletManager !== 'undefined'){

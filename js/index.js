@@ -66,6 +66,7 @@ function lockWallet() {
     // Locks the wallet
     unencryptedPrivateKey = null;
     locked = true;
+    updateNavActionsVisibility();
     changePage('password-input');
 }
 
