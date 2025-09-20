@@ -334,7 +334,7 @@ function loadSettingsPage() {
                 const newLabel = labelDiv.textContent.trim();
                 if (newLabel && newLabel !== w.label) {
                     // Save the label
-                    await WalletManager.setWalletLabel(w.publicKey, newLabel);
+                    await WalletManager.setLabel(w.publicKey, newLabel);
                     w.label = newLabel;
                 } else if (!newLabel) {
                     // Reset to placeholder
@@ -379,6 +379,18 @@ function loadSettingsPage() {
                     eraseSecureCookie('encryptedPrivateKey');
                     unencryptedPrivateKey = null;
                     locked = true;
+                }
+                
+                // If the removed wallet was active, switch to another if available
+                if (w.publicKey === active && wallets.length > 1){
+                    const other = wallets.find(x => x.publicKey !== w.publicKey);
+                    if (other) {
+                        await WalletManager.setActiveWallet(other.publicKey);
+                    }
+                }
+                if ((await WalletManager.getWallets()).length === 0){
+                    changePage('get-started');
+                    return;
                 }
                 loadSettingsPage();
             });

@@ -9,10 +9,10 @@
             <label>Wallets</label>
             <div class="wallet-actions">
                 <button class="btn btn-primary btn-sm" id="btn-add-create-wallet">
-                    <i class="icon" data-lucide="plus-circle"></i> Create new wallet
+                    <span><i class="icon" data-lucide="plus-circle"></i> Create wallet</span>
                 </button>
                 <button class="btn btn-secondary btn-sm" id="btn-add-import-wallet">
-                    <i class="icon" data-lucide="download"></i> Import wallet
+                    <span><i class="icon" data-lucide="download"></i> Import wallet</span>
                 </button>
             </div>
         </div>
@@ -52,13 +52,13 @@
     <div class="form-group">
         <label for="private_key_export">Active Wallet - Private Key</label>
         <p>Export the private key for your currently active wallet. If you lose your private key, you will lose access to your wallet and funds.</p>
-        <div class="active-wallet-info" id="activeWalletInfo">
+        <div class="active-wallet-info" id="activeWalletInfo" style="display: none;">
             <div class="active-wallet-label" id="activeWalletLabel">Loading...</div>
             <div class="active-wallet-address" id="activeWalletAddress">Loading...</div>
         </div>
         <a href="#" id="private_key_export" class="btn btn-secondary">Export Private Key</a>
     </div>
-    <div class="form-group">
+    <div class="form-group" style="display: none;">
         <label for="remove_wallet_export">Active Wallet - Remove</label>
         <p>Remove your currently active wallet from this browser. This will not delete your wallet or funds, but you will need to import it again to access it.</p>
         <a href="#" id="remove_wallet_export" class="btn btn-danger">Remove Active Wallet</a>

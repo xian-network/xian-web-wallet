@@ -982,7 +982,6 @@ body:not(.dark-mode) .privacy-indicator{ color:#1f2937; background:rgba(167,139,
 .wallet-info-title{
     position: absolute;
     margin-top: -32.5px;
-    background: var(--bg-dark);
     padding-left: 0.5rem;
     padding-right: 0.5rem;
 }
@@ -1592,7 +1591,6 @@ a:hover { text-decoration-color: currentColor; }
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
     flex-wrap: wrap;
     gap: 1rem;
 }
@@ -1624,7 +1622,9 @@ a:hover { text-decoration-color: currentColor; }
 }
 
 .wallet-list-improved {
-    display: grid;
+    flex-direction: column;
+    align-items: flex-start;
+    display: flex;
     gap: 0.75rem;
     margin-bottom: 1rem;
 }
@@ -1865,4 +1865,15 @@ body:not(.dark-mode) .active-wallet-label {
 
 body:not(.dark-mode) .active-wallet-address {
     color: rgba(0, 0, 0, 0.6);
+}
+
+.wallet-actions .btn, .wallet-card .btn{
+    width:unset;
+}
+
+#btn-get-started-import-wallet, #btn-get-started-create-wallet{
+    gap: 0.5rem;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
 }
