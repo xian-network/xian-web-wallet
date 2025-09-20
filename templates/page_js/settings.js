@@ -141,10 +141,10 @@ document.getElementById('remove_rpc_button').addEventListener('click', function(
 
 // Quick add wallet actions
 document.getElementById('btn-add-create-wallet')?.addEventListener('click', function(){
-    changePage('create-wallet');
+    changePage('create-wallet', null, null, 'add-wallet');
 });
 document.getElementById('btn-add-import-wallet')?.addEventListener('click', function(){
-    changePage('import-wallet');
+    changePage('import-wallet', null, null, 'add-wallet');
 });
 
 function addCustomRPC() {

@@ -46,7 +46,11 @@ function importWallet() {
 }
 
 document.getElementById('btn-import-wallet-back').addEventListener('click', function() {
-    changePage('get-started');
+    if (typeof pageContext !== 'undefined' && pageContext === 'add-wallet') {
+        changePage('settings');
+    } else {
+        changePage('get-started');
+    }
 });
 document.getElementById('btn-import-wallet-import-wallet').addEventListener('click', function() {
     importWallet();
@@ -94,7 +98,25 @@ function inputValidation() {
     privateKey.addEventListener("input", checkPrivateKeyLength);
 
 }
+
+// Handle context-aware UI updates
+function updateUIForContext() {
+    if (typeof pageContext !== 'undefined' && pageContext === 'add-wallet') {
+        // Update title and description for adding additional wallet
+        const title = document.getElementById('import-wallet-title');
+        const step = document.getElementById('import-wallet-step');
+        const description = document.getElementById('import-wallet-description');
+        
+        if (title) title.textContent = 'Import additional wallet';
+        if (step) step.style.display = 'none'; // Hide step indicator
+        if (description) {
+            description.innerHTML = 'Import an additional wallet. Paste your <strong>private key</strong> and set a password to encrypt it. <span class="note-danger">If you forget the password, it can\'t be recovered.</span>';
+        }
+    }
+}
+
 inputValidation();
+updateUIForContext();
 
 document.getElementById('import_confirmPassword').addEventListener('keyup', function(event) {
     if (event.keyCode === 13) {

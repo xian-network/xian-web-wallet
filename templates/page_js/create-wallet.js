@@ -71,7 +71,25 @@ function createWallet() {
     changePage('wallet');
 
 }
+
+// Handle context-aware UI updates
+function updateUIForContext() {
+    if (typeof pageContext !== 'undefined' && pageContext === 'add-wallet') {
+        // Update title and description for adding additional wallet
+        const title = document.getElementById('create-wallet-title');
+        const step = document.getElementById('create-wallet-step');
+        const description = document.getElementById('create-wallet-description');
+        
+        if (title) title.textContent = 'Add new wallet';
+        if (step) step.style.display = 'none'; // Hide step indicator
+        if (description) {
+            description.innerHTML = 'Create an additional wallet. Choose a password to <strong>encrypt your private key</strong>. <span class="note-danger">If you forget it, we can\'t recover it.</span>';
+        }
+    }
+}
+
 inputValidation();
+updateUIForContext();
 
 document.getElementById('confirmPassword').addEventListener('keyup', function(event) {
     if (event.keyCode === 13) {
@@ -83,5 +101,9 @@ document.getElementById('btn-create-wallet-create').addEventListener('click', fu
     createWallet();
 });
 document.getElementById('btn-create-wallet-back').addEventListener('click', function() {
-    changePage('get-started');
+    if (typeof pageContext !== 'undefined' && pageContext === 'add-wallet') {
+        changePage('settings');
+    } else {
+        changePage('get-started');
+    }
 });

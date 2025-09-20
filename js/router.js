@@ -6,6 +6,7 @@ var locked = true;
 var tx_history = JSON.parse(localStorage.getItem("tx_history")) || [];
 var sendResponse = null;
 var externalWindow = null;
+var pageContext = null;
 
 var callbacks = {};
 var callbackId = 0;
@@ -191,9 +192,10 @@ function sideNavActive() {
   }
 }
 
-function changePage(page, some_data = null, send_response = null) {
+function changePage(page, some_data = null, send_response = null, context = null) {
   sendEventGA("page_view", {engagement_time_msec: 100, page_title: page, page_location: page});
   app_page = page;
+  pageContext = context;
   sideNavActive();
   const loadHtmlAndScripts = (htmlPath) => {
     fetch(htmlPath)
