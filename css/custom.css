@@ -865,9 +865,6 @@ body:not(.dark-mode) .privacy-indicator{ color:#1f2937; background:rgba(167,139,
     width: unset;
 }
 
-.token-actions button:hover {
-    background-color: #ffffff;
-}
 
 .token-actions a:hover {
     background-color: #ffffff;
