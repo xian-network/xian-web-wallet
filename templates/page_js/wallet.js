@@ -185,7 +185,7 @@ function loadWalletPage() {
                                 </div>
                                 <div class="token-balance"><span id="${tokenInfo.contract}Balance">0</span>&nbsp;<span>${tokenInfo.symbol}</span></div>
                                 <div class="token-actions">
-                                                                    ${tokenInfo.contract === "currency" ? "" : `<button class="btn remove-btn" data-contract="${tokenInfo.contract}" title="Remove Token"><i class="icon" data-lucide="trash" title="Remove Token"></i></button>`}
+                                                                    ${tokenInfo.contract === "currency" ? "" : `<button class="btn remove-btn" data-contract="${tokenInfo.contract}" title="Remove Token"><i class="icon" data-lucide="trash-2" title="Remove Token"></i></button>`}
                                     <button class="btn send-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="icon" data-lucide="send"></i> Send</button>
                                     <button class="btn receive-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="icon" data-lucide="download"></i> Receive</button>
                                 </div>
