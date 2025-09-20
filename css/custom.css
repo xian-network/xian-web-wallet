@@ -1605,6 +1605,12 @@ a:hover { text-decoration-color: currentColor; }
     align-items: center;
 }
 
+@media (max-width: 768px) {
+    .wallet-actions {
+        margin-bottom: 1rem;
+    }
+}
+
 .wallet-actions .btn {
     font-size: 0.85rem;
     padding: 0.5rem 1rem;
