@@ -1606,7 +1606,8 @@ a:hover { text-decoration-color: currentColor; }
 .wallet-actions {
     display: flex;
     gap: 0.5rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    align-items: center;
 }
 
 .wallet-actions .btn {
@@ -1802,6 +1803,7 @@ body:not(.dark-mode) .wallet-label-placeholder {
     
     .wallet-actions {
         justify-content: center;
+        flex-wrap: wrap;
     }
     
     .wallet-card {
@@ -1811,4 +1813,56 @@ body:not(.dark-mode) .wallet-label-placeholder {
     .wallet-address-compact {
         font-size: 0.7rem;
     }
+}
+
+@media (max-width: 480px) {
+    .wallet-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .wallet-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Active Wallet Info Display */
+.active-wallet-info {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.active-wallet-label {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+}
+
+.active-wallet-address {
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    word-break: break-all;
+    line-height: 1.3;
+}
+
+/* Light mode active wallet info */
+body:not(.dark-mode) .active-wallet-info {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+body:not(.dark-mode) .active-wallet-label {
+    color: rgba(0, 0, 0, 0.9);
+}
+
+body:not(.dark-mode) .active-wallet-address {
+    color: rgba(0, 0, 0, 0.6);
 }

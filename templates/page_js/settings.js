@@ -389,7 +389,24 @@ function loadSettingsPage() {
             container.appendChild(card);
         });
         if (window.lucide && window.lucide.createIcons) { window.lucide.createIcons(); }
+        
+        // Update active wallet info display
+        updateActiveWalletInfo();
     })();
+}
+
+async function updateActiveWalletInfo() {
+    const activePublicKey = await WalletManager.getActivePublicKey();
+    const wallets = await WalletManager.getWallets();
+    const activeWallet = wallets.find(w => w.publicKey === activePublicKey);
+    
+    const labelElement = document.getElementById('activeWalletLabel');
+    const addressElement = document.getElementById('activeWalletAddress');
+    
+    if (activeWallet && labelElement && addressElement) {
+        labelElement.textContent = activeWallet.label || 'Unlabeled Wallet';
+        addressElement.textContent = activeWallet.publicKey;
+    }
 }
 
 loadSettingsPage();

@@ -50,14 +50,18 @@
     
     
     <div class="form-group">
-        <label for="private_key_export">Private Key</label>
-        <p>You can export your private key to back it up. If you lose your private key, you will lose access to your wallet and funds.</p>
-        <a href="#" id="private_key_export">Export Private Key</a>
+        <label for="private_key_export">Active Wallet - Private Key</label>
+        <p>Export the private key for your currently active wallet. If you lose your private key, you will lose access to your wallet and funds.</p>
+        <div class="active-wallet-info" id="activeWalletInfo">
+            <div class="active-wallet-label" id="activeWalletLabel">Loading...</div>
+            <div class="active-wallet-address" id="activeWalletAddress">Loading...</div>
+        </div>
+        <a href="#" id="private_key_export" class="btn btn-secondary">Export Private Key</a>
     </div>
     <div class="form-group">
-        <label for="remove_wallet_export">Remove Wallet</label>
-        <p>You can remove this wallet from the browser. It will not delete your wallet or funds, but you will need to import it again to access it.</p>
-        <a href="#" id="remove_wallet_export">Remove this Wallet</a>
+        <label for="remove_wallet_export">Active Wallet - Remove</label>
+        <p>Remove your currently active wallet from this browser. This will not delete your wallet or funds, but you will need to import it again to access it.</p>
+        <a href="#" id="remove_wallet_export" class="btn btn-danger">Remove Active Wallet</a>
     </div> 
     <div class="form-group">
         <label for="version">Wallet Version</label>
