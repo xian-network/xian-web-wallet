@@ -277,10 +277,9 @@ function loadSettingsPage() {
         wallets.forEach(w => {
             const row = document.createElement('div');
             row.className = 'wallet-row';
-            row.style.display = 'flex';
-            row.style.alignItems = 'center';
-            row.style.gap = '.5rem';
-            row.style.marginBottom = '.25rem';
+            if (w.publicKey === active) {
+                row.classList.add('active');
+            }
 
             const radio = document.createElement('input');
             radio.type = 'radio';
@@ -294,10 +293,20 @@ function loadSettingsPage() {
                 }
             });
 
-            const label = document.createElement('div');
-            label.style.flex = '1';
-            label.style.wordBreak = 'break-all';
-            label.textContent = (w.label ? (w.label + ' • ') : '') + w.publicKey;
+            const walletInfo = document.createElement('div');
+            walletInfo.className = 'wallet-info';
+
+            if (w.label) {
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'wallet-label';
+                labelDiv.textContent = w.label;
+                walletInfo.appendChild(labelDiv);
+            }
+
+            const addressDiv = document.createElement('div');
+            addressDiv.className = 'wallet-address';
+            addressDiv.textContent = w.publicKey;
+            walletInfo.appendChild(addressDiv);
 
             const removeBtn = document.createElement('button');
             removeBtn.className = 'btn btn-danger';
@@ -317,7 +326,7 @@ function loadSettingsPage() {
             });
 
             row.appendChild(radio);
-            row.appendChild(label);
+            row.appendChild(walletInfo);
             row.appendChild(removeBtn);
             container.appendChild(row);
         });
