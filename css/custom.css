@@ -793,10 +793,12 @@ body:not(.dark-mode) .privacy-indicator{ color:#1f2937; background:rgba(167,139,
 }
 
 .token-details {
-    display: flex;
+    display: flex
+;
     flex-direction: column;
     margin-top: 0px !important;
     width: 10rem;
+    justify-content: center;
 }
 
 .token-actions {
