@@ -152,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
       { id: 'ide', label: 'Open IDE', action: () => changePage('ide') },
       { id: 'settings', label: 'Open Settings', action: () => changePage('settings') },
       { id: 'news', label: 'Chain News', action: () => changePage('ecosystem-news') },
-      { id: 'dark', label: 'Toggle Dark Mode', action: () => document.getElementById('darkModeToggler').click() },
       { id: 'refresh', label: 'Refresh Current Page', action: () => changePage(app_page) },
     ];
   }
