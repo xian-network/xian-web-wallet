@@ -703,7 +703,6 @@ body:not(.dark-mode) .privacy-indicator{ color:#1f2937; background:rgba(167,139,
   .wallet-tabs a.active {
     background: rgba(0, 247, 224, 0.12);
     color: #06e6cb;
-    box-shadow: 0 0 6px rgba(0, 247, 224, 0.2);
     font-weight: bold;
   }
   
