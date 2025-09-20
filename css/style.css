@@ -3918,9 +3918,12 @@ input[type=submit].btn-block {
 }
 
 .input-group-append {
-    margin-left: -1px
+    height: 38px;
+    border-left: 0;
 }
-
+.input-group-append .btn{
+    border-left: 0!important;
+}
 .input-group-text {
     display: flex;
     align-items: center;

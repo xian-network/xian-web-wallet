@@ -12,6 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   function handleNavAction(action){
+    if (locked) {
+      toast && toast('warning', 'Wallet is locked');
+      return;
+    }
     if (action === 'send') return changePage('send-token');
     if (action === 'receive') return changePage('receive-token');
     if (action === 'refresh') return changePage(app_page);
