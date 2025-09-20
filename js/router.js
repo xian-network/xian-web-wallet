@@ -120,7 +120,6 @@ window.addEventListener("message", (event) => {
       callbacks[callbackKey](event.data.data);
       delete callbacks[callbackKey];
     }
-    toast('success', 'Successfully signed message');
   }
   if (event.data.type === "REQUEST_TOKEN") {
     const some_data = event.data.data;

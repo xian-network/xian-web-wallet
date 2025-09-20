@@ -1,4 +1,20 @@
+(function () {
+  const bar = document.querySelector('.action-bar');
+  if (!bar) return;
 
+  // Move fixed bar to <body> so it's fixed to the viewport, not a transformed ancestor
+  document.body.appendChild(bar);
+
+  // Keep a spacer so content isn't covered
+  const spacer = document.querySelector('.action-bar-spacer');
+  const sync = () => {
+    if (spacer) spacer.style.height = `${bar.getBoundingClientRect().height}px`;
+  };
+  new ResizeObserver(sync).observe(bar);
+  window.addEventListener('load', sync);
+  window.addEventListener('resize', sync);
+  sync();
+})();
 
 function acceptRequest() {
     let contract = document.getElementById('requestTransactionContract').innerHTML;

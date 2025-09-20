@@ -13,6 +13,36 @@
 #requestTransactionParamsRaw{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.6rem;color:#e8fefe}
 .app-box-form details summary{cursor:pointer;color:#cfe7e5}
 #failure-alert{border-color:rgba(255,77,79,.45)!important;background:rgba(255,77,79,.12)!important;color:#ffb3b5!important}
+/* 1) The fixed bar itself */
+.action-bar{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  padding: .75rem 1rem;
+  display: flex;
+  gap: .5rem;
+  justify-content: center;
+  background: rgba(10,12,14,.72);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(255,255,255,.12);
+}
+
+/* 2) Reserve space so content isn’t covered */
+.action-bar-spacer{ height: 72px; }
+
+/* 3) CRITICAL: don’t let ancestors capture fixed positioning */
+.app-root, .tx-card, .whatever-wrapper {
+  transform: none !important;
+  filter: none !important;
+  perspective: none !important;
+}
+
+/* If you have a scrolling wrapper, make window the scroller instead */
+html, body { height: auto; }
+.app-container { overflow: visible; } /* remove overflow:auto/hidden on the main wrapper */
+.action-bar-btns { gap: .5rem; }
 </style>
 <div id="failure-alert" class="alert alert-danger d-none">
     <strong>This transaction will most likely fail!</strong>
@@ -38,9 +68,16 @@
             <pre id="requestTransactionParamsRaw"></pre>
         </details>
     </div>
-    <div class="btn-group" style="margin-top:1rem;">
-        <button class="btn btn-primary" id="request-transaction-accept">Accept</button>
-        <button class="btn btn-secondary" id="request-transaction-reject">Reject</button>
-    </div>
+   
+</div>
+<!-- Spacer so content isn’t hidden behind the fixed bar -->
+<div class="action-bar-spacer"></div>
+
+<!-- Fixed bar -->
+<div class="action-bar">
+  <div class="btn-group action-bar-btns">
+    <button class="btn btn-primary" id="request-transaction-accept">Accept</button>
+    <button class="btn btn-secondary" id="request-transaction-reject">Reject</button>
+  </div>
 </div>
 <script src="templates/page_js/request-transaction.js"></script>
