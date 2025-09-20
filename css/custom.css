@@ -1870,3 +1870,8 @@ body:not(.dark-mode) .active-wallet-address {
     align-items: center;
     padding: 1rem;
 }
+
+select option{
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+}
