@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const privacyBadge = document.getElementById('privacyBadge');
   const privacySwitch = document.getElementById('privacySwitch');
   const privacyIndicator = document.getElementById('privacyIndicator');
-  const latencyCanvas = document.getElementById('latencySpark');
+
 
   function handleNavAction(action){
     if (action === 'send') return changePage('send-token');
@@ -108,41 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Latency sparkline
-  if (latencyCanvas) {
-    const ctx = latencyCanvas.getContext('2d');
-    const maxPoints = 50;
-    const values = [];
-    let lastPing = 0;
 
-    function draw(){
-      const w = latencyCanvas.width, h = latencyCanvas.height;
-      ctx.clearRect(0,0,w,h);
-      if (values.length < 2) return;
-      const min = Math.min(...values), max = Math.max(...values);
-      const range = Math.max(1, max - min);
-      ctx.beginPath();
-      for (let i=0;i<values.length;i++){
-        const x = (i/(maxPoints-1))*w;
-        const y = h - ((values[i]-min)/range)*h;
-        if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-      }
-      const grad = ctx.createLinearGradient(0,0,w,0);
-      grad.addColorStop(0,'#06e6cb'); grad.addColorStop(1,'#02b39e');
-      ctx.strokeStyle = grad; ctx.lineWidth = 2; ctx.stroke();
-    }
-
-    async function sample(){
-      const t0 = performance.now();
-      try { await ping(); } catch(e) {}
-      const t1 = performance.now();
-      lastPing = Math.round(t1 - t0);
-      values.push(lastPing); if (values.length > maxPoints) values.shift();
-      draw();
-    }
-    setInterval(sample, 5000);
-    sample();
-  }
 
   // Floating Action Button
   const fabMain = $('#fabMain');
