@@ -153,10 +153,19 @@ function loadWalletPage() {
                 <div class="cogwheel-icon add-token-link" style="font-size:1rem">
                     <i class="icon" data-lucide="plus" title="Add Token"></i> Add Token
                 </div>
+            </div>
+            <div class="token-table-container">
+                <div class="token-table-header">
+                    <div class="header-token">Token</div>
+                    <div class="header-balance">Balance</div>
+                    <div class="header-actions">Actions</div>
+                </div>
+                <div class="token-table-body">
+                </div>
             </div>`;
              lucide.createIcons();
             // Spinner for loading tokens
-            tokenList.innerHTML += `<div class="loading-spinner"><i class="icon" data-lucide="sync-alt"></i> Loading tokens...</div>`;
+            document.querySelector('.token-table-body').innerHTML = `<div class="loading-spinner"><i class="icon" data-lucide="sync-alt"></i> Loading tokens...</div>`;
 
 
             // Fetch information for each token with error handling for each promise
@@ -170,12 +179,13 @@ function loadWalletPage() {
             // Process each token information
             return Promise.all(tokenInfoPromises)
                 .then(tokenInfos => {
+                    const tokenTableBody = document.querySelector('.token-table-body');
                     tokenInfos.forEach(tokenInfo => {
                         if (tokenInfo.name === "\x9Eée" || tokenInfo.symbol === "\x9Eée") {
                             return;
                         }
                         if (tokenInfo) {
-                            tokenList.innerHTML += `
+                            tokenTableBody.innerHTML += `
                             <div class="token-item" data-contract="${tokenInfo.contract}">
                                 <div class="token-details">
                                         <div class="token-title-container">
@@ -193,7 +203,7 @@ function loadWalletPage() {
                             refreshBalance(tokenInfo.contract);
                         }
                     });
-                    tokenList.innerHTML = tokenList.innerHTML.replace('<div class="loading-spinner"><i class="icon" data-lucide="sync-alt"></i> Loading tokens...</div>', '');
+                    tokenTableBody.innerHTML = tokenTableBody.innerHTML.replace('<div class="loading-spinner"><i class="icon" data-lucide="sync-alt"></i> Loading tokens...</div>', '');
                     setupTokenEventListeners();  // Setup event listeners after tokens are loaded
                     lucide.createIcons();
                 });

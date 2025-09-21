@@ -2,7 +2,7 @@
 const originalFetch = window.fetch;
 
 // Define a function to wrap fetch with timeout
-function fetchWithTimeout(url, options, timeout = 5000) {
+function fetchWithTimeout(url, options, timeout = 10000) {
     return Promise.race([
         originalFetch(url, options),
         new Promise((_, reject) =>
