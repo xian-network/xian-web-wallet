@@ -134,7 +134,12 @@ async function sendEventGA(name, params = {}) {
 (async () => {
     // Wait for sodium to initialize
     await sodium.ready;
-
+     // Initialize nav-actions visibility based on wallet lock state
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof updateNavActionsVisibility === 'function') {
+                updateNavActionsVisibility();
+            }
+        });
     // Now you can safely use sodium functions
     console.log("Sodium is ready!");
 })();
