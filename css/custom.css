@@ -370,6 +370,12 @@ a:hover{
     flex-direction: row;
 }
 
+/* Ensure grouped buttons center their internal content (icon + label) */
+.app-box .btn-group .btn { justify-content:center; }
+
+/* If button text appears left-aligned due to width expansion, force text centering */
+.app-box .btn-group .btn { text-align:center; }
+
 @media (max-width: 768px) {
     .app-box .btn-group {
         flex-direction: column;
@@ -1667,8 +1673,17 @@ a.btn:hover { text-decoration:none; }
 .token-bar-right { right:0; }
 .token-list-title { margin:0; }
 /* Icon spacing & icon-only sizing */
-.btn i.icon, .btn i[data-lucide] { margin-right:.45rem; line-height:1; }
-.btn i.icon:last-child:only-child, .btn i[data-lucide]:last-child:only-child { margin-right:0; }
+/* Icon spacing: use gap for reliability across i/svg */
+.btn { display:inline-flex; align-items:center; }
+.btn > i.icon,
+.btn > i[data-lucide],
+.btn > svg.lucide { flex-shrink:0; }
+/* Apply gap only when icon + text (not icon-only variant) */
+.btn:not(.btn-icon-only) { gap:.5rem; }
+/* Remove gap when single child (icon-only) */
+.btn.btn-icon-only { gap:0; }
+/* Token bar inherits same button spacing */
+.token-bar .btn { align-items:center; }
 .btn.btn-icon-only { padding:.45rem .55rem; display:inline-flex; justify-content:center; align-items:center; }
 .btn.btn-icon-only i { margin-right:0 !important; }
 
@@ -1849,9 +1864,6 @@ a:hover { text-decoration-color: currentColor; }
 .wallet-card .btn-danger.btn-icon-only:hover { transform:translateY(-2px); }
 .wallet-remove-btn { width:42px; min-width:42px; }
 /* Button text color consistency overrides */
-.btn-primary:hover, .btn-primary:focus, .btn-primary:active { color:#0b1716 !important; }
-.dark-mode .btn-primary:hover, .dark-mode .btn-primary:focus, .dark-mode .btn-primary:active { color:#0b1716 !important; }
-.btn-secondary, .btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active { color:#0d0d0d !important; }
 .dark-mode .btn-secondary, .dark-mode .btn-secondary:hover, .dark-mode .btn-secondary:focus, .dark-mode .btn-secondary:active { color:#d8e4e4 !important; }
 .btn-danger, .btn-danger:hover, .btn-danger:focus, .btn-danger:active { color:#fff !important; }
 
