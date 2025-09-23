@@ -1463,8 +1463,8 @@ body.dark-mode::before {
 
 /* Containers */
 /* App box: light vs dark */
-body:not(.dark-mode) .app-box { background:#fff; box-shadow: var(--shadow-sm); border-radius: var(--radius-lg); border:1px solid rgba(0,0,0,.06); }
-.dark-mode .app-box { background: rgba(17, 17, 17, 0.85); box-shadow: var(--shadow-md); border-radius: var(--radius-lg); border: 1px solid rgba(255, 255, 255, 0.12); backdrop-filter: blur(12px) saturate(140%); }
+body:not(.dark-mode) .app-box { background:#fff; border-radius: var(--radius-lg); border:1px solid rgba(0,0,0,.06); }
+.dark-mode .app-box { background: rgba(17, 17, 17, 0.85); border-radius: var(--radius-lg); border: 1px solid rgba(255, 255, 255, 0.12); backdrop-filter: blur(12px) saturate(140%); }
 
 /* Wallet List Styling */
 .wallet-list {
