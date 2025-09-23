@@ -367,7 +367,7 @@ function loadSettingsPage() {
             walletInfo.appendChild(addressDiv);
 
             const removeBtn = document.createElement('button');
-            removeBtn.className = 'btn btn-remove';
+            removeBtn.className = 'btn btn-danger btn-icon-only wallet-remove-btn';
             removeBtn.innerHTML = '<i class="icon" data-lucide="trash-2"></i>';
             removeBtn.title = 'Remove wallet';
             removeBtn.addEventListener('click', async () => {

@@ -421,9 +421,6 @@ a:hover{
     margin-bottom: 0;
 }
 
-.app-box button {
-    width: 100%; /* Full-width buttons */
-}
 
 .online-status {
     display: flex;
@@ -897,17 +894,6 @@ body:not(.dark-mode) .token-item:hover {
     text-align: center;
 }
 
-.create-token-link{
-    position: absolute;
-    left: 0;
-    font-size: 1.25rem;
-    margin-bottom: 20px;
-    cursor: pointer;
-    color: #06e6cb;
-    display: flex
-;
-    gap: 10px;
-}
 
 .token-name span, .token-symbol span, .token-balance span {
     font-weight: bold;
@@ -1066,9 +1052,6 @@ body:not(.dark-mode) .token-item:hover {
 }
 
 .add-token-link{
-    display: flex
-;
-    gap: 10px;
 }
 #wallet-refresh-all{
     display: flex
@@ -1651,6 +1634,64 @@ body:not(.dark-mode) .btn-primary{ background: linear-gradient(135deg, var(--acc
 body:not(.dark-mode) .btn-secondary{ background:#f7f7f8; color:#0d0d0d; }
 .dark-mode .btn-secondary{ background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04)); color: #d8e4e4; }
 .btn-link { color: var(--accent); }
+/* Strengthen differentiation: give secondary a subtle border & remove gradient confusion */
+body:not(.dark-mode) .btn-secondary{ border:1px solid rgba(0,0,0,.12); }
+.dark-mode .btn-secondary{ border:1px solid rgba(255,255,255,.12); }
+body:not(.dark-mode) .btn-secondary:hover { background:#efeff0; }
+.dark-mode .btn-secondary:hover { background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.07)); }
+body:not(.dark-mode) .btn-secondary:active, body:not(.dark-mode) .btn-secondary:focus { background:#e4e4e6; }
+.dark-mode .btn-secondary:active, .dark-mode .btn-secondary:focus { background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,.1)); }
+
+/* Primary: increase contrast & depth */
+.btn-primary { position:relative; box-shadow:0 4px 18px -2px rgba(6,230,203,.35),0 0 0 1px rgba(6,230,203,.4) inset; }
+.btn-primary:hover { filter:none; transform:translateY(-2px); box-shadow:0 6px 26px -2px rgba(6,230,203,.45),0 0 0 1px rgba(255,255,255,.3) inset; }
+.btn-primary:active { transform:translateY(0); box-shadow:0 3px 14px -2px rgba(6,230,203,.4),0 0 0 1px rgba(0,0,0,.15) inset; }
+
+/* Danger variant refinement */
+body:not(.dark-mode) .btn-danger{ background:linear-gradient(135deg,#ff4d4f,#d9363e 70%); color:#fff; border:1px solid rgba(217,54,62,.5); }
+.dark-mode .btn-danger{ background:linear-gradient(135deg,#ff5f61,#e0444a 70%); color:#fff; border:1px solid rgba(255,95,97,.5); }
+.btn-danger:hover{ filter:brightness(1.05); box-shadow:0 8px 24px -4px rgba(217,54,62,.45); }
+.btn-danger:active{ filter:brightness(.94); }
+
+/* Focus visible ring for accessibility */
+.btn:focus-visible { outline:none; box-shadow:0 0 0 3px rgba(6,230,203,.55), 0 0 0 1px #0b1716; }
+.dark-mode .btn:focus-visible { box-shadow:0 0 0 3px rgba(6,230,203,.65), 0 0 0 1px rgba(0,0,0,.6); }
+
+/* Anchor buttons parity */
+a.btn { display:inline-flex; align-items:center; }
+a.btn:hover { text-decoration:none; }
+/* Token bar alignment */
+.token-bar { display:flex; align-items:center; justify-content:center; gap:.75rem; position:relative; margin-bottom:20px; }
+.token-bar-left, .token-bar-right { position:absolute; top:50%; transform:translateY(-50%); display:flex; align-items:center; gap:.5rem; }
+.token-bar-left { left:0; }
+.token-bar-right { right:0; }
+.token-list-title { margin:0; }
+/* Icon spacing & icon-only sizing */
+.btn i.icon, .btn i[data-lucide] { margin-right:.45rem; line-height:1; }
+.btn i.icon:last-child:only-child, .btn i[data-lucide]:last-child:only-child { margin-right:0; }
+.btn.btn-icon-only { padding:.45rem .55rem; display:inline-flex; justify-content:center; align-items:center; }
+.btn.btn-icon-only i { margin-right:0 !important; }
+
+/* Ghost (tertiary) button: minimal emphasis */
+/* Ghost buttons: now with subtle surface so they read as buttons */
+body:not(.dark-mode) .btn-ghost { background:rgba(6,230,203,.06); border:1px solid rgba(6,230,203,.15); color: var(--accent); box-shadow:0 2px 4px rgba(0,0,0,.04); }
+body:not(.dark-mode) .btn-ghost:hover { background:rgba(6,230,203,.10); border-color:rgba(6,230,203,.30); box-shadow:0 4px 10px rgba(0,0,0,.08); }
+.dark-mode .btn-ghost { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.10); color: var(--accent); box-shadow:0 2px 6px -2px rgba(0,0,0,.5); }
+.dark-mode .btn-ghost:hover { background:rgba(255,255,255,.09); border-color:rgba(6,230,203,.45); box-shadow:0 6px 14px -2px rgba(6,230,203,.25); }
+.btn-ghost:active { filter:brightness(.95); transform:translateY(0); box-shadow:0 2px 6px rgba(0,0,0,.12) inset; }
+.btn-ghost:focus-visible { box-shadow:0 0 0 3px rgba(6,230,203,.5),0 2px 6px rgba(0,0,0,.2); }
+/* Secondary buttons hover/active states */
+/* (old secondary hover/active overridden above) */
+
+/* Utility sizes */
+.btn-sm { padding: .25rem .55rem; font-size:.875rem; }
+.btn-lg { padding: .6rem 1.1rem; font-size:1.05rem; }
+
+/* Ensure any plain <button> without variant gets secondary style baseline */
+button.btn:not(.btn-primary):not(.btn-danger):not(.btn-success):not(.btn-warning):not(.btn-info) {
+    /* Neutral fallback */
+    background: var(--neutral-btn-bg, transparent);
+}
 
 /* Inputs */
 /* Inputs: light vs dark */
@@ -1800,6 +1841,28 @@ a:hover { text-decoration-color: currentColor; }
     border-color: rgba(0, 255, 157, 0.3);
     box-shadow: 0 0 0 1px rgba(0, 255, 157, 0.1);
 }
+
+/* Wallet card action (remove) button tweaks */
+.wallet-card .btn-danger.btn-icon-only,
+.wallet-card .btn-danger.btn-icon-only i { line-height:1; }
+.wallet-card .btn-danger.btn-icon-only { padding:.45rem .5rem; display:inline-flex; justify-content:center; align-items:center; }
+.wallet-card .btn-danger.btn-icon-only:hover { transform:translateY(-2px); }
+.wallet-remove-btn { width:42px; min-width:42px; }
+
+/* Input group styling (Settings RPC section) */
+.input-group { display:flex; width:100%; align-items:stretch; }
+.input-group > .form-control { flex:1 1 auto; border-top-right-radius:0; border-bottom-right-radius:0; }
+.input-group-append { display:flex; }
+.input-group-append > .btn { border-top-left-radius:0; border-bottom-left-radius:0; }
+.input-group-append > .btn { width:46px; min-width:46px; padding:0; display:inline-flex; align-items:center; justify-content:center; }
+.input-group-append > .btn i { margin-right:0; }
+.input-group.mb-2 { margin-bottom:.5rem; }
+.dark-mode .input-group > .form-control { border-right:0; }
+.input-group > .form-control:focus { z-index:2; }
+
+/* Compact plus / trash buttons beside inputs */
+#add_rpc_button.btn, #remove_rpc_button.btn { padding:.55rem .65rem; display:inline-flex; align-items:center; justify-content:center; }
+
 
 .wallet-card input[type="radio"] {
     appearance: none;

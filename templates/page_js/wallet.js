@@ -121,12 +121,7 @@ async function loadNFTPage() {
                         <div class="token-title-container">
                             <div class="token-name"><span class="token-symbol">${nftName}</span><br><span style="font-weight:400">${nftDescription}</span></div>
                         </div>
-                        <a class="btn send-btn" style="
-    background-color: #ffffff;
-    width: unset;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    " data-contract="${nftAddress}" href="https://pixelsnek.xian.org/frames/${nftAddress}" target="_blank"><i class="fas fa-eye"></i> View</a>
+                        <a class="btn btn-ghost" data-contract="${nftAddress}" href="https://pixelsnek.xian.org/frames/${nftAddress}" target="_blank"><i class="fas fa-eye"></i> View</a>
                     </div>
                 </div>
             </div>`;
@@ -144,14 +139,17 @@ function loadWalletPage() {
         .then((publicKey) => {
             document.getElementById("walletAddress").innerHTML = publicKey;
             let tokenList = document.getElementById("wallet-tokens");
-            tokenList.innerHTML = `<div class="title-container">
-
-                <div class="create-token-link" style="font-size:1rem">
-                    <i class="icon" data-lucide="badge-plus" title="Create Token"></i> Create Token
+            tokenList.innerHTML = `<div class="token-bar">
+                <div class="token-bar-left">
+                    <button type="button" class="btn btn-ghost create-token-link" aria-label="Create Token" title="Create Token">
+                        <i class="icon" data-lucide="badge-plus"></i> Create Token
+                    </button>
                 </div>
                 <h2 class="token-list-title">Tokens</h2>
-                <div class="cogwheel-icon add-token-link" style="font-size:1rem">
-                    <i class="icon" data-lucide="plus" title="Add Token"></i> Add Token
+                <div class="token-bar-right">
+                    <button type="button" class="btn btn-ghost add-token-link" aria-label="Add Token" title="Add Token">
+                        <i class="icon" data-lucide="plus"></i> Add Token
+                    </button>
                 </div>
             </div>
             <div class="token-table-container">
@@ -195,9 +193,9 @@ function loadWalletPage() {
                                 </div>
                                 <div class="token-balance"><span id="${tokenInfo.contract}Balance">0</span>&nbsp;<span>${tokenInfo.symbol}</span></div>
                                 <div class="token-actions">
-                                                                    ${tokenInfo.contract === "currency" ? "" : `<button class="btn remove-btn" data-contract="${tokenInfo.contract}" title="Remove Token"><i class="icon" data-lucide="trash-2" title="Remove Token"></i></button>`}
-                                    <button class="btn send-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="icon" data-lucide="send"></i> Send</button>
-                                    <button class="btn receive-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="icon" data-lucide="download"></i> Receive</button>
+                                    ${tokenInfo.contract === "currency" ? "" : `<button class=\"btn btn-danger btn-icon-only remove-btn\" data-contract=\"${tokenInfo.contract}\" title=\"Remove Token\"><i class=\"icon\" data-lucide=\"trash-2\" title=\"Remove Token\"></i></button>`}
+                                    <button class="btn btn-secondary send-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="icon" data-lucide="send"></i> Send</button>
+                                    <button class="btn btn-ghost receive-btn" style="max-width:15rem" data-contract="${tokenInfo.contract}"><i class="icon" data-lucide="download"></i> Receive</button>
                                 </div>
                             </div>`;
                             refreshBalance(tokenInfo.contract);
