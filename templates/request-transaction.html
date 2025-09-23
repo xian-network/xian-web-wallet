@@ -75,9 +75,13 @@ html, body { height: auto; }
 
 <!-- Fixed bar -->
 <div class="action-bar">
-  <div class="btn-group action-bar-btns">
-    <button class="btn btn-primary" id="request-transaction-accept">Accept</button>
-    <button class="btn btn-secondary" id="request-transaction-reject">Reject</button>
+  <div class="btn-group action-bar-btns" style="display:flex;justify-content:center;gap:.65rem;">
+    <button class="btn btn-primary" id="request-transaction-accept" style="justify-content:center;">
+      Accept
+    </button>
+    <button class="btn btn-secondary" id="request-transaction-reject" style="justify-content:center;">
+      Reject
+    </button>
   </div>
 </div>
 <script src="templates/page_js/request-transaction.js"></script>
