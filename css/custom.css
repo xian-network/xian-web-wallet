@@ -1848,6 +1848,12 @@ a:hover { text-decoration-color: currentColor; }
 .wallet-card .btn-danger.btn-icon-only { padding:.45rem .5rem; display:inline-flex; justify-content:center; align-items:center; }
 .wallet-card .btn-danger.btn-icon-only:hover { transform:translateY(-2px); }
 .wallet-remove-btn { width:42px; min-width:42px; }
+/* Button text color consistency overrides */
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active { color:#0b1716 !important; }
+.dark-mode .btn-primary:hover, .dark-mode .btn-primary:focus, .dark-mode .btn-primary:active { color:#0b1716 !important; }
+.btn-secondary, .btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active { color:#0d0d0d !important; }
+.dark-mode .btn-secondary, .dark-mode .btn-secondary:hover, .dark-mode .btn-secondary:focus, .dark-mode .btn-secondary:active { color:#d8e4e4 !important; }
+.btn-danger, .btn-danger:hover, .btn-danger:focus, .btn-danger:active { color:#fff !important; }
 
 /* Input group styling (Settings RPC section) */
 .input-group { display:flex; width:100%; align-items:stretch; }
