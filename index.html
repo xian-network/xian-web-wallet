@@ -10,7 +10,6 @@
 
     <link rel="stylesheet" href="css/style.css?v=1">
     <link rel="stylesheet" href="css/custom.css?v=133723">
-    <link rel="stylesheet" href="css/lint.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
@@ -62,14 +61,10 @@
                     Wallet
                 </div>
                 <div class="side-nav-item" id="side-change-page-ide">
-                    <i class="icon" data-lucide="code" title="IDE"></i>
-                    IDE
+                    <i class="icon" data-lucide="code" title="Deploy"></i>
+                    Deploy
                 </div>
                 
-                <div class="side-nav-item" id="side-change-page-messenger">
-                    <i class="icon" data-lucide="message-square" title="Messenger"></i>
-                    Messenger
-                </div>
                 <div class="side-nav-item" id="side-change-page-ecosystem-news" style="margin-top: auto;">
                     <i class="icon" data-lucide="newspaper" title="Ecosystem News"></i>
                     Chain News
@@ -162,23 +157,14 @@ display: flex;max-width: 100%; width: 100%;flex-direction: column;;
     <script src="js/performance-monitor.js"></script>
     <script src="js/template-cache.js"></script>
     <script src="js/crypto-worker-manager.js"></script>
-    <script src="js/pyodide-worker-manager.js"></script>
     <script src="js/xian.js?v=132337"></script>
     <script src="js/wallet-manager.js?v=1"></script>
     <script src="js/providers/lucide.js"></script>
     <script src="js/router.js?v=13377"></script>
-    <script>
-        // Initialize nav-actions visibility based on wallet lock state
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof updateNavActionsVisibility === 'function') {
-                updateNavActionsVisibility();
-            }
-        });
-    </script>
+   
     <script src="js/helpers.js"></script>
     <script src="js/providers/codemirror.js"></script>
     <script src="js/providers/python.js"></script>
-    <script src="js/providers/lint.js"></script>
     <script src="js/providers/qrcode.min.js"></script>
     <script src="js/modal.js?v=1"></script>
     <script src="js/ui-enhancements.js?v=1"></script>
@@ -186,6 +172,5 @@ display: flex;max-width: 100%; width: 100%;flex-direction: column;;
     <script src="js/index.js?v=122"></script>
     <script src="js/extension.js"></script>
     <script src="js/tx-result-manager.js"></script>
-    <script src="js/providers/pyodide-0.25.1/pyodide.js"></script>
 </body>
 </html>

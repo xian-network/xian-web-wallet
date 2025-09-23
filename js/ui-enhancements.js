@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (privacyIndicator) privacyIndicator.classList.toggle('hidden', !on);
     document.documentElement.classList.toggle('privacy-mode', !!on);
     const sensitiveSelectors = [
-      '#walletAddress', '#yourAddressReceive', '.token-balance', '.messenger-inbox-item-content p'
+      '#walletAddress', '#yourAddressReceive', '.token-balance'
     ];
     sensitiveSelectors.forEach(sel => {
       document.querySelectorAll(sel).forEach(el => {
@@ -148,8 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
       { id: 'receive', label: 'Receive Token', action: () => changePage('receive-token') },
       { id: 'addtoken', label: 'Add to Token List', action: () => changePage('add-to-token-list') },
       { id: 'advanced', label: 'Advanced Transaction', action: () => changePage('send-advanced-transaction') },
-      { id: 'messenger', label: 'Open Messenger', action: () => changePage('messenger') },
-      { id: 'ide', label: 'Open IDE', action: () => changePage('ide') },
+  // Messenger command removed
+      { id: 'ide', label: 'Open Deploy', action: () => changePage('ide') },
       { id: 'settings', label: 'Open Settings', action: () => changePage('settings') },
       { id: 'news', label: 'Chain News', action: () => changePage('ecosystem-news') },
       { id: 'refresh', label: 'Refresh Current Page', action: () => changePage(app_page) },
@@ -158,14 +158,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderCommands(filter = '') {
     if (!cmdkList) return;
-    const items = getCommands().filter(c => c.label.toLowerCase().includes(filter.toLowerCase()));
+    const normFilter = (filter || '').toString().toLowerCase();
+    const items = getCommands().filter(c => {
+      const label = (c && c.label) ? String(c.label) : '';
+      return label.toLowerCase().includes(normFilter);
+    });
     cmdkList.innerHTML = '';
     items.forEach((item, idx) => {
+      if (!item || !item.label) return; // skip malformed
       const li = document.createElement('li');
       li.textContent = item.label;
       li.setAttribute('data-id', item.id);
       if (idx === 0) li.setAttribute('aria-selected', 'true');
-      li.addEventListener('click', () => { item.action(); hideCmdk(); });
+      li.addEventListener('click', () => { try { item.action && item.action(); } finally { hideCmdk(); } });
       cmdkList.appendChild(li);
     });
   }
@@ -202,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (k === 's') { e.preventDefault(); changePage('send-token'); window.__x_hotkey_g__ = false; }
       if (k === 'r') { e.preventDefault(); changePage('receive-token'); window.__x_hotkey_g__ = false; }
       if (k === 'i') { e.preventDefault(); changePage('ide'); window.__x_hotkey_g__ = false; }
-      if (k === 'm') { e.preventDefault(); changePage('messenger'); window.__x_hotkey_g__ = false; }
+  // Messenger hotkey removed
       if (k === 'n') { e.preventDefault(); changePage('ecosystem-news'); window.__x_hotkey_g__ = false; }
       if (k === 'a') { e.preventDefault(); changePage('add-to-token-list'); window.__x_hotkey_g__ = false; }
       if (k === 'x') { e.preventDefault(); changePage('send-advanced-transaction'); window.__x_hotkey_g__ = false; }

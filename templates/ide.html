@@ -1,159 +1,38 @@
 <div class="title-container">
-    <h1 class="app-box-title">IDE</h1>
+    <h1 class="app-box-title">Contract Deployment</h1>
 </div>
-<p class="app-box-description">This is the most basic form of the Xian IDE. You can use it to write and deploy smart contracts on the Xian Network. Find standardized smart contract templates <a href="https://github.com/xian-network/xian-standard-contracts" target="_blank">here</a> and docs <a href="https://docs.xian.org" target="_blank">here</a>. Deployed Smart Contracts can be directly interacted with by using <a href="#" class="advanced-tx-link" id="ide-send-adv-tx">Advanced Transactions</a>.
-<div class="app-box-form" style="flex-grow: 1;display: flex;flex-direction: column;">
-    <div class="alert alert-danger" role="alert" id="submitContractError" style="display: none;"></div>
-    <div class="alert alert-success" role="alert" id="submitContractSuccess" style="display: none;"></div>
-    <div class="tabs-editor" id="tabs-editor"></div>
-    <div id="editor" style="flex-grow:1"></div>
-    <div id="function-boxes">
-
+<p class="app-box-description">Select and deploy a local <code>.py</code> smart contract. If you have not created a dedicated UI yet, you can still call its functions through <a href="#" class="advanced-tx-link" id="ide-send-adv-tx">Advanced Transactions</a>.</p>
+<div class="app-box-form" style="flex-grow:1;display:flex;flex-direction:column;gap:1rem;">
+    <div class="alert alert-danger" role="alert" id="submitContractError" style="display:none;"></div>
+    <div class="alert alert-success" role="alert" id="submitContractSuccess" style="display:none;"></div>
+    <div class="form-group">
+        <label for="contractFile">Smart Contract (.py)</label>
+        <div class="file-select" id="fileSelectWrapper">
+            <input type="file" id="contractFile" accept=".py" class="file-select-input" />
+            <button type="button" class="btn btn-secondary file-select-trigger" id="chooseFileBtn"><i class="icon" data-lucide="upload"></i> Choose File</button>
+            <span class="file-select-label" id="chosenFileLabel">No file selected</span>
+        </div>
+    </div>
+    <div class="form-group" id="fileMeta" style="display:none;">
+        <strong>File:</strong> <span id="fileName"></span> • <strong>Size:</strong> <span id="fileSize"></span>
     </div>
     <div id="submission-form">
-        <div class="form-group" style="display: none;" id="submitContractNameWrapper">
+        <div class="form-group" style="display:none;" id="submitContractNameWrapper">
             <label for="submitContractName">Contract Name</label>
-            <input type="text" class="form-control" id="submitContractName" placeholder="Unique, beginning with 'con_'" required>
+            <input type="text" class="form-control" id="submitContractName" placeholder="Unique, beginning with 'con_'" required />
         </div>
-        <div class="form-group" style="display: none;" id="submitContractconstructorKwargsWrapper">
-            <label for="submitContractconstructorKwargs">Constructor Kwargs (If any, not required)</label>
-            <input type="text" class="form-control" id="submitContractconstructorKwargs" placeholder="Enter the constructor kwargs in JSON format">
+        <div class="form-group" style="display:none;" id="submitContractconstructorKwargsWrapper">
+            <label for="submitContractconstructorKwargs">Constructor Kwargs (JSON, optional)</label>
+            <input type="text" class="form-control" id="submitContractconstructorKwargs" placeholder='{"arg": 1}' />
         </div>
-        <div class="form-group" style="display: none;" id="submitContractstampLimitWrapper">
+        <div class="form-group" style="display:none;" id="submitContractstampLimitWrapper">
             <label for="submitContractstampLimit">Stamp/GAS Limit (1 Xian = <span id="stampRate"><i class='icon' data-lucide="sync-alt"></i></span> Stamps)</label>
-            <input type="number" class="form-control" id="submitContractstampLimit" placeholder="Enter the stamp limit" required value="800">
+            <input type="number" class="form-control" id="submitContractstampLimit" value="800" />
         </div>
-        <div id="wallet-actions" class="btn-group">
+        <div class="btn-group" id="wallet-actions">
             <button class="btn btn-primary" id="btn-ide-submit-contract">Start Deployment</button>
             <button class="btn btn-secondary" id="btn-ide-go-to-wallet" style="display:none">Back</button>
         </div>
     </div>
 </div>
-
-<style>
-    #editor > .CodeMirror {
-        height: 100%;
-    }
-    .app-box-form .CodeMirror {
-        color: #0d0d0d; /* Dark text */
-            border:1px solid #ced4da;
-        border-bottom-right-radius: 10px;
-        border-bottom-left-radius: 10px;
-    }
-    .dark-mode .app-box-form .CodeMirror{
-        background-color: #0d0d0d; /* Dark background */
-        color: #e4e6eb; /* Bright text */
-        border:1px solid #8a8b8e;
-        
-    }
-    .dark-mode .CodeMirror-hscrollbar{
-        scrollbar-color: #8a8b8e #0d0d0d;
-    }
-    .dark-mode .app-box-form .CodeMirror-selected {
-        background-color: #8a8b8e; /* Dark background */
-    }
-
-    .dark-mode .app-box-form .CodeMirror-cursor {
-        border-color: #e4e6eb; /* Bright text */
-    }
-    .dark-mode .app-box-form .CodeMirror-gutters {
-        background-color: #0d0d0d;
-    border-right: 1px solid #8a8b8e;
-    }
-    .dark-mode .app-box-form .CodeMirror-linenumber {
-        color: #e4e6eb;
-    }
-    #editor{
-        margin-bottom: 10px;
-    }
-    .tabs-editor{
-        display: flex;
-        justify-content: flex-start;
-        flex-wrap: wrap;
-        gap: 5px;
-        padding: 5px;
-        border: 1px solid #ced4da;
-        background-color: #f8f9fa;
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
-        border-bottom: 0px!important;
-    }
-    .dark-mode .tabs-editor{
-        background-color: #0d0d0d;
-        border: 1px solid #8a8b8e;
-        color: #e4e6eb;
-    }
-    .dark-mode .add-tab-button{
-        background-color: #0d0d0d;
-        border: 1px solid #8a8b8e;
-        color: #e4e6eb;
-    }
-    .tab-editor{
-        padding: 5px;
-        cursor: pointer;
-        border: 1px solid #ced4da;
-        border-radius: 10px;
-        background-color: #f8f9fa;
-
-        display: flex;
-    align-items: center;
-    gap: 5px;
-    }
-    .dark-mode .tab-editor{
-        border-radius: var(--radius);
-        background: #121212;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 0 12px rgba(0, 247, 224, 0.02);
-        transition: box-shadow 0.2s ease;
-        color: #e4e6eb;
-    }
-    .tab-editor.active{
-        background-color: #fff;
-    }
-    .dark-mode .tab-editor.active{
-        background-color: #0d0d0d;
-        border: 1px solid #8a8b8e;
-        color: #e4e6eb;
-    }
-    .add-tab-button{
-        padding: 5px;
-        cursor: pointer;
-        border: 1px solid #ced4da;
-        border-radius: 10px;
-        background-color: #f8f9fa;
-        position: relative;
-    }
-    .dark-mode .cm-s-default .cm-builtin {
-    color: #e4e6eb;
-    }
-    .function-box{
-        padding: 5px;
-    border: 1px solid #ced4da;
-    border-radius: 10px;
-    background-color: #f8f9fa;
-    margin-bottom: 5px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: flex-start;
-    gap: 10px;
-    }
-    .dark-mode .function-box{
-        border-radius: var(--radius);
-        background: #121212;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 0 12px rgba(0, 247, 224, 0.02);
-        transition: box-shadow 0.2s ease;
-        color: #e4e6eb;
-    }
-    #function-boxes{
-        gap: 10px;
-        flex-wrap: wrap;
-        display: flex;
-    }
-    .function-args
-    {
-        flex:auto;
-    }
-</style>
 <script src="templates/page_js/ide.js"></script>

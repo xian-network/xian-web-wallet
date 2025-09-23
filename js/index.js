@@ -51,11 +51,7 @@ document.getElementById('side-change-page-ecosystem-news').addEventListener('cli
     changePage('ecosystem-news');
 });
 }
-if(document.getElementById('side-change-page-messenger')) {
-    document.getElementById('side-change-page-messenger').addEventListener('click', function() {
-        changePage('messenger');
-    });
-    }
+// Messenger feature removed
     
 
 function lockWallet() {
@@ -137,6 +133,13 @@ async function sendEventGA(name, params = {}) {
 
     // Now you can safely use sodium functions
     console.log("Sodium is ready!");
+
+     // Initialize nav-actions visibility based on wallet lock state
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof updateNavActionsVisibility === 'function') {
+                updateNavActionsVisibility();
+            }
+        });
 })();
 
  

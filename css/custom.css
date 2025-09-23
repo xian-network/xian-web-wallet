@@ -2021,3 +2021,76 @@ select option{
     background-color: var(--bg-dark);
     color: var(--text-light);
 }
+
+/* ================= Contract Deploy File Selector ================= */
+.file-select { 
+    display:flex; 
+    align-items:stretch; 
+    gap:.75rem; 
+    flex-wrap:wrap; 
+    position:relative; 
+    padding:.85rem 1rem; 
+    border:1px dashed rgba(0,0,0,.25); 
+    border-radius:12px; 
+    background:rgba(0,0,0,.02); 
+    cursor:pointer; 
+    transition:background .25s ease,border-color .25s ease, box-shadow .25s ease; 
+}
+body.dark-mode .file-select { 
+    border-color:rgba(255,255,255,.18); 
+    background:rgba(255,255,255,.04); 
+}
+.file-select:hover { background:rgba(0,0,0,.04); }
+body.dark-mode .file-select:hover { background:rgba(255,255,255,.06); }
+.file-select.drag-over { 
+    border-color: var(--accent); 
+    background: rgba(6,230,203,.10); 
+    box-shadow:0 0 0 2px rgba(6,230,203,.35); 
+}
+body.dark-mode .file-select.drag-over { 
+    background: rgba(6,230,203,.14); 
+}
+.file-select.has-file { 
+    border-style:solid; 
+    border-color: var(--accent); 
+}
+.file-select-input { 
+    position:absolute; 
+    inset:0; 
+    opacity:0; 
+    pointer-events:none; 
+}
+.file-select-trigger { 
+    display:inline-flex; 
+    align-items:center; 
+    gap:.5rem; 
+    flex:0 0 auto; 
+    font-size:.875rem; 
+    padding:.6rem .9rem; 
+}
+.file-select-label { 
+    flex:1 1 auto; 
+    align-self:center; 
+    font-size:.85rem; 
+    letter-spacing:.25px; 
+    opacity:.85; 
+    min-width:180px; 
+    max-width:100%; 
+    white-space:nowrap; 
+    overflow:hidden; 
+    text-overflow:ellipsis; 
+}
+body.dark-mode .file-select-label { color:#c3d4d3; }
+body:not(.dark-mode) .file-select-label { color:#2c3a39; }
+.file-select.empty .file-select-label { opacity:.55; }
+
+@media (max-width:600px){
+  .file-select { padding:.75rem .85rem; }
+  .file-select-trigger { width:100%; justify-content:center; }
+  .file-select-label { flex-basis:100%; text-align:center; }
+}
+
+/* Focus ring for accessibility */
+.file-select:focus-within { box-shadow:0 0 0 3px rgba(6,230,203,.35); border-color:var(--accent); }
+body.dark-mode .file-select:focus-within { box-shadow:0 0 0 3px rgba(6,230,203,.35); }
+
