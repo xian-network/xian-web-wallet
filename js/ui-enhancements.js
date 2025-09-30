@@ -186,6 +186,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('keydown', (e) => {
     const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    const tag = (e.target && e.target.tagName ? e.target.tagName : '').toLowerCase();
+    const isTyping = !!(e.target && (e.target.isContentEditable || tag === 'input' || tag === 'textarea' || tag === 'select' || (e.target.closest && e.target.closest('[contenteditable="true"]'))));
+    if (isTyping) return;
     if ((isMac && e.metaKey && e.key.toLowerCase() === 'k') || (!isMac && e.ctrlKey && e.key.toLowerCase() === 'k')) {
       e.preventDefault();
       toggleCmdk();
