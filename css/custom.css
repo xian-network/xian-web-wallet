@@ -304,12 +304,14 @@ a:hover{
     padding: 20px;
     border-radius: var(--radius);
     width: auto;
-    border: 1px solid rgba(255, 255, 255, 0.08);;;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
     background-color: #fff;
-    height: auto;
+    height: calc(100vh - 100px);
     min-width: 200px;
+    position: sticky;
+    top: 80px;
 }
 .side-nav-item {
     display: flex;
