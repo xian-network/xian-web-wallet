@@ -40,7 +40,42 @@ function goToWallet() {
     });
 }
 
+
+function getTxHistoryKey() {
+    const currentRPC = localStorage.getItem("rpc") || "https://node.xian.org";
+   
+    const rpcHash = btoa(currentRPC).replace(/[^a-zA-Z0-9]/g, '').substring(0, 8);
+    return `tx_history_${rpcHash}`;
+}
+
+function loadRPCSpecificTxHistory() {
+    const key = getTxHistoryKey();
+    let rpcSpecificHistory = JSON.parse(localStorage.getItem(key)) || [];
+    
+      if (rpcSpecificHistory.length === 0) {
+        const oldHistory = JSON.parse(localStorage.getItem('tx_history')) || [];
+        if (oldHistory.length > 0) {
+            console.log('Migrating', oldHistory.length, 'transactions from old storage to RPC-specific storage');
+            localStorage.setItem(key, JSON.stringify(oldHistory));
+            rpcSpecificHistory = oldHistory;
+        }
+    }
+    return rpcSpecificHistory;
+}
+
+
+
+
+// Helper function to save RPC-specific transaction history
+function saveRPCSpecificTxHistory(transactions) {
+    const key = getTxHistoryKey();
+    localStorage.setItem(key, JSON.stringify(transactions));
+}
+
 function prependToTransactionHistory(hash, contract, function_name, kwargs, status, timestamp) {
+
+    tx_history = loadRPCSpecificTxHistory();
+    
     tx_history.unshift({
         hash: hash,
         contract: contract,
@@ -49,5 +84,7 @@ function prependToTransactionHistory(hash, contract, function_name, kwargs, stat
         status: status,
         timestamp: timestamp
     });
-    localStorage.setItem('tx_history', JSON.stringify(tx_history));
+    
+   
+    saveRPCSpecificTxHistory(tx_history);
 }

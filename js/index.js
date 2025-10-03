@@ -139,6 +139,9 @@ async function sendEventGA(name, params = {}) {
             if (typeof updateNavActionsVisibility === 'function') {
                 updateNavActionsVisibility();
             }
+            if (typeof initializeTxHistory === 'function') {
+                initializeTxHistory();
+            }
         });
     // Now you can safely use sodium functions
     console.log("Sodium is ready!");

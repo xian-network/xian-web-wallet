@@ -134,6 +134,10 @@ async function loadNFTPage() {
 
 
 function loadWalletPage() {
+    if (typeof initializeTxHistory === 'function') {
+        initializeTxHistory();
+    }
+    
     // Start by reading the publicKey
     readSecureCookie("publicKey")
         .then((publicKey) => {
@@ -211,36 +215,16 @@ function loadWalletPage() {
             console.error("Error loading wallet page:", error);
         })
         .finally(() => {
-            let local_activity = document.getElementById("local-activity-list");
-            local_activity.innerHTML = "";
-            tx_history.forEach((tx) => {
-                local_activity.innerHTML += `
-                <div class="activity-item">
-                    <div class="activity-details">
-                        <div class="activity-hash">`+tx["hash"]+`</div>
-                        <div class="activity-contract">`+tx["contract"]+`</div>
-                        <div class="activity-function">`+tx["function"]+`</div>
-                        <div class="activity-status">`+tx["status"]+`</div>
-                        <div class="activity-timestamp">`+tx["timestamp"]+`</div>
-                    </div>
-                    <div class="activity-actions">
-                        <a href="`+EXPLORER+`/tx/`+tx["hash"]+`" target="_blank"><i class="icon" data-lucide="eye"></i> View</a>
-                    </div>
-                </div>`;
-            });
-        
-            if (local_activity.innerHTML === "") {
-                local_activity.innerHTML = `<div class="activity-item">
-                    <div class="activity-details">
-                        <div class="activity-hash">No recent activity</div>
-                    </div>
-                </div>`;
-            }
-
-            lucide.createIcons();
+            // Load full transaction history from network (includes both local and on-chain)
+            // Add a small delay to ensure all scripts are loaded
+            setTimeout(() => {
+                loadTransactionHistory();
+            }, 100);
         });
         
 }
+
+// Removed: displayLocalTransactionHistory() - now using loadTransactionHistory() with GraphQL
 
 function setupTokenEventListeners() {
     document.querySelectorAll('.token-icon').forEach(icon => {
@@ -292,6 +276,7 @@ function changeWalletTab(tab) {
         document.getElementById("wallet-tokens-tab").classList.remove("active");
         document.getElementById("local-activity-tab").classList.add("active");
         document.getElementById("wallet-nfts-tab").classList.remove("active");
+        loadTransactionHistory(); // Load from network, not just local
     }
     else if (tab === "wallet-nfts") {
         document.getElementById("wallet-tokens").style.display = "none";
@@ -304,10 +289,245 @@ function changeWalletTab(tab) {
     }
 }
 
+// Load on-chain transaction history
+async function loadTransactionHistory() {
+    const local_activity = document.getElementById("local-activity-list");
+    
+    // Show loading state
+    local_activity.innerHTML = `
+        <div class="activity-item" style="justify-content: center; align-items: center; padding: 2rem;">
+            <i class="icon" data-lucide="loader" style="animation: spin 1s linear infinite;"></i>
+            <span style="margin-left: 0.5rem;">Loading transaction history...</span>
+        </div>
+    `;
+    setTimeout(() => {
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+            lucide.createIcons();
+        }
+    }, 50);
+    
+    try {
+        const publicKey = await readSecureCookie("publicKey");
+        
+        // Fetch on-chain transactions from network
+        const historyResult = await fetchTransactionHistory(publicKey, 1, 100);
+        
+        // Use GraphQL results as the source of truth
+        const allTransactions = new Map();
+        
+        // Add all GraphQL transactions (blockchain data)
+        historyResult.transactions.forEach(tx => {
+            allTransactions.set(tx.hash, tx);
+        });
+        
+        // Add ONLY pending local transactions (not yet confirmed on-chain)
+        const rpcSpecificHistory = (typeof loadRPCSpecificTxHistory === 'function') ? 
+            loadRPCSpecificTxHistory() : tx_history;
+        
+        rpcSpecificHistory.forEach(tx => {
+            // Only add pending transactions that haven't appeared in GraphQL yet
+            if (tx.status === 'pending' && !allTransactions.has(tx.hash)) {
+                allTransactions.set(tx.hash, tx);
+            }
+        });
+        
+        // Convert to array and sort by timestamp (newest first)
+        const sortedTransactions = Array.from(allTransactions.values()).sort((a, b) => {
+            const timeA = new Date(a.timestamp || 0).getTime();
+            const timeB = new Date(b.timestamp || 0).getTime();
+            return timeB - timeA;
+        });
+        
+        
+        // Display transactions
+        if (sortedTransactions.length === 0) {
+            local_activity.innerHTML = `
+                <div class="activity-item">
+                    <div class="activity-details" style="text-align: center; opacity: 0.6;">
+                        <div class="activity-hash">No transaction history found</div>
+                        <small>Your transactions will appear here</small>
+                    </div>
+                </div>
+            `;
+        } else {
+            local_activity.innerHTML = "";
+            
+            sortedTransactions.forEach((tx, index) => {
+                // Format timestamp as simple readable text
+                let timestamp = 'Unknown time';
+                if (tx.timestamp) {
+                    try {
+                        const date = new Date(tx.timestamp);
+                        if (!isNaN(date.getTime())) {
+                            // Simple plain text format: MM/DD/YYYY HH:MM
+                            const month = String(date.getMonth() + 1).padStart(2, '0');
+                            const day = String(date.getDate()).padStart(2, '0');
+                            const year = date.getFullYear();
+                            const hours = String(date.getHours()).padStart(2, '0');
+                            const minutes = String(date.getMinutes()).padStart(2, '0');
+                            timestamp = `${month}/${day}/${year} ${hours}:${minutes}`;
+                        }
+                    } catch (e) {
+                        console.error('Error formatting timestamp:', tx.timestamp, e);
+                    }
+                }
+                
+                // Determine transaction type/direction and amount
+                let txType = '';
+                let txTypeClass = '';
+                let amount = null;
+                let tokenSymbol = '';
+                
+                // Check if this is a transfer transaction
+                if (tx.function === 'transfer' && tx.kwargs) {
+                    amount = tx.kwargs.amount;
+                    // Determine if it's incoming or outgoing
+                    if (tx.sender === publicKey) {
+                        txType = 'Sent';
+                        txTypeClass = 'tx-sent';
+                    } else if (tx.kwargs.to === publicKey) {
+                        txType = 'Received';
+                        txTypeClass = 'tx-received';
+                    }
+                } else if (tx.sender === publicKey) {
+                    txType = 'Contract Call';
+                    txTypeClass = 'tx-sent';
+                } else {
+                    txType = 'Interacted';
+                    txTypeClass = 'tx-interact';
+                }
+                
+                // Get token symbol - if contract is "currency", it's XIAN
+                if (tx.contract === 'currency') {
+                    tokenSymbol = 'XIAN';
+                } else {
+                    // For other tokens, we'd need to fetch the symbol
+                    tokenSymbol = tx.contract;
+                }
+                
+                // Status styling
+                const statusClass = tx.status === 'success' ? 'status-success' : 
+                                   tx.status === 'pending' ? 'status-pending' : 'status-failed';
+                
+                // Format function name (make it more readable)
+                const functionName = tx.function || 'unknown';
+                const formattedFunction = functionName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                
+                // Short hash for display
+                const shortHash = tx.hash ? `${tx.hash.substring(0, 8)}...${tx.hash.substring(tx.hash.length - 6)}` : 'Unknown';
+                
+                // Format contract name - show XIAN for currency
+                const displayContract = tx.contract === 'currency' ? 'XIAN' : tx.contract;
+                
+                // Build amount display
+                let amountDisplay = '';
+                if (amount !== null && amount !== undefined) {
+                    const amountSign = txType === 'Sent' ? '-' : '+';
+                    const amountClass = txType === 'Sent' ? 'amount-sent' : 'amount-received';
+                    amountDisplay = `<div class="activity-amount ${amountClass}">${amountSign}${amount} ${tokenSymbol}</div>`;
+                }
+                
+                // Show stamps used
+                const stampsDisplay = tx.stamps ? `<span class="activity-stamps" title="Stamps Used"><i class="icon" data-lucide="zap"></i> ${tx.stamps}</span>` : '';
+                
+                // Show recipient for sent transactions
+                let recipientDisplay = '';
+                if (txType === 'Sent' && tx.kwargs && tx.kwargs.to) {
+                    const shortRecipient = `${tx.kwargs.to.substring(0, 8)}...${tx.kwargs.to.substring(tx.kwargs.to.length - 6)}`;
+                    recipientDisplay = `<div class="activity-recipient">To: <span title="${tx.kwargs.to}">${shortRecipient}</span></div>`;
+                } else if (txType === 'Received' && tx.sender) {
+                    const shortSender = `${tx.sender.substring(0, 8)}...${tx.sender.substring(tx.sender.length - 6)}`;
+                    recipientDisplay = `<div class="activity-recipient">From: <span title="${tx.sender}">${shortSender}</span></div>`;
+                }
+                
+                local_activity.innerHTML += `
+                    <div class="activity-item ${index === 0 ? 'latest-tx' : ''}">
+                        <div class="activity-icon ${txTypeClass}">
+                            <i class="icon" data-lucide="${txType === 'Sent' ? 'arrow-up-right' : txType === 'Received' ? 'arrow-down-left' : 'activity'}"></i>
+                        </div>
+                        <div class="activity-details">
+                            <div class="activity-main">
+                                <div class="activity-header">
+                                    <div class="activity-function-name">${formattedFunction}</div>
+                                    ${amountDisplay}
+                                </div>
+                                <div class="activity-contract">${displayContract}</div>
+                                ${recipientDisplay}
+                            </div>
+                            <div class="activity-meta">
+                                <span class="activity-hash" title="${tx.hash}">${shortHash}</span>
+                                ${tx.height ? `<span class="activity-height">Block #${tx.height}</span>` : ''}
+                                <span class="activity-timestamp">${timestamp}</span>
+                                ${stampsDisplay}
+                                <span class="activity-status ${statusClass}">${tx.status}</span>
+                            </div>
+                        </div>
+                        <div class="activity-actions">
+                            <a href="${EXPLORER}/tx/${tx.hash}" target="_blank" class="btn btn-ghost btn-sm" title="View in Explorer">
+                                <i class="icon" data-lucide="external-link"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Add view on explorer button at the bottom
+            if (sortedTransactions.length > 0) {
+                local_activity.innerHTML += `
+                    <div style="text-align: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <a href="${EXPLORER}/addresses/${publicKey}" target="_blank" class="btn btn-secondary">
+                            <i class="icon" data-lucide="external-link"></i> View Full History on Explorer
+                        </a>
+                    </div>
+                `;
+            }
+        }
+        
+        // Initialize Lucide icons after DOM is updated
+        setTimeout(() => {
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+        }, 100);
+        
+    } catch (error) {
+        console.error("Error loading transaction history:", error);
+        const publicKeyForError = await readSecureCookie("publicKey").catch(() => '');
+        local_activity.innerHTML = `
+            <div class="activity-item">
+                <div class="activity-details" style="text-align: center; color: #ff6b6b;">
+                    <i class="icon" data-lucide="alert-circle"></i>
+                    <div class="activity-hash">Failed to load transaction history</div>
+                    <small>${error.message || 'Unknown error'}</small>
+                    <div style="margin-top: 1rem;">
+                        <a href="${EXPLORER}/addresses/${publicKeyForError}" target="_blank" class="btn btn-secondary">
+                            View on Explorer Instead
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+        setTimeout(() => {
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+        }, 50);
+    }
+}
+
 async function clearLocalActivity() {
     const confirm_clear = await (window.showConfirmModal ? showConfirmModal("Are you sure you want to clear the local activity?", 'Confirm') : Promise.resolve(confirm("Are you sure you want to clear the local activity?")));
     if (!confirm_clear) return;
-    localStorage.removeItem('tx_history');
+    
+    // Clear RPC-specific transaction history
+    if (typeof getTxHistoryKey === 'function') {
+        const key = getTxHistoryKey();
+        localStorage.removeItem(key);
+    } else {
+        // Fallback to old storage
+        localStorage.removeItem('tx_history');
+    }
+    
     tx_history = [];
     loadWalletPage();
 }
@@ -363,16 +583,17 @@ document.getElementById('wallet-tokens-tab').addEventListener('click', function(
 });
 
 document.getElementById('local-activity-tab').addEventListener('click', function() {
-    // Create new tab with explorer
-    window.open(EXPLORER + '/addresses/' + publicKey, '_blank');
+    changeWalletTab('local-activity');
 });
 
 document.getElementById('wallet-nfts-tab').addEventListener('click', function() {
     changeWalletTab('wallet-nfts');
 });
 
-document.getElementById('wallet-clear-local-activity').addEventListener('click', function() {
-    clearLocalActivity();
+
+
+document.getElementById('wallet-refresh-history').addEventListener('click', function() {
+    loadTransactionHistory(); // Use network fetching instead of local only
 });
 
 document.getElementById('wallet-refresh-all').addEventListener('click', function() {

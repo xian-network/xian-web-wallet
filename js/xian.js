@@ -404,3 +404,137 @@ async function execute_get_main_name_to_address(name) {
       let result = decoded["result"].replaceAll("'", "");
       return result;
   }
+
+
+async function fetchTransactionHistory(address, page = 1, perPage = 50) {
+  try {
+    const offset = (page - 1) * perPage;
+    const graphQLEndpoint = RPC + "/graphql";
+
+    const response = await fetch(graphQLEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        query: `
+            query MyQuery($address: String!, $offset: Int!, $batchSize: Int!) {
+              allStateChanges(
+                filter: { key: { includes: $address }, txHash: { notEqualTo: "GENESIS"}}
+                first: $batchSize
+                offset: $offset
+                orderBy: CREATED_DESC
+              ) {
+                edges {
+                  node {
+                    transactionByTxHash {
+                      blockTime
+                      blockHeight
+                      contract
+                      stamps
+                      success
+                      function
+                      hash
+                      sender
+                      result
+                      blockHash
+                      created
+                      jsonContent
+                    }
+                  }
+                }
+              }
+            }
+          `,
+        variables: {
+          address: address,
+          offset: offset,
+          batchSize: perPage
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`GraphQL request failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (data.errors) {
+      throw new Error(`GraphQL errors: ${JSON.stringify(data.errors)}`);
+    }
+
+    const transactions = [];
+    const seenHashes = new Set();
+
+    if (data.data && data.data.allStateChanges && data.data.allStateChanges.edges) {
+      data.data.allStateChanges.edges.forEach((edge) => {
+        const tx = edge.node.transactionByTxHash;
+        
+        if (tx && tx.hash && !seenHashes.has(tx.hash)) {
+          seenHashes.add(tx.hash);
+          
+          let timestamp;
+          if (tx.blockTime) {
+            try {
+              const blockTimeNanos = parseInt(tx.blockTime);
+              const blockTimeMillis = Math.floor(blockTimeNanos / 1000000);
+              timestamp = new Date(blockTimeMillis).toISOString();
+            } catch (e) {
+              console.error('Error converting blockTime:', e);
+              timestamp = new Date().toISOString();
+            }
+          } else {
+            timestamp = new Date().toISOString();
+          }
+          
+          let kwargs = {};
+          let stampsUsed = tx.stamps || 0;
+          let actualSender = tx.sender || address;
+          
+          if (tx.jsonContent && tx.jsonContent.payload) {
+            kwargs = tx.jsonContent.payload.kwargs || {};
+            actualSender = tx.jsonContent.payload.sender || actualSender;
+            if (tx.jsonContent.tx_result && tx.jsonContent.tx_result.stamps_used) {
+              stampsUsed = parseInt(tx.jsonContent.tx_result.stamps_used) || stampsUsed;
+            }
+          }
+          
+          const transaction = {
+            hash: tx.hash,
+            height: tx.blockHeight || 0,
+            timestamp: timestamp,
+            contract: tx.contract || 'unknown',
+            function: tx.function || 'unknown',
+            status: tx.success ? 'success' : 'failed',
+            stamps: stampsUsed,
+            sender: actualSender,
+            kwargs: kwargs,
+            result: tx.result,
+            blockHash: tx.blockHash,
+            jsonContent: tx.jsonContent || {},
+            nonce: (tx.jsonContent && tx.jsonContent.payload && tx.jsonContent.payload.nonce) || 0
+          };
+          
+          transactions.push(transaction);
+        }
+      });
+    }
+
+    return {
+      transactions: transactions,
+      total: transactions.length,
+      page: page,
+      perPage: perPage
+    };
+    
+  } catch (error) {
+    console.error('Error fetching transaction history via GraphQL:', error);
+    return {
+      transactions: [],
+      total: 0,
+      page: page,
+      perPage: perPage
+    };
+  }
+}
