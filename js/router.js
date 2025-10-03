@@ -3,10 +3,23 @@ var app_box = document.getElementById("app-box");
 var publicKey = "";
 var unencryptedPrivateKey = null;
 var locked = true;
-var tx_history = JSON.parse(localStorage.getItem("tx_history")) || [];
+var tx_history = [];
 var sendResponse = null;
 var externalWindow = null;
 var pageContext = null;
+
+function initializeTxHistory() {
+    try {
+        if (typeof loadRPCSpecificTxHistory === 'function') {
+            tx_history = loadRPCSpecificTxHistory();
+        } else {
+            tx_history = JSON.parse(localStorage.getItem("tx_history")) || [];
+        }
+    } catch (error) {
+        console.error('Error initializing transaction history:', error);
+        tx_history = JSON.parse(localStorage.getItem("tx_history")) || [];
+    }
+}
 
 var callbacks = {};
 var callbackId = 0;
@@ -121,7 +134,7 @@ window.addEventListener("message", (event) => {
       callbacks[callbackKey](event.data.data);
       delete callbacks[callbackKey];
     }
-    tx_history = JSON.parse(localStorage.getItem("tx_history")) || [];
+    initializeTxHistory();
     if (app_page == "wallet"){
       changePage("wallet");
   }

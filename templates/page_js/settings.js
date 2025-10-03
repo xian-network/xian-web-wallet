@@ -66,6 +66,10 @@ function saveSettings() {
     localStorage.setItem("rpc", rpc);
     RPC = rpc;
     EXPLORER = explorer;
+    
+    if (typeof initializeTxHistory === 'function') {
+        initializeTxHistory();
+    }
     let online_status_element = document.getElementById("onlineStatus");
 
     ping().then(online_status => {
@@ -198,6 +202,11 @@ function addCustomRPC() {
     document.getElementById('rpc_select').value = rpc;
     RPC = rpc;
     EXPLORER = explorer;
+    
+    if (typeof initializeTxHistory === 'function') {
+        initializeTxHistory();
+    }
+    
     loadSettingsPage();
     saveSettings();
     

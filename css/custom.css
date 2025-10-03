@@ -350,6 +350,7 @@ a:hover{
     align-items: stretch;
     position: relative;
     gap: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .token-title-container {
@@ -644,32 +645,227 @@ body:not(.dark-mode) .privacy-indicator{ color:#1f2937; background:rgba(167,139,
 
 .activity-item {
     display: flex;
-    flex-direction: column; /* Stacks the details and actions on top of each other */
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
     border-radius: var(--radius);
-    overflow: hidden; /* Ensures the content fits within the borders */
-    border: 1px solid rgba(255, 255, 255, 0.08);;;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 0.75rem;
+    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.02);
 }
+
+.activity-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(6, 230, 203, 0.3);
+    transform: translateY(-1px);
+}
+
 .dark-mode .activity-item {
-    border: 1px solid rgba(255, 255, 255, 0.08);;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
 }
 
-.activity-details, .activity-actions {
-    padding: 15px;
+.activity-icon {
     display: flex;
-    flex-wrap: wrap; /* Allows items to wrap onto the next line on smaller screens */
-    gap: 10px; /* Adjusts spacing between details and actions */
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    flex-shrink: 0;
 }
 
-.activity-details > div, .activity-actions > a {
-    flex: 1 1 200px; /* Allows flex items to grow and shrink but not smaller than 200px */
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap; /* Ensures the text is on one line and cuts off with ellipsis if too long */
+.activity-icon.tx-sent {
+    background: rgba(255, 107, 107, 0.15);
+    color: #ff6b6b;
+}
+
+.activity-icon.tx-received {
+    background: rgba(81, 207, 102, 0.15);
+    color: #51cf66;
+}
+
+.activity-icon.tx-interact {
+    background: rgba(6, 230, 203, 0.15);
+    color: var(--accent);
+}
+
+.activity-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.activity-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.activity-function-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-light);
+}
+
+.activity-contract {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.activity-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.activity-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.activity-hash {
+    font-family: 'Roboto Mono', monospace;
+    cursor: pointer;
+}
+
+.activity-height {
+    color: var(--accent);
+}
+
+.activity-status {
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+}
+
+.status-success {
+    background: rgba(81, 207, 102, 0.2);
+    color: #51cf66;
+}
+
+.status-pending {
+    background: rgba(255, 200, 87, 0.2);
+    color: #ffc857;
+}
+
+.status-failed {
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
 }
 
 .activity-actions {
-    justify-content: flex-end; /* Aligns actions to the right */
-    border: 1px solid rgba(255, 255, 255, 0.08);;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* Transaction amount styling */
+.activity-amount {
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.activity-amount.amount-sent {
+    background: rgba(255, 107, 107, 0.15);
+    color: #ff6b6b;
+}
+
+.activity-amount.amount-received {
+    background: rgba(81, 207, 102, 0.15);
+    color: #51cf66;
+}
+
+/* Stamps display styling */
+.activity-stamps {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #ffc857;
+    font-weight: 500;
+}
+
+.activity-stamps i {
+    width: 0.75rem;
+    height: 0.75rem;
+}
+
+/* Recipient/Sender display */
+.activity-recipient {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-top: 0.25rem;
+}
+
+.activity-recipient span {
+    font-family: 'Roboto Mono', monospace;
+    cursor: pointer;
+    color: var(--accent);
+}
+
+.activity-recipient span:hover {
+    text-decoration: underline;
+}
+
+.latest-tx {
+    border-color: rgba(6, 230, 203, 0.3);
+    background: rgba(6, 230, 203, 0.05);
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .activity-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .activity-meta {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .activity-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .activity-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .activity-amount {
+        font-size: 0.85rem;
+        padding: 0.2rem 0.5rem;
+    }
 }
 
 .activity-actions a {
@@ -1059,8 +1255,6 @@ body:not(.dark-mode) .token-item:hover {
     }
 }
 
-.add-token-link{
-}
 #wallet-refresh-all{
     display: flex
 ;
