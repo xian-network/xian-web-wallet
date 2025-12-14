@@ -34,7 +34,12 @@ async function updateTxHistory() {
         }
     }
     if (historyUpdated) {
-        localStorage.setItem("tx_history", JSON.stringify(tx_history));
+        if (typeof saveRPCSpecificTxHistory === 'function') {
+            saveRPCSpecificTxHistory(tx_history);
+        } else {
+            
+            localStorage.setItem("tx_history", JSON.stringify(tx_history));
+        }
         if (app_page == "wallet"){
             changePage("wallet");
         }
