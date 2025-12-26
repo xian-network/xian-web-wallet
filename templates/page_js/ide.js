@@ -1,5 +1,6 @@
 var code_storage = JSON.parse(localStorage.getItem('code_storage')) || { "contract": "@construct\ndef seed():\n    pass\n\n@export\ndef test():\n    return 'Hello, World!'" };
 var current_tab = Object.keys(code_storage)[0];
+var deployment_started = {};
 
 function saveCode() {
     code_storage[current_tab] = editor.getValue();
@@ -24,6 +25,7 @@ function removeTab(tab_name) {
     );
 
     localStorage.setItem('code_storage', JSON.stringify(code_storage));
+    if(deployment_started[tab_name]) deployment_started[tab_name] = false;
 }
 
 function changeTab(tab_name) {
@@ -41,6 +43,19 @@ function changeTab(tab_name) {
         editor.setOption('lint', true);
         document.getElementById('submission-form').style.display = 'block';
         document.getElementById('function-boxes').style.display = 'none';
+        
+        if(!deployment_started[current_tab]){
+            document.getElementById('submitContractNameWrapper').style.display = 'none';
+            document.getElementById('submitContractstampLimitWrapper').style.display = 'none';
+            document.getElementById('submitContractconstructorKwargsWrapper').style.display = 'none';
+            document.getElementById('btn-ide-submit-contract').innerHTML = 'Start Deployment';
+        } else{
+            document.getElementById('submitContractNameWrapper').style.display = 'block';
+            document.getElementById("submitContractName").value = current_tab;
+            document.getElementById('submitContractstampLimitWrapper').style.display = 'block';
+            document.getElementById('submitContractconstructorKwargsWrapper').style.display = 'block';
+            document.getElementById('btn-ide-submit-contract').innerHTML = 'Deploy Contract'; 
+        }
     }
     refreshTabList();
 }
@@ -617,9 +632,11 @@ getStampRate().then((rate) => {
 document.getElementById('btn-ide-submit-contract').addEventListener('click', function () {
     if( document.getElementById('submitContractNameWrapper').style.display === 'none' ) {
         document.getElementById('submitContractNameWrapper').style.display = 'block';
+        document.getElementById("submitContractName").value = current_tab;
         document.getElementById('submitContractstampLimitWrapper').style.display = 'block';
         document.getElementById('submitContractconstructorKwargsWrapper').style.display = 'block';
         document.getElementById('btn-ide-submit-contract').innerHTML = 'Deploy Contract';
+        deployment_started[current_tab]= true;
     }
     else {
         submitContract();
